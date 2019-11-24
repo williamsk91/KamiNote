@@ -20,10 +20,11 @@ export const markNodeStyles = css`
 
   div.taskItem {
     display: flex;
+    margin-top: 3px;
     div.checkbox {
       width: 20px;
       height: 20px;
-      margin: 0 3px 3px 3px;
+      /* margin: 0 3px 3px 3px; */
       border: 2px solid rgb(55, 53, 47);
       border-radius: 5px;
       cursor: pointer;
