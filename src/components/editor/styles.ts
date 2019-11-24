@@ -24,16 +24,13 @@ export const markNodeStyles = css`
     div.checkbox {
       width: 20px;
       height: 20px;
-      /* margin: 0 3px 3px 3px; */
       border: 2px solid rgb(55, 53, 47);
       border-radius: 5px;
       cursor: pointer;
     }
   }
 
-  div.taskItem[data-checked="true"] {
-    div.checkbox {
-      background: rgb(55, 53, 47);
-    }
+  div.taskItem[data-checked="true"] > div.checkbox {
+    background: rgb(55, 53, 47);
   }
 `;
