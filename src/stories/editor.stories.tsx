@@ -1,5 +1,6 @@
-import React, { useState, useRef, useEffect } from "react";
-import { storiesOf } from "@storybook/react";
+import React from "react";
 import { Editor } from "components/editor/Editor";
 
-storiesOf("Editor", module).add("default", () => <Editor />);
+export default { title: "Editor|Editor", component: Editor };
+
+export const base = () => <Editor />;
