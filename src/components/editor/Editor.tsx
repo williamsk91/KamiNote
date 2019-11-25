@@ -52,22 +52,19 @@ export const Editor = () => {
         <ol start={3}>
           <li>item 1</li>
           <ol>
-            <li>item 2</li>
+            <li>nested 1</li>
+            <li>nested 2</li>
           </ol>
         </ol>
         <hr />
-        <div className="taskList">
-          <div className="taskItem" data-checked={true}>
-            checked
-            <div className="taskList">
-              <div className="taskItem" data-checked={false}>
-                unchecked
-              </div>
-              <div className="taskItem" data-checked={true}>
-                checked
-              </div>
-            </div>
-          </div>
+        <div className="taskItem" data-checked={true}>
+          checked
+        </div>
+        <div className="taskItem" data-level={2} data-checked={false}>
+          unchecked
+        </div>
+        <div className="taskItem" data-level={1} data-checked={true}>
+          checked
         </div>
         <hr />
         <blockquote>Quote</blockquote>

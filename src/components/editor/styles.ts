@@ -19,13 +19,9 @@ export const editorStyles = css`
     background-color: ${colors.clouds};
   }
 
-  div.taskList > div.taskList {
-    margin-left: 30px;
-  }
-
   div.taskItem {
     display: flex;
-    margin-top: 3px;
+    margin: 10px;
     div.checkbox {
       width: 20px;
       height: 20px;

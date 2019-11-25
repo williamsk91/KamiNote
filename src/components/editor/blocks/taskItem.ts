@@ -1,9 +1,5 @@
 import { wrappingInputRule } from "prosemirror-inputrules";
-import {
-  splitListItem,
-  liftListItem,
-  sinkListItem
-} from "prosemirror-schema-list";
+import { splitListItem } from "prosemirror-schema-list";
 import { EditorState } from "prosemirror-state";
 import { NodeView, EditorView } from "prosemirror-view";
 import { Node, NodeType } from "prosemirror-model";
@@ -19,13 +15,64 @@ const toggleTaskItem = (itemType: NodeType) => (
 ) => {
   let { $from, $anchor } = state.selection;
   let parent = $from.node(-1);
-  if (parent.type !== schema.nodes.taskItem) return false;
+  if (parent.type !== itemType) return false;
   if (dispatch) {
     // -2 comes from going up 2 levels taskItem - paragraph - text
     dispatch(
       state.tr
         .setNodeMarkup($anchor.pos - $anchor.parentOffset - 2, undefined, {
+          ...parent.attrs,
           "data-checked": !parent.attrs["data-checked"]
+        })
+        .scrollIntoView()
+    );
+  }
+  return true;
+};
+
+const sinkTaskItem = (itemType: NodeType) => (
+  state: EditorState,
+  dispatch?: IDispatch
+) => {
+  let { $from, $anchor } = state.selection;
+  let parent = $from.node(-1);
+  if (parent.type !== itemType) return false;
+  if (dispatch) {
+    // -2 comes from going up 2 levels taskItem - paragraph - text
+    console.log("parent.attrs: ", parent.attrs);
+    dispatch(
+      state.tr
+        .setNodeMarkup($anchor.pos - $anchor.parentOffset - 2, undefined, {
+          ...parent.attrs,
+          "data-level":
+            +parent.attrs["data-level"] >= 8
+              ? 8
+              : +parent.attrs["data-level"] + 1
+        })
+        .scrollIntoView()
+    );
+  }
+  return true;
+};
+
+const liftTaskItem = (itemType: NodeType) => (
+  state: EditorState,
+  dispatch?: IDispatch
+) => {
+  let { $from, $anchor } = state.selection;
+  let parent = $from.node(-1);
+  if (parent.type !== itemType) return false;
+  if (dispatch) {
+    // -2 comes from going up 2 levels taskItem - paragraph - text
+    console.log("parent.attrs: ", parent.attrs);
+    dispatch(
+      state.tr
+        .setNodeMarkup($anchor.pos - $anchor.parentOffset - 2, undefined, {
+          ...parent.attrs,
+          "data-level":
+            +parent.attrs["data-level"] <= 0
+              ? 0
+              : +parent.attrs["data-level"] - 1
         })
         .scrollIntoView()
     );
@@ -44,6 +91,8 @@ class TaskItemView implements NodeView {
     this.dom = document.createElement("div");
     this.dom.classList.add("taskItem");
     this.dom.setAttribute("data-checked", node.attrs["data-checked"]);
+    this.dom.setAttribute("data-level", node.attrs["data-level"]);
+    this.dom.style.marginLeft = `${node.attrs["data-level"] * 24}px`;
 
     // icon
     // update this div with an icon
@@ -54,8 +103,10 @@ class TaskItemView implements NodeView {
     // toggle `data-checked` onClick
     this.icon.addEventListener("click", e => {
       e.preventDefault();
+      console.log("node.attrs: ", node.attrs);
       view.dispatch(
         view.state.tr.setNodeMarkup(getPos(), undefined, {
+          ...node.attrs,
           "data-checked": !node.attrs["data-checked"]
         })
       );
@@ -82,8 +133,8 @@ const taskItemRule = (nodeType: any) =>
 const keymaps = {
   Enter: splitListItem(schema.nodes.taskItem),
   "Mod-Enter": toggleTaskItem(schema.nodes.taskItem),
-  "Shift-Tab": liftListItem(schema.nodes.taskItem),
-  Tab: sinkListItem(schema.nodes.taskItem)
+  "Shift-Tab": liftTaskItem(schema.nodes.taskItem),
+  Tab: sinkTaskItem(schema.nodes.taskItem)
 };
 
 // -------------------- Export --------------------

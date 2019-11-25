@@ -65,25 +65,26 @@ export const schema = new Schema({
       toDOM: () => ["li", 0],
       defining: true
     },
-    taskList: {
-      group: "block",
-      content: "taskItem+",
-      parseDOM: [
-        {
-          tag: "div.taskList"
-        }
-      ],
-      toDOM: () => ["div", { class: "taskList" }, 0]
-    },
     taskItem: {
       // toDom -> taskItemView
-      content: "paragraph taskList*",
-      attrs: { "data-checked": { default: false } },
+      group: "block",
+      content: "paragraph",
+      attrs: {
+        "data-level": { default: 0 },
+        "data-checked": { default: false }
+      },
       defining: true,
       parseDOM: [
         {
           tag: "div.taskItem",
           getAttrs: (node: any) => ({
+            // get data-level to [0,8]
+            "data-level":
+              node.getAttribute("data-level") >= 8
+                ? 8
+                : node.getAttribute("data-level") <= 0
+                ? 0
+                : node.getAttribute("data-level"),
             "data-checked":
               node.getAttribute("data-checked") === "true" ? true : false
           })
