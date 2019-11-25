@@ -1,7 +1,12 @@
 import { css } from "styled-components";
 import { colors } from "components/styles/colors";
 
-export const markNodeStyles = css`
+export const editorStyles = css`
+  p {
+    padding: 3px;
+    margin: 0;
+  }
+
   pre {
     background-color: ${colors.clouds};
   }

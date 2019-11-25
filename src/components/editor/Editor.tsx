@@ -4,17 +4,17 @@ import styled from "styled-components";
 import { EditorState } from "prosemirror-state";
 import { EditorView } from "prosemirror-view";
 import { DOMParser } from "prosemirror-model";
-import { baseKeymap } from "prosemirror-commands";
 import { keymap } from "prosemirror-keymap";
 import { undo, redo, history } from "prosemirror-history";
 
 import applyDevTools from "prosemirror-dev-tools";
 
 import { schema } from "./schema";
-import { setKeymap } from "./plugins/keymaps";
-import { markNodeStyles } from "./styles";
-import { TaskItemView } from "./views/taskItem";
-import { buildInputRules } from "./plugins/inputRules";
+import { editorStyles } from "./styles";
+import { buildViews, buildInputRulesAndKeymaps } from "./blocks/utils";
+import { taskItem } from "./blocks/taskItem";
+import { list } from "./blocks/list";
+import { marks } from "./blocks/marks";
 
 export const Editor = () => {
   useEffect(() => {
@@ -26,17 +26,13 @@ export const Editor = () => {
       plugins: [
         history(),
         keymap({ "Mod-z": undo, "Mod-y": redo }),
-        ...setKeymap,
-        keymap(baseKeymap),
-        buildInputRules()
+        ...buildInputRulesAndKeymaps([taskItem, list, marks])
       ]
     });
 
     const view = new EditorView(document.querySelector("#editor") as Node, {
       state,
-      nodeViews: {
-        taskItem: (node, view, getPos) => new TaskItemView(node, view, getPos)
-      }
+      nodeViews: buildViews([taskItem])
     });
 
     applyDevTools(view);
@@ -61,14 +57,14 @@ export const Editor = () => {
         </ol>
         <hr />
         <div className="taskList">
-          <div className="taskItem" data-checked={false}>
-            unchecked
+          <div className="taskItem" data-checked={true}>
+            checked
             <div className="taskList">
               <div className="taskItem" data-checked={false}>
-                nested 1
+                unchecked
               </div>
               <div className="taskItem" data-checked={true}>
-                nested 2
+                checked
               </div>
             </div>
           </div>
@@ -99,13 +95,5 @@ export const Editor = () => {
 };
 
 const Container = styled.div`
-  padding: 45px;
-  border: 1px solid grey;
-
-  ${markNodeStyles};
-
-  p {
-    padding: 3px;
-    margin: 0;
-  }
+  ${editorStyles};
 `;

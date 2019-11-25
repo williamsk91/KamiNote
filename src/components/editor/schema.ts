@@ -17,28 +17,24 @@ export const schema = new Schema({
     },
     heading: {
       group: "block",
-      attrs: { level: { default: 1 } },
       content: "text*",
+      attrs: { level: { default: 1 } },
       defining: true,
       parseDOM: [
         { tag: "h1", attrs: { level: 1 } },
         { tag: "h2", attrs: { level: 2 } },
         { tag: "h3", attrs: { level: 3 } }
       ],
-      toDOM(node) {
-        return ["h" + node.attrs.level, 0];
-      }
+      toDOM: node => ["h" + node.attrs.level, 0]
     },
     code_block: {
+      group: "block",
       content: "text*",
       marks: "",
-      group: "block",
       code: true,
       defining: true,
       parseDOM: [{ tag: "pre", preserveWhitespace: "full" }],
-      toDOM() {
-        return ["pre", ["code", 0]];
-      }
+      toDOM: () => ["pre", ["code", 0]]
     },
     numberList: {
       group: "block",
@@ -47,15 +43,13 @@ export const schema = new Schema({
       parseDOM: [
         {
           tag: "ol",
-          getAttrs: (dom: HTMLOListElement) => ({
-            order: dom.hasAttribute("start")
-              ? +(dom as any).getAttribute("start")
-              : 1
+          getAttrs: (dom: any) => ({
+            order: dom.hasAttribute("start") ? +dom.getAttribute("start") : 1
           })
         }
       ],
       toDOM: node =>
-        node.attrs.order == 1
+        node.attrs.order === 1
           ? ["ol", 0]
           : ["ol", { start: node.attrs.order }, 0]
     },
@@ -71,7 +65,6 @@ export const schema = new Schema({
       toDOM: () => ["li", 0],
       defining: true
     },
-
     taskList: {
       group: "block",
       content: "taskItem+",
@@ -102,27 +95,25 @@ export const schema = new Schema({
       content: "text*",
       defining: true,
       parseDOM: [{ tag: "blockquote" }],
-      toDOM: () => {
-        return ["blockquote", 0];
-      }
+      toDOM: () => ["blockquote", 0]
     }
   },
   marks: {
     bold: {
-      toDOM: () => ["b"],
-      parseDOM: [{ tag: "b" }, { tag: "strong" }]
+      parseDOM: [{ tag: "b" }, { tag: "strong" }],
+      toDOM: () => ["b"]
     },
     italic: {
-      toDOM: () => ["i"],
-      parseDOM: [{ tag: "i" }, { tag: "em" }]
+      parseDOM: [{ tag: "i" }, { tag: "em" }],
+      toDOM: () => ["i"]
     },
     strike: {
-      toDOM: () => ["s"],
-      parseDOM: [{ tag: "s" }, { tag: "del" }]
+      parseDOM: [{ tag: "s" }, { tag: "del" }],
+      toDOM: () => ["s"]
     },
     code: {
-      toDOM: () => ["code"],
-      parseDOM: [{ tag: "code" }]
+      parseDOM: [{ tag: "code" }],
+      toDOM: () => ["code"]
     }
   }
 });
