@@ -28,7 +28,7 @@ export const schema = new Schema({
       ],
       toDOM: node => ["h" + node.attrs.level, 0]
     },
-    code_block: {
+    codeBlock: {
       group: "block",
       content: "text*",
       marks: "",

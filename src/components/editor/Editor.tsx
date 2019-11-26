@@ -42,6 +42,26 @@ export const Editor = () => {
     <>
       <Container id="editor" />
       <div id="content" style={{ display: "none" }}>
+        <h1>H1</h1>
+        <h2>H2</h2>
+        <h3>H3</h3>
+        <hr />
+        <p>text</p>
+        <p>
+          <b>bold</b> && <i>italic</i> && <s>strike</s>
+        </p>
+        <p>
+          <span data-color="yellow">yellow text</span>
+        </p>
+        <p>
+          also <code>code</code>
+        </p>
+        <hr />
+        <blockquote>Quote</blockquote>
+        <pre>
+          <code>codeeeee</code>
+          <code>export const foo = () => </code>
+        </pre>
         <hr />
         <ul>
           <li>item 1</li>
@@ -52,40 +72,15 @@ export const Editor = () => {
         <ul data-level={2}>
           <li>item 1</li>
         </ul>
-        <ol start={3}>
-          <li>item 1</li>
-        </ol>
-        <ol>
-          <li>item 1</li>
-        </ol>
         <ol>
           <li>item 1</li>
         </ol>
         <ol data-level={1}>
           <li>item 1</li>
         </ol>
-        <ol data-level={1}>
-          <li>item 1</li>
-        </ol>
-        <ol data-level={1}>
-          <li>item 1</li>
-        </ol>
         <ol data-level={2}>
           <li>item 1</li>
         </ol>
-        <ol data-level={1}>
-          <li>item 1</li>
-        </ol>
-        <ol data-level={2}>
-          <li>item 1</li>
-        </ol>
-        <ol data-level={2}>
-          <li>item 1</li>
-        </ol>
-        <ol data-level={2}>
-          <li>item 1</li>
-        </ol>
-        <hr />
         <ul className="taskList">
           <div className="taskItem" data-checked={true}>
             checked
@@ -102,30 +97,15 @@ export const Editor = () => {
           </div>
         </ul>
         <hr />
-        <blockquote>Quote</blockquote>
-        <pre>
-          <code>codeeeee</code>
-          <code>export const foo = () => </code>
-        </pre>
-        <p>Starting content</p>
-        <p>
-          with <b>bold</b>, <i>italic</i>, <s>strike</s>
-        </p>
-        <p>
-          <span data-color="yellow">yellow text</span>
-        </p>
-        <p>
-          <code>code</code>
-        </p>
-        <hr />
-        <h1>H1</h1>
-        <h2>H2</h2>
-        <h3>H3</h3>
       </div>
     </>
   );
 };
 
 const Container = styled.div`
+  max-width: 720px;
+  margin: auto;
+  padding: 96px;
+
   ${editorStyles};
 `;
