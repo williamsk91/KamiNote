@@ -41,6 +41,7 @@ export const schema = new Schema({
       group: "block",
       content: "taskItem",
       attrs: { "data-level": { default: 0 } },
+      defining: true,
       parseDOM: [
         {
           tag: "ul.taskList",
@@ -69,7 +70,6 @@ export const schema = new Schema({
       attrs: {
         "data-checked": { default: false }
       },
-      defining: true,
       parseDOM: [
         {
           tag: "div.taskItem",
@@ -89,6 +89,7 @@ export const schema = new Schema({
       group: "block",
       content: "listItem",
       attrs: { order: { default: 1 }, "data-level": { default: 0 } },
+      defining: true,
       parseDOM: [
         {
           tag: "ol",
@@ -126,6 +127,7 @@ export const schema = new Schema({
       attrs: {
         "data-level": { default: 0 }
       },
+      defining: true,
       parseDOM: [
         {
           tag: "ul",
@@ -152,7 +154,6 @@ export const schema = new Schema({
     },
     listItem: {
       content: "paragraph",
-      defining: true,
       parseDOM: [
         {
           tag: "li"
