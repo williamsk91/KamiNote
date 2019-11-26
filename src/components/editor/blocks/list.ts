@@ -2,7 +2,7 @@ import { wrappingInputRule } from "prosemirror-inputrules";
 import { schema } from "../schema";
 import { IBlock, IDispatch } from "./utils";
 import { NodeType, Node } from "prosemirror-model";
-import { EditorState } from "prosemirror-state";
+import { EditorState, TextSelection } from "prosemirror-state";
 import { chainCommands } from "prosemirror-commands";
 import { canSplit } from "prosemirror-transform";
 
@@ -14,30 +14,34 @@ const splitList = (listType: NodeType) => (
 ) => {
   let { $from } = state.selection;
 
-  let list = $from.node(-2);
+  let list = $from.node(-1);
   if (!list || list.type != listType) return false;
 
   if ($from.parent.content.size == 0) {
-    // In an empty block.
-    // If level > 0 outdent
-    // If level = 0 let removing to other commands
-    const level = list.attrs["data-level"];
-    if (level === 0) return false;
-
     if (dispatch) {
-      const pos = $from.pos - 3;
-      let tr = state.tr.setNodeMarkup(pos, undefined, {
-        "data-level": decreaseLevelAttr(list)
-      });
+      // In an empty block.
+      // If level > 0 outdent
+      // If level = 0 let removing to other commands
+      const level = list.attrs["data-level"];
+      const from = $from.pos - 2;
+      let tr = state.tr;
+      if (level === 0) {
+        const to = from + 4;
+        tr.replaceWith(from, to, schema.node(schema.nodes.paragraph));
+        tr.setSelection(TextSelection.create(tr.doc, from));
+      } else {
+        tr.setNodeMarkup(from, undefined, {
+          "data-level": decreaseLevelAttr(list)
+        });
+      }
       dispatch(tr.scrollIntoView());
     }
     return true;
   }
 
   let tr = state.tr.deleteSelection();
-  // Changed the depth into 3
-  if (!canSplit(tr.doc, $from.pos, 3)) return false;
-  if (dispatch) dispatch(tr.split($from.pos, 3).scrollIntoView());
+  if (!canSplit(tr.doc, $from.pos, 2)) return false;
+  if (dispatch) dispatch(tr.split($from.pos, 2).scrollIntoView());
   return true;
 };
 

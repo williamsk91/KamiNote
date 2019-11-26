@@ -3,7 +3,7 @@ import { ulListType, olListType } from "./styles";
 
 export const schema = new Schema({
   nodes: {
-    doc: { content: "block+" },
+    doc: { content: "block+ paragraph" },
     paragraph: {
       group: "block",
       content: "inline*",
@@ -65,7 +65,7 @@ export const schema = new Schema({
       ]
     },
     taskItem: {
-      content: "paragraph",
+      content: "inline*",
       attrs: {
         "data-checked": { default: false }
       },
@@ -152,7 +152,7 @@ export const schema = new Schema({
       ]
     },
     listItem: {
-      content: "paragraph",
+      content: "inline*",
       parseDOM: [
         {
           tag: "li"

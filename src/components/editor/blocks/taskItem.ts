@@ -20,7 +20,8 @@ const toggleTaskItem = (itemType: NodeType) => (
 ) => {
   let { $from, from, to } = state.selection;
 
-  const sourceTaskItem = $from.node(-1);
+  const sourceTaskItem = $from.node();
+  console.log("sourceTaskItem: ", sourceTaskItem);
   if (sourceTaskItem.type !== itemType) return false;
   // change all taskItem under selection into !checked of source taskitem
   const newChecked = !sourceTaskItem.attrs["data-checked"];
