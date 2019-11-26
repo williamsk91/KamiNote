@@ -1,4 +1,5 @@
 import { Schema } from "prosemirror-model";
+import { ulListType, olListType } from "./styles";
 
 export const schema = new Schema({
   nodes: {
@@ -56,7 +57,10 @@ export const schema = new Schema({
       ],
       toDOM: node => [
         "ul",
-        { style: `margin-left:${24 * node.attrs["data-level"]}px;` },
+        {
+          "data-level": node.attrs["data-level"],
+          style: `margin-left:${24 * node.attrs["data-level"]}px;`
+        },
         0
       ]
     },
@@ -90,7 +94,7 @@ export const schema = new Schema({
           tag: "ol",
           getAttrs: (node: any) => ({
             order: node.hasAttribute("start") ? +node.getAttribute("start") : 1,
-            // get data-level to [0,8]
+            // get and set data-level to [0,8]
             "data-level":
               node.getAttribute("data-level") >= 8
                 ? 8
@@ -100,21 +104,21 @@ export const schema = new Schema({
           })
         }
       ],
-      toDOM: node =>
-        node.attrs.order === 1
-          ? [
-              "ol",
-              { style: `margin-left:${24 * node.attrs["data-level"]}px;` },
-              0
-            ]
-          : [
-              "ol",
-              {
-                start: node.attrs.order,
-                style: `margin-left:${24 * node.attrs["data-level"]}px;`
-              },
-              0
-            ]
+      toDOM: node => {
+        const start = node.attrs.order !== 1 && {
+          start: node.attrs.order
+        };
+        return [
+          "ol",
+          {
+            ...start,
+            "data-level": node.attrs["data-level"],
+            style: `margin-left:${24 * node.attrs["data-level"]}px;
+            list-style-type:${olListType(node.attrs["data-level"])}`
+          },
+          0
+        ];
+      }
     },
     bulletList: {
       group: "block",
@@ -138,7 +142,11 @@ export const schema = new Schema({
       ],
       toDOM: node => [
         "ul",
-        { style: `margin-left:${24 * node.attrs["data-level"]}px;` },
+        {
+          "data-level": node.attrs["data-level"],
+          style: `margin-left:${24 * node.attrs["data-level"]}px;
+                  list-style-type:${ulListType(node.attrs["data-level"])}`
+        },
         0
       ]
     },

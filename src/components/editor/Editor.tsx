@@ -55,7 +55,31 @@ export const Editor = () => {
         <ol start={3}>
           <li>item 1</li>
         </ol>
+        <ol>
+          <li>item 1</li>
+        </ol>
+        <ol>
+          <li>item 1</li>
+        </ol>
         <ol data-level={1}>
+          <li>item 1</li>
+        </ol>
+        <ol data-level={1}>
+          <li>item 1</li>
+        </ol>
+        <ol data-level={1}>
+          <li>item 1</li>
+        </ol>
+        <ol data-level={2}>
+          <li>item 1</li>
+        </ol>
+        <ol data-level={1}>
+          <li>item 1</li>
+        </ol>
+        <ol data-level={2}>
+          <li>item 1</li>
+        </ol>
+        <ol data-level={2}>
           <li>item 1</li>
         </ol>
         <ol data-level={2}>

@@ -35,3 +35,9 @@ export const editorStyles = css`
     background: rgb(55, 53, 47);
   }
 `;
+
+export const ulListType = (level: number) =>
+  ["disc", "circle", "square"][level % 3];
+
+export const olListType = (level: number) =>
+  ["decimal", "lower-latin", "lower-roman"][level % 3];
