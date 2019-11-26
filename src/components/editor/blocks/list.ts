@@ -8,7 +8,7 @@ import { canSplit } from "prosemirror-transform";
 
 // ------------------------- Commands -------------------------
 
-const splitListItem = (listType: NodeType) => (
+const splitList = (listType: NodeType) => (
   state: EditorState,
   dispatch?: IDispatch
 ) => {
@@ -105,9 +105,9 @@ function bulletListRule(nodeType: NodeType) {
 
 const keymaps = {
   Enter: chainCommands(
-    splitListItem(schema.nodes.taskList),
-    splitListItem(schema.nodes.numberList),
-    splitListItem(schema.nodes.bulletList)
+    splitList(schema.nodes.taskList),
+    splitList(schema.nodes.numberList),
+    splitList(schema.nodes.bulletList)
   ),
   Tab: chainCommands(
     indentList([

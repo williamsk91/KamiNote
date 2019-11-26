@@ -7,25 +7,41 @@ import { schema } from "../schema";
 
 // -------------------- Commands --------------------
 
-const toggleListCheckedAttr = (itemType: NodeType) => (
+/**
+ * Toggle a `taskItem`.
+ *
+ * If there is a selection, all the taskItem will be changed into
+ * !checked of the source taskItem.
+ * source taskItem is the taskItem where the selection starts.
+ */
+const toggleTaskItem = (itemType: NodeType) => (
   state: EditorState,
   dispatch?: IDispatch
 ) => {
-  let { $from, $anchor } = state.selection;
-  let parent = $from.node(-1);
-  if (parent.type !== itemType) return false;
+  let { $from, from, to } = state.selection;
+
+  const sourceTaskItem = $from.node(-1);
+  if (sourceTaskItem.type !== itemType) return false;
+  // change all taskItem under selection into !checked of source taskitem
+  const newChecked = !sourceTaskItem.attrs["data-checked"];
+
+  let dispatched = false;
   if (dispatch) {
-    // -2 comes from going up 2 levels taskItem - paragraph - text
-    dispatch(
-      state.tr
-        .setNodeMarkup($anchor.pos - $anchor.parentOffset - 2, undefined, {
-          ...parent.attrs,
-          "data-checked": !parent.attrs["data-checked"]
-        })
-        .scrollIntoView()
-    );
+    const tr = state.tr;
+    state.doc.nodesBetween(from, to, (node, pos) => {
+      if (node.type === itemType) {
+        dispatched = true;
+        tr.setNodeMarkup(pos, undefined, {
+          ...node.attrs,
+          "data-checked": newChecked
+        });
+      }
+    });
+
+    dispatch(tr);
   }
-  return true;
+
+  return dispatched;
 };
 
 // -------------------- View --------------------
@@ -69,7 +85,7 @@ class TaskItemView implements NodeView {
 // -------------------- Keymaps --------------------
 
 const keymaps = {
-  "Mod-Enter": toggleListCheckedAttr(schema.nodes.taskItem)
+  "Mod-Enter": toggleTaskItem(schema.nodes.taskItem)
 };
 
 // -------------------- Export --------------------
