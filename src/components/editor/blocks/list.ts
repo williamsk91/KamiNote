@@ -8,39 +8,38 @@ import { canSplit } from "prosemirror-transform";
 
 // ------------------------- Commands -------------------------
 
-function splitListItem(listType: NodeType) {
-  return function(state: EditorState, dispatch?: IDispatch) {
-    let { $from, $to, node } = state.selection;
-    if ((node && node.isBlock) || $from.depth < 2 || !$from.sameParent($to))
-      return false;
+const splitListItem = (listType: NodeType) => (
+  state: EditorState,
+  dispatch?: IDispatch
+) => {
+  let { $from } = state.selection;
 
-    let list = $from.node(-2);
-    if (list.type != listType) return false;
+  let list = $from.node(-2);
+  if (list.type != listType) return false;
 
-    if ($from.parent.content.size == 0) {
-      // In an empty block.
-      // If level > 0 outdent
-      // If level = 0 let removing to other commands
-      const level = list.attrs["data-level"];
-      if (level === 0) return false;
+  if ($from.parent.content.size == 0) {
+    // In an empty block.
+    // If level > 0 outdent
+    // If level = 0 let removing to other commands
+    const level = list.attrs["data-level"];
+    if (level === 0) return false;
 
-      if (dispatch) {
-        const pos = $from.pos - 3;
-        let tr = state.tr.setNodeMarkup(pos, undefined, {
-          "data-level": decreaseLevelAttr(list)
-        });
-        dispatch(tr.scrollIntoView());
-      }
-      return true;
+    if (dispatch) {
+      const pos = $from.pos - 3;
+      let tr = state.tr.setNodeMarkup(pos, undefined, {
+        "data-level": decreaseLevelAttr(list)
+      });
+      dispatch(tr.scrollIntoView());
     }
-
-    let tr = state.tr.deleteSelection();
-    // Changed the depth into 3
-    if (!canSplit(tr.doc, $from.pos, 3)) return false;
-    if (dispatch) dispatch(tr.split($from.pos, 3).scrollIntoView());
     return true;
-  };
-}
+  }
+
+  let tr = state.tr.deleteSelection();
+  // Changed the depth into 3
+  if (!canSplit(tr.doc, $from.pos, 3)) return false;
+  if (dispatch) dispatch(tr.split($from.pos, 3).scrollIntoView());
+  return true;
+};
 
 const adjustListLevel = (
   listTypes: NodeType[],
