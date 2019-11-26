@@ -4,10 +4,9 @@ import { ulListType, olListType } from "./styles";
 export const schema = new Schema({
   nodes: {
     doc: { content: "block+" },
-    text: {},
     paragraph: {
       group: "block",
-      content: "text*",
+      content: "inline*",
       parseDOM: [{ tag: "p" }],
       toDOM: () => ["p", 0]
     },
@@ -18,7 +17,7 @@ export const schema = new Schema({
     },
     heading: {
       group: "block",
-      content: "text*",
+      content: "inline*",
       attrs: { level: { default: 1 } },
       defining: true,
       parseDOM: [
@@ -30,7 +29,7 @@ export const schema = new Schema({
     },
     codeBlock: {
       group: "block",
-      content: "text*",
+      content: "inline*",
       marks: "",
       code: true,
       defining: true,
@@ -163,10 +162,13 @@ export const schema = new Schema({
     },
     blockquote: {
       group: "block",
-      content: "text*",
+      content: "inline*",
       defining: true,
       parseDOM: [{ tag: "blockquote" }],
       toDOM: () => ["blockquote", 0]
+    },
+    text: {
+      group: "inline"
     }
   },
   marks: {
