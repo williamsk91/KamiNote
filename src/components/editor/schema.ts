@@ -36,47 +36,13 @@ export const schema = new Schema({
       parseDOM: [{ tag: "pre", preserveWhitespace: "full" }],
       toDOM: () => ["pre", ["code", 0]]
     },
-    numberList: {
+    taskList: {
       group: "block",
-      content: "listItem+",
-      attrs: { order: { default: 1 } },
+      content: "taskItem",
+      attrs: { "data-level": { default: 0 } },
       parseDOM: [
         {
-          tag: "ol",
-          getAttrs: (dom: any) => ({
-            order: dom.hasAttribute("start") ? +dom.getAttribute("start") : 1
-          })
-        }
-      ],
-      toDOM: node =>
-        node.attrs.order === 1
-          ? ["ol", 0]
-          : ["ol", { start: node.attrs.order }, 0]
-    },
-    bulletList: {
-      group: "block",
-      content: "listItem+",
-      parseDOM: [{ tag: "ul" }],
-      toDOM: () => ["ul", 0]
-    },
-    listItem: {
-      content: "paragraph (numberList | bulletList)*",
-      parseDOM: [{ tag: "li" }],
-      toDOM: () => ["li", 0],
-      defining: true
-    },
-    taskItem: {
-      // toDom -> taskItemView
-      group: "block",
-      content: "paragraph",
-      attrs: {
-        "data-level": { default: 0 },
-        "data-checked": { default: false }
-      },
-      defining: true,
-      parseDOM: [
-        {
-          tag: "div.taskItem",
+          tag: "ul.taskList",
           getAttrs: (node: any) => ({
             // get data-level to [0,8]
             "data-level":
@@ -84,12 +50,107 @@ export const schema = new Schema({
                 ? 8
                 : node.getAttribute("data-level") <= 0
                 ? 0
-                : node.getAttribute("data-level"),
+                : node.getAttribute("data-level")
+          })
+        }
+      ],
+      toDOM: node => [
+        "ul",
+        { style: `margin-left:${24 * node.attrs["data-level"]}px;` },
+        0
+      ]
+    },
+    taskItem: {
+      content: "paragraph",
+      attrs: {
+        "data-checked": { default: false }
+      },
+      defining: true,
+      parseDOM: [
+        {
+          tag: "div.taskItem",
+          getAttrs: (node: any) => ({
             "data-checked":
               node.getAttribute("data-checked") === "true" ? true : false
           })
         }
+      ],
+      // also check `taskItemView`
+      toDOM: node => [
+        "div.taskItem",
+        { "data-checked": node.attrs["data-checked"] }
       ]
+    },
+    numberList: {
+      group: "block",
+      content: "listItem",
+      attrs: { order: { default: 1 }, "data-level": { default: 0 } },
+      parseDOM: [
+        {
+          tag: "ol",
+          getAttrs: (node: any) => ({
+            order: node.hasAttribute("start") ? +node.getAttribute("start") : 1,
+            // get data-level to [0,8]
+            "data-level":
+              node.getAttribute("data-level") >= 8
+                ? 8
+                : node.getAttribute("data-level") <= 0
+                ? 0
+                : node.getAttribute("data-level")
+          })
+        }
+      ],
+      toDOM: node =>
+        node.attrs.order === 1
+          ? [
+              "ol",
+              { style: `margin-left:${24 * node.attrs["data-level"]}px;` },
+              0
+            ]
+          : [
+              "ol",
+              {
+                start: node.attrs.order,
+                style: `margin-left:${24 * node.attrs["data-level"]}px;`
+              },
+              0
+            ]
+    },
+    bulletList: {
+      group: "block",
+      content: "listItem",
+      attrs: {
+        "data-level": { default: 0 }
+      },
+      parseDOM: [
+        {
+          tag: "ul",
+          getAttrs: (node: any) => ({
+            // get data-level to [0,8]
+            "data-level":
+              node.getAttribute("data-level") >= 8
+                ? 8
+                : node.getAttribute("data-level") <= 0
+                ? 0
+                : node.getAttribute("data-level")
+          })
+        }
+      ],
+      toDOM: node => [
+        "ul",
+        { style: `margin-left:${24 * node.attrs["data-level"]}px;` },
+        0
+      ]
+    },
+    listItem: {
+      content: "paragraph",
+      defining: true,
+      parseDOM: [
+        {
+          tag: "li"
+        }
+      ],
+      toDOM: () => ["li", 0]
     },
     blockquote: {
       group: "block",

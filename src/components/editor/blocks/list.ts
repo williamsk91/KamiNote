@@ -1,15 +1,88 @@
 import { wrappingInputRule } from "prosemirror-inputrules";
-import {
-  splitListItem,
-  liftListItem,
-  sinkListItem
-} from "prosemirror-schema-list";
-import { chainCommands } from "prosemirror-commands";
 import { schema } from "../schema";
-import { IBlock } from "./utils";
-import { NodeType } from "prosemirror-model";
+import { IBlock, IDispatch } from "./utils";
+import { NodeType, Node } from "prosemirror-model";
+import { EditorState } from "prosemirror-state";
+import { chainCommands } from "prosemirror-commands";
+import { canSplit } from "prosemirror-transform";
+
+// ------------------------- Commands -------------------------
+
+function splitListItem(listType: NodeType) {
+  return function(state: EditorState, dispatch?: IDispatch) {
+    let { $from, $to, node } = state.selection;
+    if ((node && node.isBlock) || $from.depth < 2 || !$from.sameParent($to))
+      return false;
+
+    let list = $from.node(-2);
+    if (list.type != listType) return false;
+
+    if ($from.parent.content.size == 0) {
+      // In an empty block.
+      // If level > 0 outdent
+      // If level = 0 let removing to other commands
+      const level = list.attrs["data-level"];
+      if (level === 0) return false;
+
+      if (dispatch) {
+        const pos = $from.pos - 3;
+        let tr = state.tr.setNodeMarkup(pos, undefined, {
+          "data-level": decreaseLevelAttr(list)
+        });
+        dispatch(tr.scrollIntoView());
+      }
+      return true;
+    }
+
+    let tr = state.tr.deleteSelection();
+    // Changed the depth into 3
+    if (!canSplit(tr.doc, $from.pos, 3)) return false;
+    if (dispatch) dispatch(tr.split($from.pos, 3).scrollIntoView());
+    return true;
+  };
+}
+
+const adjustListLevel = (
+  listTypes: NodeType[],
+  adjustedLevel: (node: Node) => number
+) => (state: EditorState, dispatch?: IDispatch) => {
+  let { from, to } = state.selection;
+  let dispatched = false;
+
+  if (dispatch) {
+    const tr = state.tr;
+    state.doc.nodesBetween(from, to, (node, pos) => {
+      if (listTypes.includes(node.type)) {
+        dispatched = true;
+        tr.setNodeMarkup(pos, undefined, {
+          ...node.attrs,
+          "data-level": adjustedLevel(node)
+        });
+      }
+    });
+    dispatch(tr);
+  }
+
+  return dispatched;
+};
+const increaseLevelAttr = (node: Node) =>
+  +node.attrs["data-level"] >= 8 ? 8 : +node.attrs["data-level"] + 1;
+
+const indentList = (listTypes: NodeType[]) =>
+  adjustListLevel(listTypes, increaseLevelAttr);
+
+const decreaseLevelAttr = (node: Node) =>
+  +node.attrs["data-level"] <= 0 ? 0 : +node.attrs["data-level"] - 1;
+
+const outdentList = (listTypes: NodeType[]) =>
+  adjustListLevel(listTypes, decreaseLevelAttr);
 
 // -------------------- Input Rule --------------------
+
+// Given a list node type, returns an input rule that turns a box
+// ([ ] / []) at the start of a textblock into a task list.
+const taskListRule = (nodeType: any) =>
+  wrappingInputRule(/^\s*((\[\])|(\[ \]))\s$/, nodeType);
 
 // Given a list node type, returns an input rule that turns a number
 // followed by a dot at the start of a textblock into an ordered list.
@@ -32,17 +105,39 @@ function bulletListRule(nodeType: NodeType) {
 // -------------------- Keymaps --------------------
 
 const keymaps = {
-  Enter: splitListItem(schema.nodes.listItem),
-  "Shift-Tab": liftListItem(schema.nodes.listItem),
-  // () => true is used to stop 'Tab' keydown on unestable list to cause editor to lose focus
-  Tab: chainCommands(sinkListItem(schema.nodes.listItem), () => true)
+  Enter: chainCommands(
+    splitListItem(schema.nodes.taskList),
+    splitListItem(schema.nodes.numberList),
+    splitListItem(schema.nodes.bulletList)
+  ),
+  Tab: chainCommands(
+    indentList([
+      schema.nodes.taskList,
+      schema.nodes.numberList,
+      schema.nodes.bulletList
+    ])
+  ),
+  "Shift-Tab": chainCommands(
+    outdentList([
+      schema.nodes.taskList,
+      schema.nodes.numberList,
+      schema.nodes.bulletList
+    ])
+  )
 };
 
 // -------------------- Export --------------------
 
+/**
+ * list has 3 children
+ *    1. taskList
+ *    2. numberList
+ *    3. bulletList
+ */
 export const list: IBlock = {
   name: "_list",
   inputRules: [
+    taskListRule(schema.nodes.taskList),
     bulletListRule(schema.nodes.bulletList),
     numberListRule(schema.nodes.numberList)
   ],
