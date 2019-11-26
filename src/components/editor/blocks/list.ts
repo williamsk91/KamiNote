@@ -15,7 +15,7 @@ const splitList = (listType: NodeType) => (
   let { $from } = state.selection;
 
   let list = $from.node(-2);
-  if (list.type != listType) return false;
+  if (!list || list.type != listType) return false;
 
   if ($from.parent.content.size == 0) {
     // In an empty block.
