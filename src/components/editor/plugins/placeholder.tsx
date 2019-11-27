@@ -18,7 +18,6 @@ export const placeholderPlugin = () =>
         const decorate = (node: Node, pos: number) => {
           if (
             node.type.isBlock &&
-            // empty
             node.childCount === 0 &&
             // focus
             state.selection.$anchor.parent === node
@@ -64,8 +63,9 @@ export const placeholderPluginStyles = css`
   ${placeholderPluginNodeContent("h2", "Heading 2")}
   ${placeholderPluginNodeContent("h3", "Heading 3")}
 
-  ${placeholderPluginNodeContent("div.taskItem", "To-Do")}
-  ${placeholderPluginNodeContent("li", "List")}
+  ${placeholderPluginNodeContent("div.taskList", "To-Do")}
+  ${placeholderPluginNodeContent("ul", "List")}
+  ${placeholderPluginNodeContent("ol", "List")}
 
   ${placeholderPluginNodeContent("blockquote", "Empty Quote")}
 

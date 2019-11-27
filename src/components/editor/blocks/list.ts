@@ -1,10 +1,11 @@
-import { wrappingInputRule } from "prosemirror-inputrules";
+import { textblockTypeInputRule } from "prosemirror-inputrules";
 import { schema } from "../schema";
 import { IBlock, IDispatch } from "./utils";
 import { NodeType, Node } from "prosemirror-model";
 import { EditorState, TextSelection } from "prosemirror-state";
 import { chainCommands } from "prosemirror-commands";
 import { canSplit } from "prosemirror-transform";
+import { css } from "styled-components";
 
 // ------------------------- Commands -------------------------
 
@@ -14,7 +15,7 @@ const splitList = (listType: NodeType) => (
 ) => {
   let { $from } = state.selection;
 
-  let list = $from.node(-1);
+  let list = $from.node();
   if (!list || list.type != listType) return false;
 
   if ($from.parent.content.size == 0) {
@@ -23,12 +24,12 @@ const splitList = (listType: NodeType) => (
       // If level > 0 outdent
       // If level = 0 let removing to other commands
       const level = list.attrs["data-level"];
-      const from = $from.pos - 2;
+      const from = $from.pos - 1;
       let tr = state.tr;
       if (level === 0) {
-        const to = from + 4;
+        const to = from + 2;
         tr.replaceWith(from, to, schema.node(schema.nodes.paragraph));
-        tr.setSelection(TextSelection.create(tr.doc, from));
+        tr.setSelection(TextSelection.create(tr.doc, $from.pos));
       } else {
         tr.setNodeMarkup(from, undefined, {
           "data-level": decreaseLevelAttr(list)
@@ -40,8 +41,8 @@ const splitList = (listType: NodeType) => (
   }
 
   let tr = state.tr.deleteSelection();
-  if (!canSplit(tr.doc, $from.pos, 2)) return false;
-  if (dispatch) dispatch(tr.split($from.pos, 2).scrollIntoView());
+  if (!canSplit(tr.doc, $from.pos, 1)) return false;
+  if (dispatch) dispatch(tr.split($from.pos, 1).scrollIntoView());
   return true;
 };
 
@@ -85,23 +86,20 @@ const outdentList = (listTypes: NodeType[]) =>
 // Given a list node type, returns an input rule that turns a box
 // ([ ] / []) at the start of a textblock into a task list.
 const taskListRule = (nodeType: any) =>
-  wrappingInputRule(/^\s*((\[\])|(\[ \]))\s$/, nodeType);
+  textblockTypeInputRule(/^\s*((\[\])|(\[ \]))\s$/, nodeType);
 
 // Given a list node type, returns an input rule that turns a number
 // followed by a dot (1. ) at the start of a textblock into an ordered list.
 const numberListRule = (nodeType: NodeType) =>
-  wrappingInputRule(
-    /^(\d+)\.\s$/,
-    nodeType,
-    match => ({ order: +match[1] }),
-    (match, node) => node.childCount + node.attrs.order === +match[1]
-  );
+  textblockTypeInputRule(/^(\d+)\.\s$/, nodeType, match => ({
+    order: +match[1]
+  }));
 
 // Given a list node type, returns an input rule that turns a bullet
 // (dash -, plus +, or asterisk *) at the start of a textblock into a
 // bullet list.
 const bulletListRule = (nodeType: NodeType) =>
-  wrappingInputRule(/^\s*([-+*])\s$/, nodeType);
+  textblockTypeInputRule(/^\s*([-+*])\s$/, nodeType);
 
 // -------------------- Keymaps --------------------
 
@@ -127,6 +125,18 @@ const keymaps = {
   )
 };
 
+// ------------------------- Style -------------------------
+
+const listLevelIndent = (indent: number) => css`
+  ul,
+  ol,
+  div.taskList {
+    &[data-level="${indent}"] {
+      margin-left: ${`${24 * indent}px`};
+    }
+  }
+`;
+
 // -------------------- Export --------------------
 
 /**
@@ -144,3 +154,23 @@ export const list: IBlock = {
   ],
   keymaps
 };
+
+export const listStyle = css`
+  ul,
+  ol,
+  div.taskList {
+  margin: 6px 0;
+  }
+  
+  /* indentation */
+  ${listLevelIndent(0)}
+  ${listLevelIndent(1)}
+  ${listLevelIndent(2)}
+  ${listLevelIndent(3)}
+  ${listLevelIndent(4)}
+  ${listLevelIndent(5)}
+  ${listLevelIndent(6)}
+  ${listLevelIndent(7)}
+  ${listLevelIndent(8)}
+
+`;

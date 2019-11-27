@@ -1,5 +1,6 @@
 import { Schema } from "prosemirror-model";
-import { ulListType, olListType } from "./styles";
+
+// ------------------------- Schema -------------------------
 
 export const schema = new Schema({
   nodes: {
@@ -37,70 +38,42 @@ export const schema = new Schema({
       toDOM: () => ["pre", ["code", 0]]
     },
     taskList: {
+      // also check `taskListView`
       group: "block",
-      content: "taskItem",
-      attrs: { "data-level": { default: 0 } },
+      content: "inline*",
+      attrs: {
+        "data-level": { default: 0 },
+        "data-checked": { default: false }
+      },
       defining: true,
       parseDOM: [
         {
-          tag: "ul.taskList",
+          tag: "div.taskList",
           getAttrs: (node: any) => ({
-            // get data-level to [0,8]
-            "data-level":
-              node.getAttribute("data-level") >= 8
-                ? 8
-                : node.getAttribute("data-level") <= 0
-                ? 0
-                : node.getAttribute("data-level")
+            "data-level": getListDataLevel(node),
+            "data-checked": node.getAttribute("data-checked")
           })
         }
       ],
       toDOM: node => [
-        "ul",
+        "div.taskList",
         {
           "data-level": node.attrs["data-level"],
-          style: `margin-left:${24 * node.attrs["data-level"]}px;`
-        },
-        0
-      ]
-    },
-    taskItem: {
-      content: "inline*",
-      attrs: {
-        "data-checked": { default: false }
-      },
-      parseDOM: [
-        {
-          tag: "div.taskItem",
-          getAttrs: (node: any) => ({
-            "data-checked":
-              node.getAttribute("data-checked") === "true" ? true : false
-          })
+          "data-checked": node.attrs["data-checked"]
         }
-      ],
-      // also check `taskItemView`
-      toDOM: node => [
-        "div.taskItem",
-        { "data-checked": node.attrs["data-checked"] }
       ]
     },
     numberList: {
       group: "block",
-      content: "listItem",
+      content: "inline*",
       attrs: { order: { default: 1 }, "data-level": { default: 0 } },
       defining: true,
       parseDOM: [
         {
           tag: "ol",
           getAttrs: (node: any) => ({
-            order: node.hasAttribute("start") ? +node.getAttribute("start") : 1,
-            // get and set data-level to [0,8]
-            "data-level":
-              node.getAttribute("data-level") >= 8
-                ? 8
-                : node.getAttribute("data-level") <= 0
-                ? 0
-                : node.getAttribute("data-level")
+            "data-level": getListDataLevel(node),
+            order: node.hasAttribute("start") ? +node.getAttribute("start") : 1
           })
         }
       ],
@@ -111,18 +84,16 @@ export const schema = new Schema({
         return [
           "ol",
           {
-            ...start,
             "data-level": node.attrs["data-level"],
-            style: `margin-left:${24 * node.attrs["data-level"]}px;
-            list-style-type:${olListType(node.attrs["data-level"])}`
+            ...start
           },
-          0
+          ["li", 0]
         ];
       }
     },
     bulletList: {
       group: "block",
-      content: "listItem",
+      content: "inline*",
       attrs: {
         "data-level": { default: 0 }
       },
@@ -131,34 +102,17 @@ export const schema = new Schema({
         {
           tag: "ul",
           getAttrs: (node: any) => ({
-            // get data-level to [0,8]
-            "data-level":
-              node.getAttribute("data-level") >= 8
-                ? 8
-                : node.getAttribute("data-level") <= 0
-                ? 0
-                : node.getAttribute("data-level")
+            "data-level": getListDataLevel(node)
           })
         }
       ],
       toDOM: node => [
         "ul",
         {
-          "data-level": node.attrs["data-level"],
-          style: `margin-left:${24 * node.attrs["data-level"]}px;
-                  list-style-type:${ulListType(node.attrs["data-level"])}`
+          "data-level": node.attrs["data-level"]
         },
-        0
+        ["li", 0]
       ]
-    },
-    listItem: {
-      content: "inline*",
-      parseDOM: [
-        {
-          tag: "li"
-        }
-      ],
-      toDOM: () => ["li", 0]
     },
     blockquote: {
       group: "block",
@@ -190,3 +144,16 @@ export const schema = new Schema({
     }
   }
 });
+
+// ------------------------- Helper functions -------------------------
+
+/**
+ * get list data-level attribute.
+ *
+ * range is [0,8]
+ */
+const getListDataLevel = (node: any) => {
+  if (node.getAttribute("data-level") >= 8) return 8;
+  if (node.getAttribute("data-level") <= 0) return 0;
+  return node.getAttribute("data-level");
+};

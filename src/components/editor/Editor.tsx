@@ -12,7 +12,7 @@ import applyDevTools from "prosemirror-dev-tools";
 import { schema } from "./schema";
 import { editorStyles } from "./styles";
 import { buildViews, buildInputRulesAndKeymaps } from "./blocks/utils";
-import { taskItem } from "./blocks/taskItem";
+import { taskList } from "./blocks/taskList";
 import { list } from "./blocks/list";
 import { marks } from "./blocks/marks";
 import { placeholderPlugin } from "./plugins/placeholder";
@@ -30,7 +30,7 @@ export const Editor = () => {
         history(),
         keymap({ "Mod-z": undo, "Mod-y": redo }),
         ...buildInputRulesAndKeymaps([
-          taskItem,
+          taskList,
           list,
           marks,
           heading,
@@ -43,7 +43,7 @@ export const Editor = () => {
 
     view = new EditorView(document.querySelector("#editor") as Node, {
       state,
-      nodeViews: buildViews([taskItem])
+      nodeViews: buildViews([taskList])
     });
 
     applyDevTools(view);
@@ -53,6 +53,22 @@ export const Editor = () => {
     <>
       <Container onClick={() => view && view.focus()} id="editor" />
       <div id="content" style={{ display: "none" }}>
+        <ul>item 1 </ul>
+        <ul data-level={1}>item 1 </ul>
+        <ul data-level={2}>item 1 </ul>
+        <ol>item 1 </ol>
+        <ol data-level={1}>item 1 </ol>
+        <ol data-level={2}>item 1 </ol>
+        <div className="taskList" data-checked={true}>
+          checked
+        </div>
+        <div className="taskList" data-level={1} data-checked={false}>
+          unchecked
+        </div>
+        <div className="taskList" data-level={2} data-checked={true}>
+          checked
+        </div>
+        <hr />
         <h1>H1</h1>
         <h2>H2</h2>
         <h3>H3</h3>
@@ -73,40 +89,6 @@ export const Editor = () => {
           <code>codeeeee</code>
           <code>export const foo = () => </code>
         </pre>
-        <hr />
-        <ul>
-          <li>item 1</li>
-        </ul>
-        <ul data-level={1}>
-          <li>item 1</li>
-        </ul>
-        <ul data-level={2}>
-          <li>item 1</li>
-        </ul>
-        <ol>
-          <li>item 1</li>
-        </ol>
-        <ol data-level={1}>
-          <li>item 1</li>
-        </ol>
-        <ol data-level={2}>
-          <li>item 1</li>
-        </ol>
-        <ul className="taskList">
-          <div className="taskItem" data-checked={true}>
-            checked
-          </div>
-        </ul>
-        <ul className="taskList" data-level={1}>
-          <div className="taskItem" data-checked={false}>
-            unchecked
-          </div>
-        </ul>
-        <ul className="taskList" data-level={2}>
-          <div className="taskItem" data-checked={true}>
-            checked
-          </div>
-        </ul>
         <hr />
       </div>
     </>

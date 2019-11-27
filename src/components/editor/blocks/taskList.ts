@@ -1,6 +1,7 @@
 import { EditorState } from "prosemirror-state";
 import { NodeView, EditorView } from "prosemirror-view";
 import { Node, NodeType } from "prosemirror-model";
+import { css } from "styled-components";
 
 import { IBlock, IDispatch } from "./utils";
 import { schema } from "../schema";
@@ -8,22 +9,21 @@ import { schema } from "../schema";
 // -------------------- Commands --------------------
 
 /**
- * Toggle a `taskItem`.
+ * Toggle a `taskList`.
  *
  * If there is a selection, all the taskItem will be changed into
  * !checked of the source taskItem.
  * source taskItem is the taskItem where the selection starts.
  */
-const toggleTaskItem = (itemType: NodeType) => (
+const toggleTaskList = (itemType: NodeType) => (
   state: EditorState,
   dispatch?: IDispatch
 ) => {
   let { $from, from, to } = state.selection;
 
   const sourceTaskItem = $from.node();
-  console.log("sourceTaskItem: ", sourceTaskItem);
   if (sourceTaskItem.type !== itemType) return false;
-  // change all taskItem under selection into !checked of source taskitem
+  // change all taskList under selection into !checked of source taskitem
   const newChecked = !sourceTaskItem.attrs["data-checked"];
 
   let dispatched = false;
@@ -47,14 +47,15 @@ const toggleTaskItem = (itemType: NodeType) => (
 
 // -------------------- View --------------------
 
-class TaskItemView implements NodeView {
+class TaskListView implements NodeView {
   dom: HTMLDivElement;
   contentDOM: HTMLDivElement;
   icon: HTMLDivElement;
 
   constructor(node: Node, view: EditorView, getPos: () => number) {
     this.dom = document.createElement("div");
-    this.dom.classList.add("taskItem");
+    this.dom.classList.add("taskList");
+    this.dom.setAttribute("data-level", node.attrs["data-level"]);
     this.dom.setAttribute("data-checked", node.attrs["data-checked"]);
 
     // icon
@@ -86,13 +87,46 @@ class TaskItemView implements NodeView {
 // -------------------- Keymaps --------------------
 
 const keymaps = {
-  "Mod-Enter": toggleTaskItem(schema.nodes.taskItem)
+  "Mod-Enter": toggleTaskList(schema.nodes.taskList)
 };
+
+// ------------------------- Style -------------------------
+
+export const taskListStyle = css`
+  div.taskList {
+    position: relative;
+    padding-left: 40px;
+
+    div.checkbox {
+      position: absolute;
+      left: 18px;
+
+      width: 15px;
+      height: 15px;
+
+      border: 2px solid rgb(55, 53, 47);
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    &[data-checked="true"] {
+      div.checkbox {
+        background: rgb(55, 53, 47);
+      }
+
+      text-decoration: line-through;
+      color: #aaa;
+    }
+  }
+`;
 
 // -------------------- Export --------------------
 
-export const taskItem: IBlock = {
-  name: "taskItem",
-  view: TaskItemView,
+/**
+ * also check list.ts for a general list
+ */
+export const taskList: IBlock = {
+  name: "taskList",
+  view: TaskListView,
   keymaps
 };

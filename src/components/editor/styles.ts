@@ -1,5 +1,7 @@
 import { css } from "styled-components";
 import { placeholderPluginStyles } from "./plugins/placeholder";
+import { listStyle } from "./blocks/list";
+import { taskListStyle } from "./blocks/taskList";
 
 export const editorStyles = css`
   & ::selection {
@@ -46,32 +48,8 @@ export const editorStyles = css`
     border-left: 3px solid rgb(55, 53, 47);
   }
 
-  div.taskItem {
-    display: flex;
-    position: relative;
-    padding-left: 6px;
-
-    &[data-checked="true"] {
-      div.checkbox {
-        background: rgb(55, 53, 47);
-      }
-
-      text-decoration: line-through;
-      color: #aaa;
-    }
-
-    div.checkbox {
-      position: absolute;
-      right: 100%;
-
-      width: 15px;
-      height: 15px;
-
-      border: 2px solid rgb(55, 53, 47);
-      border-radius: 5px;
-      cursor: pointer;
-    }
-  }
+  ${listStyle}
+  ${taskListStyle}
 `;
 
 export const ulListType = (level: number) =>
