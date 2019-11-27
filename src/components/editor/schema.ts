@@ -10,7 +10,7 @@ export const schema = new Schema({
       parseDOM: [{ tag: "p" }],
       toDOM: () => ["p", 0]
     },
-    horizontal_rule: {
+    hr: {
       group: "block",
       parseDOM: [{ tag: "hr" }],
       toDOM: () => ["hr"]

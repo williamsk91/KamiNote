@@ -16,6 +16,7 @@ import { taskItem } from "./blocks/taskItem";
 import { list } from "./blocks/list";
 import { marks } from "./blocks/marks";
 import { placeholderPlugin } from "./plugins/placeholder";
+import { heading, hr, blockQuote } from "./blocks/base";
 
 export const Editor = () => {
   let view: EditorView | null;
@@ -28,7 +29,14 @@ export const Editor = () => {
       plugins: [
         history(),
         keymap({ "Mod-z": undo, "Mod-y": redo }),
-        ...buildInputRulesAndKeymaps([taskItem, list, marks]),
+        ...buildInputRulesAndKeymaps([
+          taskItem,
+          list,
+          marks,
+          heading,
+          hr,
+          blockQuote
+        ]),
         placeholderPlugin()
       ]
     });

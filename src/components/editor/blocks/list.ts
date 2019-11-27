@@ -88,22 +88,20 @@ const taskListRule = (nodeType: any) =>
   wrappingInputRule(/^\s*((\[\])|(\[ \]))\s$/, nodeType);
 
 // Given a list node type, returns an input rule that turns a number
-// followed by a dot at the start of a textblock into an ordered list.
-function numberListRule(nodeType: NodeType) {
-  return wrappingInputRule(
+// followed by a dot (1. ) at the start of a textblock into an ordered list.
+const numberListRule = (nodeType: NodeType) =>
+  wrappingInputRule(
     /^(\d+)\.\s$/,
     nodeType,
     match => ({ order: +match[1] }),
     (match, node) => node.childCount + node.attrs.order === +match[1]
   );
-}
 
 // Given a list node type, returns an input rule that turns a bullet
-// (dash, plush, or asterisk) at the start of a textblock into a
+// (dash -, plus +, or asterisk *) at the start of a textblock into a
 // bullet list.
-function bulletListRule(nodeType: NodeType) {
-  return wrappingInputRule(/^\s*([-+*])\s$/, nodeType);
-}
+const bulletListRule = (nodeType: NodeType) =>
+  wrappingInputRule(/^\s*([-+*])\s$/, nodeType);
 
 // -------------------- Keymaps --------------------
 
@@ -141,8 +139,8 @@ export const list: IBlock = {
   name: "_list",
   inputRules: [
     taskListRule(schema.nodes.taskList),
-    bulletListRule(schema.nodes.bulletList),
-    numberListRule(schema.nodes.numberList)
+    numberListRule(schema.nodes.numberList),
+    bulletListRule(schema.nodes.bulletList)
   ],
   keymaps
 };
