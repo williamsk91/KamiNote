@@ -54,10 +54,6 @@ export const placeholderPluginStyles = css`
       color: #aaa;
       cursor: text;
     }
-
-    :hover {
-      color: #777;
-    }
   }
 
   ${placeholderPluginNodeContent("p", "Insert some content")}

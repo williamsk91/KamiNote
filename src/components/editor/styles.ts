@@ -2,6 +2,10 @@ import { css } from "styled-components";
 import { placeholderPluginStyles } from "./plugins/placeholder";
 
 export const editorStyles = css`
+  & ::selection {
+    background: rgba(45, 170, 219, 0.3);
+  }
+
   ${placeholderPluginStyles}
 
   font-size: 16px;
@@ -45,10 +49,15 @@ export const editorStyles = css`
   div.taskItem {
     display: flex;
     position: relative;
-    padding-left: 3px;
+    padding-left: 6px;
 
-    &[data-checked="true"] > div.checkbox {
-      background: rgb(55, 53, 47);
+    &[data-checked="true"] {
+      div.checkbox {
+        background: rgb(55, 53, 47);
+      }
+
+      text-decoration: line-through;
+      color: #aaa;
     }
 
     div.checkbox {
