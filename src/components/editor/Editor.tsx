@@ -15,8 +15,10 @@ import { buildViews, buildInputRulesAndKeymaps } from "./blocks/utils";
 import { taskItem } from "./blocks/taskItem";
 import { list } from "./blocks/list";
 import { marks } from "./blocks/marks";
+import { placeholderPlugin } from "./plugins/placeholder";
 
 export const Editor = () => {
+  let view: EditorView | null;
   useEffect(() => {
     const state = EditorState.create({
       schema,
@@ -26,11 +28,12 @@ export const Editor = () => {
       plugins: [
         history(),
         keymap({ "Mod-z": undo, "Mod-y": redo }),
-        ...buildInputRulesAndKeymaps([taskItem, list, marks])
+        ...buildInputRulesAndKeymaps([taskItem, list, marks]),
+        placeholderPlugin()
       ]
     });
 
-    const view = new EditorView(document.querySelector("#editor") as Node, {
+    view = new EditorView(document.querySelector("#editor") as Node, {
       state,
       nodeViews: buildViews([taskItem])
     });
@@ -40,7 +43,7 @@ export const Editor = () => {
 
   return (
     <>
-      <Container id="editor" />
+      <Container onClick={() => view && view.focus()} id="editor" />
       <div id="content" style={{ display: "none" }}>
         <h1>H1</h1>
         <h2>H2</h2>
@@ -106,6 +109,10 @@ const Container = styled.div`
   max-width: 720px;
   margin: auto;
   padding: 96px;
+
+  & :focus {
+    outline: none;
+  }
 
   ${editorStyles};
 `;
