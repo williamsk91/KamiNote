@@ -12,7 +12,7 @@ export const editorStyles = css`
 
   p {
     margin: 0;
-    padding: 3px;
+    padding: 3px 2px;
   }
 
   code {

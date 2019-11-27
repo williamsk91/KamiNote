@@ -53,6 +53,8 @@ export const placeholderPluginStyles = css`
       position: absolute;
       color: #aaa;
       cursor: text;
+      /* place the text behind text cursor */
+      z-index: -1;
     }
   }
 
