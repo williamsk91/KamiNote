@@ -4,7 +4,7 @@ import {
   ellipsis,
   inputRules
 } from "prosemirror-inputrules";
-import { EditorState, Transaction } from "prosemirror-state";
+import { EditorState, Transaction, Plugin } from "prosemirror-state";
 import { Node, MarkType } from "prosemirror-model";
 import { EditorView } from "prosemirror-view";
 import { keymap } from "prosemirror-keymap";
@@ -22,6 +22,7 @@ export interface IBlock {
   view?: any;
   inputRules?: InputRule[];
   keymaps?: IKeymap;
+  plugins?: Plugin[];
 }
 
 // ------------------------- View -------------------------
@@ -79,8 +80,7 @@ export const buildInputRules = (blocks: IBlock[]) => {
 
   const blockRules: InputRule[] = blocks
     .filter(b => b.inputRules)
-    .map(b => b.inputRules)
-    .flat();
+    .flatMap(b => b.inputRules as InputRule[]);
 
   return inputRules({ rules: [...baseRules, ...blockRules] });
 };
@@ -96,9 +96,19 @@ export const buildKeymaps = (blocks: IBlock[]) => {
   return [...blockKeymaps, baseKeymaps];
 };
 
+// ------------------------- Plugins -------------------------
+
+export const buildPlugins = (blocks: IBlock[]) => {
+  const blockPlugins = blocks
+    .filter(b => b.plugins)
+    .flatMap(b => keymap(b.plugins as Plugin[]));
+
+  return blockPlugins;
+};
 // ------------------------- Input Rules and Keymaps  -------------------------
 
-export const buildInputRulesAndKeymaps = (blocks: IBlock[]) => [
+export const buildBlockPlugins = (blocks: IBlock[]) => [
   ...buildKeymaps(blocks),
-  buildInputRules(blocks)
+  buildInputRules(blocks),
+  ...buildPlugins(blocks)
 ];

@@ -12,12 +12,13 @@ import applyDevTools from "prosemirror-dev-tools";
 
 import { schema } from "./schema";
 import { editorStyles } from "./styles";
-import { buildViews, buildInputRulesAndKeymaps } from "./blocks/utils";
+import { buildViews, buildBlockPlugins } from "./blocks/utils";
 import { taskList } from "./blocks/taskList";
 import { list } from "./blocks/list";
 import { marks } from "./blocks/marks";
 import { placeholderPlugin } from "./plugins/placeholder";
 import { heading, hr, blockQuote, codeBlock } from "./blocks/base";
+import { tooltipPlugin } from "./plugins/tooltip";
 
 export const Editor = () => {
   let view: EditorView | null;
@@ -31,7 +32,7 @@ export const Editor = () => {
         history(),
         keymap({ "Mod-z": undo, "Mod-y": redo }),
         dropCursor(),
-        ...buildInputRulesAndKeymaps([
+        ...buildBlockPlugins([
           taskList,
           list,
           marks,
@@ -40,8 +41,9 @@ export const Editor = () => {
           blockQuote,
           codeBlock
         ]),
+
         placeholderPlugin()
-      ]
+      ].concat(tooltipPlugin)
     });
 
     view = new EditorView(document.querySelector("#editor") as Node, {
@@ -73,7 +75,7 @@ export const Editor = () => {
           also <code>code</code>
         </p>
         <hr />
-        <hr />
+        {/* <hr />
         <hr />
         <blockquote>Quote</blockquote>
         <pre>
@@ -95,14 +97,15 @@ export const Editor = () => {
         </div>
         <div className="taskList" data-level={2} data-checked={true}>
           checked
-        </div>
-        <hr />
+        </div> */}
       </div>
     </>
   );
 };
 
 const Container = styled.div`
+  position: relative;
+
   max-width: 720px;
   margin: auto;
   padding: 96px;
