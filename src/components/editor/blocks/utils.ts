@@ -5,10 +5,11 @@ import {
   inputRules
 } from "prosemirror-inputrules";
 import { EditorState, Transaction } from "prosemirror-state";
-import { Node } from "prosemirror-model";
+import { Node, MarkType } from "prosemirror-model";
 import { EditorView } from "prosemirror-view";
 import { keymap } from "prosemirror-keymap";
 import { baseKeymap } from "prosemirror-commands";
+import { schema } from "../schema";
 
 export type IDispatch = (tr: Transaction) => void;
 
@@ -41,6 +42,35 @@ export const buildViews = (blocks: IBlock[]) => {
   );
 };
 // ------------------------- Input Rules -------------------------
+
+/**
+ * Helper to make mark input rules (wraps text).
+ */
+export const markInputRule = (
+  regexp: RegExp,
+  markType: MarkType,
+  getAttrs?: { [key: string]: any }
+) => {
+  const newRegexp = new RegExp(regexp.source.replace(/\$$/, "") + "(.)" + "$");
+
+  return new InputRule(newRegexp, (state, match, start, end) => {
+    const attrs = getAttrs instanceof Function ? getAttrs(match) : getAttrs;
+    const textStart = start + match[0].indexOf(match[1]);
+    const textEnd = textStart + match[1].length;
+    const tr = state.tr;
+
+    start = match[0].match(/^\s/) ? start + 1 : start;
+
+    if (textEnd < end) tr.delete(textEnd, end);
+    if (textStart > start) tr.delete(start, textStart);
+
+    end = start + match[1].length;
+
+    return tr
+      .addMark(start, end, markType.create(attrs))
+      .insert(end, schema.text(match[2]));
+  });
+};
 
 export const buildInputRules = (blocks: IBlock[]) => {
   const baseRules: InputRule[] = smartQuotes.concat(ellipsis);

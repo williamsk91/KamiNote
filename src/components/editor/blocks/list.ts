@@ -99,7 +99,7 @@ const numberListRule = (nodeType: NodeType) =>
 // (dash -, plus +, or asterisk *) at the start of a textblock into a
 // bullet list.
 const bulletListRule = (nodeType: NodeType) =>
-  textblockTypeInputRule(/^\s*([-+*])\s$/, nodeType);
+  textblockTypeInputRule(/^\s*([-+])\s$/, nodeType);
 
 // -------------------- Keymaps --------------------
 
@@ -146,7 +146,7 @@ const listLevelIndent = (indent: number) => css`
  *    3. bulletList
  */
 export const list: IBlock = {
-  name: "_list",
+  name: "list",
   inputRules: [
     taskListRule(schema.nodes.taskList),
     numberListRule(schema.nodes.numberList),

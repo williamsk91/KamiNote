@@ -75,6 +75,6 @@ export const blockQuote: IBlock = {
 };
 
 export const codeBlock: IBlock = {
-  name: "code_block",
+  name: "codeBlock",
   inputRules: [codeBlockRule(schema.nodes.codeBlock)]
 };
