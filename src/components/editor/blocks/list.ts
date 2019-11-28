@@ -42,6 +42,7 @@ const splitList = (listType: NodeType) => (
 
   let tr = state.tr.deleteSelection();
   if (!canSplit(tr.doc, $from.pos, 1)) return false;
+
   if (dispatch) dispatch(tr.split($from.pos, 1).scrollIntoView());
   return true;
 };
@@ -53,20 +54,18 @@ const adjustListLevel = (
   let { from, to } = state.selection;
   let dispatched = false;
 
-  if (dispatch) {
-    const tr = state.tr;
-    state.doc.nodesBetween(from, to, (node, pos) => {
-      if (listTypes.includes(node.type)) {
-        dispatched = true;
-        tr.setNodeMarkup(pos, undefined, {
-          ...node.attrs,
-          "data-level": adjustedLevel(node)
-        });
-      }
-    });
-    dispatch(tr);
-  }
+  const tr = state.tr;
+  state.doc.nodesBetween(from, to, (node, pos) => {
+    if (listTypes.includes(node.type)) {
+      dispatched = true;
+      tr.setNodeMarkup(pos, undefined, {
+        ...node.attrs,
+        "data-level": adjustedLevel(node)
+      });
+    }
+  });
 
+  if (dispatch) dispatch(tr);
   return dispatched;
 };
 const increaseLevelAttr = (node: Node) =>

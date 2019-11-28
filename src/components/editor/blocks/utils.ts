@@ -45,6 +45,8 @@ export const buildViews = (blocks: IBlock[]) => {
 
 /**
  * Helper to make mark input rules (wraps text).
+ *
+ * taken from: https://discuss.prosemirror.net/t/input-rules-for-wrapping-marks/537
  */
 export const markInputRule = (
   regexp: RegExp,

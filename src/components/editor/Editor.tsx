@@ -6,6 +6,7 @@ import { EditorView } from "prosemirror-view";
 import { DOMParser } from "prosemirror-model";
 import { keymap } from "prosemirror-keymap";
 import { undo, redo, history } from "prosemirror-history";
+import { dropCursor } from "prosemirror-dropcursor";
 
 import applyDevTools from "prosemirror-dev-tools";
 
@@ -29,6 +30,7 @@ export const Editor = () => {
       plugins: [
         history(),
         keymap({ "Mod-z": undo, "Mod-y": redo }),
+        dropCursor(),
         ...buildInputRulesAndKeymaps([
           taskList,
           list,
