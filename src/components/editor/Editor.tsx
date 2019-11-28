@@ -56,6 +56,8 @@ export const Editor = () => {
     <>
       <Container onClick={() => view && view.focus()} id="editor" />
       <div id="content" style={{ display: "none" }}>
+        <a href="https://evernote.com/">note</a>
+        <hr />
         <h1>H1</h1>
         <h2>H2</h2>
         <h3>H3</h3>

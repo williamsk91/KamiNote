@@ -141,6 +141,19 @@ export const schema = new Schema({
     code: {
       parseDOM: [{ tag: "code" }],
       toDOM: () => ["code"]
+    },
+    link: {
+      attrs: { href: {} },
+      parseDOM: [
+        {
+          tag: "a",
+          getAttrs: (node: any) => ({
+            href: node.href
+          })
+        }
+      ],
+      toDOM: node => ["a", { href: node.attrs.href }, 0],
+      inclusive: false
     }
   }
 });
