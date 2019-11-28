@@ -16,7 +16,7 @@ import { taskList } from "./blocks/taskList";
 import { list } from "./blocks/list";
 import { marks } from "./blocks/marks";
 import { placeholderPlugin } from "./plugins/placeholder";
-import { heading, hr, blockQuote } from "./blocks/base";
+import { heading, hr, blockQuote, codeBlock } from "./blocks/base";
 
 export const Editor = () => {
   let view: EditorView | null;
@@ -35,7 +35,8 @@ export const Editor = () => {
           marks,
           heading,
           hr,
-          blockQuote
+          blockQuote,
+          codeBlock
         ]),
         placeholderPlugin()
       ]
@@ -53,22 +54,6 @@ export const Editor = () => {
     <>
       <Container onClick={() => view && view.focus()} id="editor" />
       <div id="content" style={{ display: "none" }}>
-        <ul>item 1 </ul>
-        <ul data-level={1}>item 1 </ul>
-        <ul data-level={2}>item 1 </ul>
-        <ol>item 1 </ol>
-        <ol data-level={1}>item 1 </ol>
-        <ol data-level={2}>item 1 </ol>
-        <div className="taskList" data-checked={true}>
-          checked
-        </div>
-        <div className="taskList" data-level={1} data-checked={false}>
-          unchecked
-        </div>
-        <div className="taskList" data-level={2} data-checked={true}>
-          checked
-        </div>
-        <hr />
         <h1>H1</h1>
         <h2>H2</h2>
         <h3>H3</h3>
@@ -84,11 +69,29 @@ export const Editor = () => {
           also <code>code</code>
         </p>
         <hr />
+        <hr />
+        <hr />
         <blockquote>Quote</blockquote>
         <pre>
-          <code>codeeeee</code>
+          <code>codee</code>
           <code>export const foo = () => </code>
         </pre>
+        <hr />
+        <ul>item 1 </ul>
+        <ul data-level={1}>item 1 </ul>
+        <ul data-level={2}>item 1 </ul>
+        <ol>item 1 </ol>
+        <ol data-level={1}>item 1 </ol>
+        <ol data-level={2}>item 1 </ol>
+        <div className="taskList" data-checked={true}>
+          checked
+        </div>
+        <div className="taskList" data-level={1} data-checked={false}>
+          unchecked
+        </div>
+        <div className="taskList" data-level={2} data-checked={true}>
+          checked
+        </div>
         <hr />
       </div>
     </>

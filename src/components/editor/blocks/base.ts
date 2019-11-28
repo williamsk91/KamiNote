@@ -1,10 +1,8 @@
 import { IBlock } from "./utils";
 import { schema } from "../schema";
-import { NodeType } from "prosemirror-model";
-import {
-  textblockTypeInputRule,
-  wrappingInputRule
-} from "prosemirror-inputrules";
+import { NodeType, Fragment } from "prosemirror-model";
+import { textblockTypeInputRule, InputRule } from "prosemirror-inputrules";
+import { TextSelection } from "prosemirror-state";
 
 /**
  * A collection of *Input Rules* and *Keymaps* for the following
@@ -34,13 +32,28 @@ const headingRule = (nodeType: NodeType, maxLevel: number) =>
     match => ({ level: match[1].length })
   );
 
+/**
+ * Insert hr before the current node.
+ *
+ * patterns: --- | *** | ___
+ */
 const hrRule = (nodeType: NodeType) =>
-  textblockTypeInputRule(/^\s*(---)\s$/, nodeType);
+  new InputRule(/^\s*((---)|(\*\*\*)|(___))$/, (state, _match, start, end) => {
+    const tr = state.tr.replaceWith(start, end, Fragment.empty);
+    tr.insert(tr.selection.from - 1, nodeType.createChecked());
+    tr.setSelection(TextSelection.create(tr.doc, start + 1));
+    return tr;
+  });
 
 // Given a blockquote node type, returns an input rule that turns `"> "`
 // at the start of a textblock into a blockquote.
 const blockQuoteRule = (nodeType: NodeType) =>
   textblockTypeInputRule(/^\s*>\s$/, nodeType);
+
+// Given a code block node type, returns an input rule that turns a
+// textblock starting with three backticks into a code block.
+const codeBlockRule = (nodeType: NodeType) =>
+  textblockTypeInputRule(/^```$/, nodeType);
 
 // -------------------- Keymaps --------------------
 
@@ -59,4 +72,9 @@ export const hr: IBlock = {
 export const blockQuote: IBlock = {
   name: "blockquote",
   inputRules: [blockQuoteRule(schema.nodes.blockquote)]
+};
+
+export const codeBlock: IBlock = {
+  name: "code_block",
+  inputRules: [codeBlockRule(schema.nodes.codeBlock)]
 };

@@ -2,7 +2,6 @@ import {
   InputRule,
   smartQuotes,
   ellipsis,
-  emDash,
   inputRules
 } from "prosemirror-inputrules";
 import { EditorState, Transaction } from "prosemirror-state";
@@ -44,7 +43,7 @@ export const buildViews = (blocks: IBlock[]) => {
 // ------------------------- Input Rules -------------------------
 
 export const buildInputRules = (blocks: IBlock[]) => {
-  const baseRules: InputRule[] = smartQuotes.concat(ellipsis, emDash);
+  const baseRules: InputRule[] = smartQuotes.concat(ellipsis);
 
   const blockRules: InputRule[] = blocks
     .filter(b => b.inputRules)

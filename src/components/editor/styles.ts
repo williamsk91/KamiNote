@@ -35,6 +35,7 @@ export const editorStyles = css`
 
   hr {
     height: 1px;
+    margin: 12px 0;
     background-color: rgb(228, 227, 226);
     border: none;
   }
