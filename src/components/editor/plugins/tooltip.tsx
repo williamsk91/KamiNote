@@ -36,25 +36,16 @@ export interface ITooltip {
  */
 export const tooltipPlugin = (ReactNode: FC<ITooltip>) =>
   new Plugin({
-    view: editorView => new SelectionSizeTooltip(editorView, ReactNode)
+    view: editorView => tooltip(editorView, ReactNode)
   });
 
-class SelectionSizeTooltip {
-  tooltip: HTMLDivElement;
-  ReactNode: FC<ITooltip>;
+const tooltip = (editorView: EditorView, ReactNode: FC<ITooltip>) => {
+  const tooltip = document.createElement("div");
+  tooltip.className = "tooltip";
 
-  constructor(view: EditorView, ReactNode: FC<ITooltip>) {
-    this.tooltip = document.createElement("div");
-    this.tooltip.className = "tooltip";
+  editorView.dom.parentNode && editorView.dom.parentNode.appendChild(tooltip);
 
-    view.dom.parentNode && view.dom.parentNode.appendChild(this.tooltip);
-
-    this.ReactNode = ReactNode;
-
-    this.update(view, null);
-  }
-
-  render(view: EditorView) {
+  const render = (view: EditorView) => {
     const { from, to, empty } = view.state.selection;
 
     // These are in screen coordinates
@@ -62,8 +53,8 @@ class SelectionSizeTooltip {
     const end = view.coordsAtPos(to);
 
     // The box in which the tooltip is positioned, to use as base
-    const box = this.tooltip.offsetParent
-      ? this.tooltip.offsetParent.getBoundingClientRect()
+    const box = tooltip.offsetParent
+      ? tooltip.offsetParent.getBoundingClientRect()
       : { bottom: 0, left: 0 };
 
     // Find a center-ish x position from the selection endpoints (when
@@ -74,34 +65,35 @@ class SelectionSizeTooltip {
     const bottomSpacing = `${box.bottom - start.top}px`;
 
     return (
-      <this.ReactNode
+      <ReactNode
         empty={empty}
         left={leftSpacing}
         bottom={bottomSpacing}
         view={view}
       />
     );
-  }
+  };
 
-  update(view: EditorView, lastState: EditorState | null) {
-    const state = view.state;
+  return {
+    update(view: EditorView, lastState: EditorState | null) {
+      const state = view.state;
 
-    // Don't do anything if the document/selection didn't change
-    if (
-      lastState &&
-      lastState.doc.eq(state.doc) &&
-      lastState.selection.eq(state.selection)
-    ) {
-      return;
+      // Don't do anything if the document/selection didn't change
+      if (
+        lastState &&
+        lastState.doc.eq(state.doc) &&
+        lastState.selection.eq(state.selection)
+      ) {
+        return;
+      }
+
+      // render / update react
+      const tooltipComponent = render(view);
+      tooltipComponent && ReactDOM.render(tooltipComponent, tooltip);
+    },
+    destroy() {
+      ReactDOM.unmountComponentAtNode(tooltip);
+      tooltip.remove();
     }
-
-    // render / update react
-    const tooltipComponent = this.render(view);
-    tooltipComponent && ReactDOM.render(tooltipComponent, this.tooltip);
-  }
-
-  destroy() {
-    ReactDOM.unmountComponentAtNode(this.tooltip);
-    this.tooltip.remove();
-  }
-}
+  };
+};

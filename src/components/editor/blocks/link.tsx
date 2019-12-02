@@ -1,6 +1,5 @@
-import React, { FC, useState, useRef, useEffect } from "react";
+import React, { FC, useState } from "react";
 import styled from "styled-components";
-import { Scissors } from "react-feather";
 
 import { ITooltip } from "../plugins/tooltip";
 
@@ -48,25 +47,8 @@ export const LinkTooltip: FC<ITooltip> = props => {
     props.view.dispatch(trans);
   };
 
-  /**
-   * sanitize href.
-   *
-   * turn to a command?
-   */
-  const setHref = (href: string) => {
-    const from = $from.pos - $from.textOffset;
-
-    const toNode = props.view.state.doc.nodeAt($to.pos) as Node;
-    const to = $to.pos - $to.textOffset + toNode.nodeSize;
-  };
-
   const body = editing ? (
-    <UrlInput
-      onMouseDown={e => {
-        console.log("clic");
-        e.preventDefault();
-      }}
-    />
+    <URLInput contentEditable>{linkMark.attrs.href}</URLInput>
   ) : (
     <>
       <LinkActions onClick={() => window.open(linkMark.attrs.href, "_blank")}>
@@ -113,4 +95,7 @@ const Spacer = styled.span`
   margin: 0 3px;
 `;
 
-const UrlInput = styled.input``;
+const URLInput = styled.div`
+  min-width: 84px;
+  padding: 6px;
+`;
