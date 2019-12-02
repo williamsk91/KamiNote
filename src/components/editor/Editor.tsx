@@ -19,6 +19,7 @@ import { marks } from "./blocks/marks";
 import { placeholderPlugin } from "./plugins/placeholder";
 import { heading, hr, blockQuote, codeBlock } from "./blocks/base";
 import { tooltipPlugin } from "./plugins/tooltip";
+import { LinkTooltip } from "./blocks/link";
 
 export const Editor = () => {
   let view: EditorView | null;
@@ -43,7 +44,7 @@ export const Editor = () => {
         ]),
 
         placeholderPlugin()
-      ].concat(tooltipPlugin)
+      ].concat(tooltipPlugin(LinkTooltip))
     });
 
     view = new EditorView(document.querySelector("#editor") as Node, {
@@ -58,7 +59,15 @@ export const Editor = () => {
     <>
       <Container onClick={() => view && view.focus()} id="editor" />
       <div id="content" style={{ display: "none" }}>
-        <a href="https://evernote.com/">note</a>
+        <p>
+          hmmmm{" "}
+          <a href="https://evernote.com/">
+            note link <b>wow</b> amazing
+          </a>
+          <a href="https://google.com/">different link</a>
+          normal
+          <b>boooold</b> weeeee
+        </p>
         <hr />
         <h1>H1</h1>
         <h2>H2</h2>

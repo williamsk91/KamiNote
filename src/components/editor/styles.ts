@@ -2,7 +2,6 @@ import { css } from "styled-components";
 import { placeholderPluginStyles } from "./plugins/placeholder";
 import { listStyle } from "./blocks/list";
 import { taskListStyle } from "./blocks/taskList";
-import { tooltipStyles } from "./plugins/tooltip";
 
 export const editorStyles = css`
   & ::selection {
@@ -10,7 +9,6 @@ export const editorStyles = css`
   }
 
   ${placeholderPluginStyles}
-  ${tooltipStyles}
 
   font-size: 16px;
 
