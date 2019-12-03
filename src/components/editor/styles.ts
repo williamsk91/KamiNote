@@ -2,6 +2,7 @@ import { css } from "styled-components";
 import { placeholderPluginStyles } from "./plugins/placeholder";
 import { listStyle } from "./blocks/list";
 import { taskListStyle } from "./blocks/taskList";
+import { markStyles } from "./blocks/marks";
 
 export const editorStyles = css`
   & ::selection {
@@ -51,6 +52,7 @@ export const editorStyles = css`
 
   ${listStyle}
   ${taskListStyle}
+  ${markStyles}
 `;
 
 export const ulListType = (level: number) =>

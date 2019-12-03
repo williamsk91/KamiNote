@@ -152,7 +152,11 @@ export const schema = new Schema({
           })
         }
       ],
-      toDOM: node => ["a", { href: node.attrs.href }, 0],
+      toDOM: node => [
+        "a",
+        { href: node.attrs.href, rel: "noopener noreferrer nofollow" },
+        0
+      ],
       inclusive: false
     }
   }

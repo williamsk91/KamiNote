@@ -47,42 +47,44 @@ const toggleTaskList = (itemType: NodeType) => (
 
 // -------------------- View --------------------
 
-class TaskListView implements NodeView {
-  dom: HTMLDivElement;
-  contentDOM: HTMLDivElement;
-  icon: HTMLDivElement;
+const TaskListView = (
+  node: Node,
+  view: EditorView,
+  getPos: () => number
+): NodeView => {
+  const dom = document.createElement("div");
+  dom.classList.add("taskList");
+  dom.setAttribute("data-level", node.attrs["data-level"]);
+  dom.setAttribute("data-checked", node.attrs["data-checked"]);
 
-  constructor(node: Node, view: EditorView, getPos: () => number) {
-    this.dom = document.createElement("div");
-    this.dom.classList.add("taskList");
-    this.dom.setAttribute("data-level", node.attrs["data-level"]);
-    this.dom.setAttribute("data-checked", node.attrs["data-checked"]);
+  // icon
+  // update this div with an icon
+  const icon = dom.appendChild(document.createElement("div"));
+  icon.setAttribute("contenteditable", "false");
+  icon.classList.add("checkbox");
 
-    // icon
-    // update this div with an icon
-    this.icon = this.dom.appendChild(document.createElement("div"));
-    this.icon.setAttribute("contenteditable", "false");
-    this.icon.classList.add("checkbox");
+  // toggle `data-checked` onClick
+  icon.addEventListener("click", e => {
+    e.preventDefault();
+    view.dispatch(
+      view.state.tr.setNodeMarkup(getPos(), undefined, {
+        ...node.attrs,
+        "data-checked": !node.attrs["data-checked"]
+      })
+    );
+  });
 
-    // toggle `data-checked` onClick
-    this.icon.addEventListener("click", e => {
-      e.preventDefault();
-      view.dispatch(
-        view.state.tr.setNodeMarkup(getPos(), undefined, {
-          ...node.attrs,
-          "data-checked": !node.attrs["data-checked"]
-        })
-      );
-    });
+  // content
+  const contentDOM = dom.appendChild(document.createElement("div"));
 
-    // content
-    this.contentDOM = this.dom.appendChild(document.createElement("div"));
-  }
-
-  stopEvent() {
-    return true;
-  }
-}
+  return {
+    dom,
+    contentDOM,
+    stopEvent() {
+      return true;
+    }
+  };
+};
 
 // -------------------- Keymaps --------------------
 

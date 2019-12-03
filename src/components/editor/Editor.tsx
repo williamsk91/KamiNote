@@ -18,8 +18,8 @@ import { list } from "./blocks/list";
 import { marks } from "./blocks/marks";
 import { placeholderPlugin } from "./plugins/placeholder";
 import { heading, hr, blockQuote, codeBlock } from "./blocks/base";
-import { tooltipPlugin } from "./plugins/tooltip";
-import { LinkTooltip } from "./blocks/link";
+import { buildTooltipPlugin } from "./plugins/tooltip";
+import { link, LinkTooltip } from "./blocks/link";
 
 export const Editor = () => {
   let view: EditorView | null;
@@ -33,6 +33,7 @@ export const Editor = () => {
         history(),
         keymap({ "Mod-z": undo, "Mod-y": redo }),
         dropCursor(),
+
         ...buildBlockPlugins([
           taskList,
           list,
@@ -40,11 +41,14 @@ export const Editor = () => {
           heading,
           hr,
           blockQuote,
-          codeBlock
+          codeBlock,
+          link
         ]),
 
+        ...buildTooltipPlugin("tooltipParent", [LinkTooltip]),
+
         placeholderPlugin()
-      ].concat(tooltipPlugin(LinkTooltip))
+      ]
     });
 
     view = new EditorView(document.querySelector("#editor") as Node, {
@@ -68,6 +72,8 @@ export const Editor = () => {
           normal
           <b>boooold</b> weeeee
         </p>
+        <p>[name](hieo)</p>
+        <p>https://evernote.com/</p>
         <hr />
         <h1>H1</h1>
         <h2>H2</h2>
@@ -84,7 +90,7 @@ export const Editor = () => {
           also <code>code</code>
         </p>
         <hr />
-        {/* <hr />
+        <hr />
         <hr />
         <blockquote>Quote</blockquote>
         <pre>
@@ -106,8 +112,11 @@ export const Editor = () => {
         </div>
         <div className="taskList" data-level={2} data-checked={true}>
           checked
-        </div> */}
+        </div>
+        <hr />
       </div>
+      {/* This is used to render tooltips */}
+      <div id="tooltipParent" />
     </>
   );
 };

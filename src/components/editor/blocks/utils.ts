@@ -5,11 +5,10 @@ import {
   inputRules
 } from "prosemirror-inputrules";
 import { EditorState, Transaction, Plugin } from "prosemirror-state";
-import { Node, MarkType } from "prosemirror-model";
+import { Node } from "prosemirror-model";
 import { EditorView } from "prosemirror-view";
 import { keymap } from "prosemirror-keymap";
 import { baseKeymap } from "prosemirror-commands";
-import { schema } from "../schema";
 
 export type IDispatch = (tr: Transaction) => void;
 
@@ -27,12 +26,12 @@ export interface IBlock {
 
 // ------------------------- View -------------------------
 
-const buildView = (name: string, viewClass: any) => {
+const buildView = (name: string, nodeView: any) => {
   const value = (
     node: Node,
     view: EditorView,
     getPos: boolean | (() => number)
-  ) => new viewClass(node, view, getPos);
+  ) => nodeView(node, view, getPos);
   return { [name]: value };
 };
 
@@ -43,37 +42,6 @@ export const buildViews = (blocks: IBlock[]) => {
   );
 };
 // ------------------------- Input Rules -------------------------
-
-/**
- * Helper to make mark input rules (wraps text).
- *
- * taken from: https://discuss.prosemirror.net/t/input-rules-for-wrapping-marks/537
- */
-export const markInputRule = (
-  regexp: RegExp,
-  markType: MarkType,
-  getAttrs?: { [key: string]: any }
-) => {
-  const newRegexp = new RegExp(regexp.source.replace(/\$$/, "") + "(.)" + "$");
-
-  return new InputRule(newRegexp, (state, match, start, end) => {
-    const attrs = getAttrs instanceof Function ? getAttrs(match) : getAttrs;
-    const textStart = start + match[0].indexOf(match[1]);
-    const textEnd = textStart + match[1].length;
-    const tr = state.tr;
-
-    start = match[0].match(/^\s/) ? start + 1 : start;
-
-    if (textEnd < end) tr.delete(textEnd, end);
-    if (textStart > start) tr.delete(start, textStart);
-
-    end = start + match[1].length;
-
-    return tr
-      .addMark(start, end, markType.create(attrs))
-      .insert(end, schema.text(match[2]));
-  });
-};
 
 export const buildInputRules = (blocks: IBlock[]) => {
   const baseRules: InputRule[] = smartQuotes.concat(ellipsis);
@@ -101,8 +69,7 @@ export const buildKeymaps = (blocks: IBlock[]) => {
 export const buildPlugins = (blocks: IBlock[]) => {
   const blockPlugins = blocks
     .filter(b => b.plugins)
-    .flatMap(b => keymap(b.plugins as Plugin[]));
-
+    .flatMap(b => b.plugins as Plugin[]);
   return blockPlugins;
 };
 // ------------------------- Input Rules and Keymaps  -------------------------

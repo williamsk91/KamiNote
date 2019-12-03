@@ -1,7 +1,14 @@
 import React, { FC } from "react";
 import ReactDOM from "react-dom";
 import { Plugin, EditorState } from "prosemirror-state";
-import { EditorView, NodeView } from "prosemirror-view";
+import { EditorView } from "prosemirror-view";
+
+export interface IViewPortCoords {
+  left: number;
+  right: number;
+  top: number;
+  bottom: number;
+}
 
 export interface ITooltip {
   /**
@@ -21,54 +28,50 @@ export interface ITooltip {
   empty: boolean;
 
   /**
-   * left padding
+   * the viewport coordinates of the anchor and
+   *  head of a text selection.
    */
-  left: string;
-
-  /**
-   * bottom padding
-   */
-  bottom: string;
+  anchor: IViewPortCoords;
+  head: IViewPortCoords;
 }
 
 /**
  * PM plugins that renders react component with ITooltip props.
+ * the component is rendered as a child of node with nodeId
  */
-export const tooltipPlugin = (ReactNode: FC<ITooltip>) =>
+export const tooltipPlugin = (nodeId: string, ReactNode: FC<ITooltip>) =>
   new Plugin({
-    view: editorView => tooltip(editorView, ReactNode)
+    view: () => tooltip(nodeId, ReactNode)
   });
 
-const tooltip = (editorView: EditorView, ReactNode: FC<ITooltip>) => {
+const tooltip = (nodeId: string, ReactNode: FC<ITooltip>) => {
   const tooltip = document.createElement("div");
-  tooltip.className = "tooltip";
 
-  editorView.dom.parentNode && editorView.dom.parentNode.appendChild(tooltip);
+  /**
+   * This requires a div tag outside of the editor.
+   *  By rendering it outside of the editor, the selection
+   *  made inside the tooltip won't be intervened by the editor.
+   *
+   * For example, if tooltip is rendered inside the editor,
+   *  rendering an `input` element will not be focusable.
+   */
+  const tooltipParent = document.getElementById(nodeId);
+
+  // editorView.dom.parentNode && editorView.dom.parentNode.appendChild(tooltip);
+  tooltipParent && tooltipParent.appendChild(tooltip);
 
   const render = (view: EditorView) => {
-    const { from, to, empty } = view.state.selection;
+    const { anchor, head, empty } = view.state.selection;
 
     // These are in screen coordinates
-    const start = view.coordsAtPos(from);
-    const end = view.coordsAtPos(to);
-
-    // The box in which the tooltip is positioned, to use as base
-    const box = tooltip.offsetParent
-      ? tooltip.offsetParent.getBoundingClientRect()
-      : { bottom: 0, left: 0 };
-
-    // Find a center-ish x position from the selection endpoints (when
-    // crossing lines, end may be more to the left)
-    const left = Math.max((start.left + end.left) / 2, start.left + 3);
-
-    const leftSpacing = `${left - box.left}px`;
-    const bottomSpacing = `${box.bottom - start.top}px`;
+    const anchorCoor = view.coordsAtPos(anchor);
+    const headCoor = view.coordsAtPos(head);
 
     return (
       <ReactNode
         empty={empty}
-        left={leftSpacing}
-        bottom={bottomSpacing}
+        anchor={anchorCoor}
+        head={headCoor}
         view={view}
       />
     );
@@ -91,9 +94,15 @@ const tooltip = (editorView: EditorView, ReactNode: FC<ITooltip>) => {
       const tooltipComponent = render(view);
       tooltipComponent && ReactDOM.render(tooltipComponent, tooltip);
     },
+
     destroy() {
       ReactDOM.unmountComponentAtNode(tooltip);
       tooltip.remove();
     }
   };
 };
+
+export const buildTooltipPlugin = (
+  nodeId: string,
+  ReactNodes: FC<ITooltip>[]
+) => ReactNodes.map(c => tooltipPlugin(nodeId, c));
