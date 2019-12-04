@@ -44,7 +44,7 @@ export const tooltipPlugin = (nodeId: string, ReactNode: FC<ITooltip>) =>
     view: () => tooltip(nodeId, ReactNode)
   });
 
-const tooltip = (nodeId: string, ReactNode: FC<ITooltip>) => {
+export const tooltip = (nodeId: string, ReactNode: FC<ITooltip>) => {
   const tooltip = document.createElement("div");
 
   /**

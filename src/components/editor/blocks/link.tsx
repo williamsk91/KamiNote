@@ -13,6 +13,33 @@ import { InputRule } from "prosemirror-inputrules";
 // -------------------- Commands --------------------
 
 /**
+ * insert link in the selection.
+ *
+ * the href will default to the selected text.
+ */
+export const insertLink = (markType: MarkType) => (
+  state: EditorState,
+  dispatch?: IDispatch
+) => {
+  const { empty, from, to } = state.selection;
+
+  // can't set a link on an empty selection
+  if (empty) return false;
+
+  if (dispatch) {
+    const textSelected = state.doc.cut(from, to).textContent;
+    const tr = state.tr.addMark(
+      from,
+      to,
+      markType.create({ href: textSelected })
+    );
+    dispatch(tr);
+  }
+
+  return true;
+};
+
+/**
  * open href attrs of markType in new tab.
  */
 const openHrefInNewTab = (markType: MarkType) => (
@@ -188,8 +215,7 @@ export const LinkTooltip: FC<ITooltip> = props => {
 
   const { state, dispatch } = props.view;
   const { selection, schema } = state;
-  const { $from, $to } = selection.ranges[0];
-
+  const { $from, $to } = selection;
   /**
    * Reset to not editing on selection change.
    */

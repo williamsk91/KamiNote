@@ -20,6 +20,7 @@ import { placeholderPlugin } from "./plugins/placeholder";
 import { heading, hr, blockQuote, codeBlock } from "./blocks/base";
 import { buildTooltipPlugin } from "./plugins/tooltip";
 import { link, LinkTooltip } from "./blocks/link";
+import { inlineToolbar } from "./plugins/inlineToolbar";
 
 export const Editor = () => {
   let view: EditorView | null;
@@ -46,6 +47,7 @@ export const Editor = () => {
         ]),
 
         ...buildTooltipPlugin("tooltipParent", [LinkTooltip]),
+        inlineToolbar("toolbar"),
 
         placeholderPlugin()
       ]
@@ -117,6 +119,7 @@ export const Editor = () => {
       </div>
       {/* This is used to render tooltips */}
       <div id="tooltipParent" />
+      <div id="toolbar" />
     </>
   );
 };

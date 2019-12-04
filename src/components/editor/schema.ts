@@ -139,11 +139,12 @@ export const schema = new Schema({
       toDOM: () => ["s"]
     },
     code: {
+      excludes: "_",
       parseDOM: [{ tag: "code" }],
       toDOM: () => ["code"]
     },
     link: {
-      attrs: { href: {} },
+      attrs: { href: { default: "" } },
       parseDOM: [
         {
           tag: "a",
