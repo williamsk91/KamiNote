@@ -21,6 +21,10 @@ import { heading, hr, blockQuote, codeBlock } from "./blocks/base";
 import { buildTooltipPlugin } from "./plugins/tooltip";
 import { link, LinkTooltip } from "./blocks/link";
 import { inlineToolbar } from "./plugins/inlineToolbar";
+import {
+  suggestionPlugin,
+  suggestionPluginStyles
+} from "./plugins/suggestionPlugin/suggestion";
 
 export const Editor = () => {
   let view: EditorView | null;
@@ -49,7 +53,9 @@ export const Editor = () => {
         ...buildTooltipPlugin("tooltipParent", [LinkTooltip]),
         inlineToolbar("toolbar"),
 
-        placeholderPlugin()
+        placeholderPlugin(),
+
+        suggestionPlugin("wss://suggestion-next.cadmus.io")
       ]
     });
 
@@ -65,7 +71,7 @@ export const Editor = () => {
     <>
       <Container onClick={() => view && view.focus()} id="editor" />
       <div id="content" style={{ display: "none" }}>
-        <p>
+        {/* <p>
           hmmmm{" "}
           <a href="https://evernote.com/">
             note link <b>wow</b> amazing
@@ -79,10 +85,11 @@ export const Editor = () => {
         <hr />
         <h1>H1</h1>
         <h2>H2</h2>
-        <h3>H3</h3>
-        <hr />
-        <p>text</p>
-        <p>
+        <h3>H3</h3> */}
+        <p>simple txt with sme words</p>
+        <p>this paagrph misspelled wrd</p>
+        <p>ths one too wrd teehee wrd</p>
+        {/* <p>
           <b>bold</b> && <i>italic</i> && <s>strike</s>
         </p>
         <p>
@@ -90,8 +97,8 @@ export const Editor = () => {
         </p>
         <p>
           also <code>code</code>
-        </p>
-        <hr />
+        </p> */}
+        {/* <hr />
         <hr />
         <hr />
         <blockquote>Quote</blockquote>
@@ -115,11 +122,12 @@ export const Editor = () => {
         <div className="taskList" data-level={2} data-checked={true}>
           checked
         </div>
-        <hr />
+        <hr /> */}
       </div>
       {/* This is used to render tooltips */}
       <div id="tooltipParent" />
       <div id="toolbar" />
+      <div id="suggestion" />
     </>
   );
 };
@@ -136,4 +144,5 @@ const Container = styled.div`
   }
 
   ${editorStyles};
+  ${suggestionPluginStyles}
 `;
