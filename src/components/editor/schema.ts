@@ -1,4 +1,10 @@
 import { Schema } from "prosemirror-model";
+import {
+  colorPallete,
+  highlightPallete,
+  ColorPallete,
+  HighlightPallete
+} from "./blocks/color";
 
 // ------------------------- Schema -------------------------
 
@@ -142,6 +148,43 @@ export const schema = new Schema({
       excludes: "_",
       parseDOM: [{ tag: "code" }],
       toDOM: () => ["code"]
+    },
+    color: {
+      attrs: { color: {} },
+      parseDOM: [
+        {
+          tag: "span.color",
+          getAttrs: (node: any) => {
+            const nodeColor = node.getAttribute("color");
+            if (!(nodeColor in colorPallete)) return false;
+
+            return {
+              color: colorPallete[nodeColor as ColorPallete]
+            };
+          }
+        }
+      ],
+      toDOM: node => ["span.color", { style: `color: ${node.attrs.color}` }]
+    },
+    higlight: {
+      attrs: { color: {} },
+      parseDOM: [
+        {
+          tag: "span.highlight",
+          getAttrs: (node: any) => {
+            const nodeColor = node.getAttribute("color");
+            if (!(nodeColor in colorPallete)) return false;
+
+            return {
+              color: highlightPallete[nodeColor as HighlightPallete]
+            };
+          }
+        }
+      ],
+      toDOM: node => [
+        "span.higlight",
+        { style: `background-color: ${node.attrs.color}` }
+      ]
     },
     link: {
       attrs: { href: { default: "" } },

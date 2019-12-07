@@ -92,6 +92,105 @@ export const Editor = () => {
           also <code>code</code>
         </p>
         <hr />
+        <p>
+          Hello{" "}
+          <span className="color" color="red">
+            colored
+          </span>{" "}
+          text
+        </p>
+        <p>
+          Hello{" "}
+          <span className="color" color="orange">
+            colored
+          </span>{" "}
+          text
+        </p>
+        <p>
+          Hello{" "}
+          <span className="color" color="yellow">
+            colored
+          </span>{" "}
+          text
+        </p>
+        <p>
+          Hello{" "}
+          <span className="color" color="green">
+            colored
+          </span>{" "}
+          text
+        </p>
+        <p>
+          Hello{" "}
+          <span className="color" color="blue">
+            colored
+          </span>{" "}
+          text
+        </p>
+        <p>
+          Hello{" "}
+          <span className="color" color="purple">
+            colored
+          </span>{" "}
+          text
+        </p>
+        <p>
+          Hello{" "}
+          <span className="color" color="pink">
+            colored
+          </span>{" "}
+          text
+        </p>
+        <hr />
+        <p>
+          Hello{" "}
+          <span className="highlight" color="red">
+            colored
+          </span>{" "}
+          text
+        </p>
+        <p>
+          Hello{" "}
+          <span className="highlight" color="orange">
+            colored
+          </span>{" "}
+          text
+        </p>
+        <p>
+          Hello{" "}
+          <span className="highlight" color="yellow">
+            colored
+          </span>{" "}
+          text
+        </p>
+        <p>
+          Hello{" "}
+          <span className="highlight" color="green">
+            colored
+          </span>{" "}
+          text
+        </p>
+        <p>
+          Hello{" "}
+          <span className="highlight" color="blue">
+            colored
+          </span>{" "}
+          text
+        </p>
+        <p>
+          Hello{" "}
+          <span className="highlight" color="purple">
+            colored
+          </span>{" "}
+          text
+        </p>
+        <p>
+          Hello{" "}
+          <span className="highlight" color="pink">
+            colored
+          </span>{" "}
+          text
+        </p>
         <hr />
         <hr />
         <blockquote>Quote</blockquote>
