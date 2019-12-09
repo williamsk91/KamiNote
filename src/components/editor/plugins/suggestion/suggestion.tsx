@@ -2,10 +2,11 @@ import React, { FC } from "react";
 import ReactDOM from "react-dom";
 import { css } from "styled-components";
 
-import { Plugin, PluginKey, EditorState } from "prosemirror-state";
+import { Plugin, PluginKey, EditorState, Transaction } from "prosemirror-state";
 import { DecorationSet, Decoration, EditorView } from "prosemirror-view";
 
 import { ISuggestionTooltip, SuggestionMenu } from "./menu";
+import { debounce } from "./debounce";
 
 export interface ISuggestion {
   phrase: string;
@@ -96,6 +97,10 @@ export const suggestionPlugin = (url: string) => {
       })
     );
   };
+
+  // ------------------------- Plugin State helpers  -------------------------
+
+  const debouncedSendRequest = debounce(sendRequest, 500);
 
   // ------------------------- Plugin instance -------------------------
 
@@ -200,28 +205,7 @@ export const suggestionPlugin = (url: string) => {
           ignoreList.push(ignoreWord);
         } else {
           // ------------------------- 4. New suggestion request -------------------------
-
-          /**
-           * the pos range affected by this transaction
-           */
-          let from = tr.doc.content.size,
-            to = 0;
-          tr.mapping.maps.map(stepMap => {
-            stepMap.forEach((_oldStart, _oldEnd, newStart, newEnd) => {
-              from = Math.min(from, newStart);
-              to = Math.max(to, newEnd);
-            });
-          });
-
-          /**
-           * request suggestion on affected nodes
-           */
-          tr.doc.nodesBetween(from, to, (node, pos) => {
-            sendToSocket(pos, node.textContent);
-
-            // to not iterate deeper.
-            return false;
-          });
+          debouncedSendRequest(tr, sendToSocket);
         }
 
         return { decoSet: updatedDecoSet, ignoreList };
@@ -297,9 +281,6 @@ const suggestionTooltip = (
        */
       const { from, to } = state.selection;
 
-      /**
-       * TODO: type suggestionKey
-       */
       const decoSet = suggestionKey.getState(state).decoSet;
 
       const decoInFrom = decoSet && decoSet.find(from, from);
@@ -372,4 +353,34 @@ const findSubtextPos = (
     match = re.exec(text);
   }
   return positions;
+};
+
+/**
+ * Send suggestion requests on affected nodes
+ */
+const sendRequest = (
+  tr: Transaction,
+  sendToSocket: (key: number, text: string) => void
+) => {
+  /**
+   * the pos range affected by this transaction
+   */
+  let from = tr.doc.content.size,
+    to = 0;
+  tr.mapping.maps.map(stepMap => {
+    stepMap.forEach((_oldStart, _oldEnd, newStart, newEnd) => {
+      from = Math.min(from, newStart);
+      to = Math.max(to, newEnd);
+    });
+  });
+
+  /**
+   * request suggestion on affected nodes
+   */
+  tr.doc.nodesBetween(from, to, (node, pos) => {
+    sendToSocket(pos, node.textContent);
+
+    // to not iterate deeper.
+    return false;
+  });
 };
