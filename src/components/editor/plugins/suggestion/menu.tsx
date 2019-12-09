@@ -1,14 +1,22 @@
 import React, { FC, useState, useEffect } from "react";
 import styled from "styled-components";
 
-import { ITooltip } from "../tooltip";
 import { IInlineSuggestion, ITextPos } from "./suggestion";
 
-export interface ISuggestionTooltip extends ITooltip {
+export interface ISuggestionTooltip {
+  /**
+   * left and top offset in px for
+   * absolute positioning the component
+   * just under the text
+   */
+  left: number;
+  top: number;
+
   suggestion?: IInlineSuggestion;
   onSelect: (suggestion: string, pos: ITextPos) => void;
-  onIgnore: () => void;
+  onIgnore: (phrase: string) => void;
 }
+
 export const SuggestionMenu: FC<ISuggestionTooltip> = props => {
   const { suggestion, onSelect, onIgnore, ...tooltipProps } = props;
 
@@ -18,15 +26,15 @@ export const SuggestionMenu: FC<ISuggestionTooltip> = props => {
    * This is used to close the menu after selecting one
    * of the suggested phrase or ignoring the phrase.
    */
-  const [close, setClose] = useState(!suggestion);
+  const [close, setClose] = useState(false);
 
   useEffect(() => {
-    setClose(!suggestion);
+    setClose(false);
   }, [suggestion]);
 
-  if (close) return null;
+  if (!suggestion || close) return null;
 
-  const { candidates, pos } = suggestion as IInlineSuggestion;
+  const { phrase, candidates, pos } = suggestion as IInlineSuggestion;
 
   return (
     <Container {...tooltipProps}>
@@ -47,7 +55,7 @@ export const SuggestionMenu: FC<ISuggestionTooltip> = props => {
       <ActionButton>-</ActionButton>
       <ActionButton
         onClick={() => {
-          onIgnore();
+          onIgnore(phrase);
           setClose(true);
         }}
       >
@@ -57,11 +65,10 @@ export const SuggestionMenu: FC<ISuggestionTooltip> = props => {
   );
 };
 
-const Container = styled.div<ITooltip>`
+const Container = styled.div<{ left: number; top: number }>`
   position: absolute;
-  left: ${p => `${p.anchor.left}px`};
-  top: ${p => `${p.anchor.top}px`};
-  transform: translateX(-200%);
+  left: ${p => `${p.left}px`};
+  top: ${p => `${p.top}px`};
 
   display: flex;
   flex-direction: column;

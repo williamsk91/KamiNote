@@ -5,6 +5,7 @@ import { css } from "styled-components";
 import { Plugin, PluginKey, EditorState } from "prosemirror-state";
 import { DecorationSet, Decoration, EditorView } from "prosemirror-view";
 import { ISuggestionTooltip, SuggestionMenu } from "./menu";
+import { start } from "repl";
 
 export interface ISuggestion {
   phrase: string;
@@ -249,30 +250,32 @@ const suggestionTooltip = (
   const tooltip = document.createElement("div");
   view.dom.parentElement && view.dom.parentElement.appendChild(tooltip);
 
-  const render = (view: EditorView, suggestion: IInlineSuggestion) => {
+  const render = (view: EditorView, suggestion?: IInlineSuggestion) => {
     const { state, dispatch } = view;
-    const { anchor, head, empty } = view.state.selection;
 
-    // These are in screen coordinates
-    const anchorCoor = view.coordsAtPos(anchor);
-    const headCoor = view.coordsAtPos(head);
+    let left = 0;
+    let top = 0;
+    if (suggestion) {
+      const phraseStart = view.coordsAtPos(suggestion.pos.from);
+
+      let box = tooltip.offsetParent
+        ? tooltip.offsetParent.getBoundingClientRect()
+        : { left: 0, top: 0 };
+
+      left = phraseStart.left - box.left;
+      top = phraseStart.bottom - box.top;
+    }
 
     return (
       <ReactNode
-        empty={empty}
-        anchor={anchorCoor}
-        head={headCoor}
-        view={view}
+        left={left}
+        top={top}
         suggestion={suggestion}
         onSelect={(suggestion, pos) => {
-          const tr = state.tr.insertText(suggestion, pos.from, pos.to);
-          dispatch(tr);
+          dispatch(state.tr.insertText(suggestion, pos.from, pos.to));
         }}
-        onIgnore={() => {
-          /** remove current deco with this word */
-          dispatch(
-            state.tr.setMeta(suggestionKey, { ignore: suggestion.phrase })
-          );
+        onIgnore={phrase => {
+          dispatch(state.tr.setMeta(suggestionKey, { ignore: phrase }));
         }}
       />
     );
