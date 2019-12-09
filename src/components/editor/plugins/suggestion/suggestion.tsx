@@ -1,10 +1,9 @@
 import React, { FC } from "react";
 import ReactDOM from "react-dom";
-import styled, { css } from "styled-components";
+import { css } from "styled-components";
 
 import { Plugin, PluginKey, EditorState } from "prosemirror-state";
 import { DecorationSet, Decoration, EditorView } from "prosemirror-view";
-import { ITooltip } from "../tooltip";
 import { ISuggestionTooltip, SuggestionMenu } from "./menu";
 
 export interface ISuggestion {
@@ -20,11 +19,11 @@ interface IBlockSuggestion {
 /**
  * Pos is used to decorate inline
  */
-interface IInlineSuggestion extends ISuggestion {
+export interface IInlineSuggestion extends ISuggestion {
   pos: ITextPos;
 }
 
-interface ITextPos {
+export interface ITextPos {
   from: number;
   to: number;
 }
@@ -32,6 +31,7 @@ interface ITextPos {
 const suggestionKey = new PluginKey("suggestion");
 
 interface ISuggestionPluginState {
+  ignoreList: string[];
   decoSet: DecorationSet;
 }
 
@@ -39,7 +39,7 @@ interface ISuggestionPluginState {
 
 const decoClass = "suggestionClass";
 
-const suggestionDeco = (from: number, to: number, spec: ISuggestion) => {
+const suggestionDeco = (from: number, to: number, spec: IInlineSuggestion) => {
   return Decoration.inline(
     from,
     to,
@@ -115,6 +115,7 @@ export const suggestionPlugin = (url: string) => {
         };
 
         return {
+          ignoreList: [],
           decoSet: DecorationSet.empty
         };
       },
@@ -122,19 +123,23 @@ export const suggestionPlugin = (url: string) => {
        * Does a couple of things
        *    1. updates decoration positions
        *
-       *    if suggestionMetadata is included
+       *    if suggestion metadata is included
        *        2.a. update that block's decoration
        *
-       *    if suggestionMetadata is NOT included
+       *    if ignore metadata is included
+       *        3. removes this word from all decorations
+       *
+       *    if suggestion metadata is NOT included
        *        2.b. find affected blocks and send new suggestion request
        */
       apply: (tr, value, _oldState, newState) => {
         // ------------------------- 1. Update deco pos -------------------------
         let updatedDecoSet = value.decoSet.map(tr.mapping, tr.doc);
+        const ignoreList = value.ignoreList;
 
         const suggestionMeta = tr.getMeta(suggestionKey);
 
-        if (suggestionMeta) {
+        if (suggestionMeta && suggestionMeta.suggestion) {
           // ------------------------- 2.a Remove & Add deco -------------------------
           /**
            * Suggestion from the server
@@ -147,7 +152,8 @@ export const suggestionPlugin = (url: string) => {
            * Remove all decos from this block
            */
           const from = +blockSuggestions.key;
-          const nodeSize = tr.doc.nodeAt(from).nodeSize;
+          const node = tr.doc.nodeAt(from);
+          const nodeSize = node ? node.nodeSize : 0;
           const to = from + nodeSize;
           const currBlockDeco = updatedDecoSet.find(from, to);
 
@@ -161,13 +167,38 @@ export const suggestionPlugin = (url: string) => {
            * the edited text as opposed to whole node
            */
           const inlineSuggestions = phraseToPos(newState, blockSuggestions);
+
+          const validInlineSuggestions = inlineSuggestions.filter(
+            ({ phrase }) => !ignoreList.includes(phrase)
+          );
+
           const newDecos: Decoration[] = [];
-          inlineSuggestions.map(({ pos: { from, to }, phrase, candidates }) => {
-            newDecos.push(suggestionDeco(from, to, { phrase, candidates }));
+          validInlineSuggestions.map(({ pos, phrase, candidates }) => {
+            newDecos.push(
+              suggestionDeco(pos.from, pos.to, { phrase, candidates, pos })
+            );
           });
 
           // add deco
           updatedDecoSet = updatedDecoSet.add(tr.doc, newDecos);
+        } else if (suggestionMeta && suggestionMeta.ignore) {
+          const ignoreWord = suggestionMeta.ignore;
+
+          /**
+           * Removes all deco from document that have `phrase` === `ignoreWord`
+           */
+          const currDecoToBeIgnored = updatedDecoSet.find(
+            0,
+            tr.doc.content.size,
+            spec => spec.phrase === ignoreWord
+          );
+          updatedDecoSet = updatedDecoSet.remove(currDecoToBeIgnored);
+
+          /**
+           * Adds ignoreWord to the ignoreList.
+           * This list is used to prevent future addition of the phrase.
+           */
+          ignoreList.push(ignoreWord);
         } else {
           // ------------------------- New suggestion request -------------------------
 
@@ -196,7 +227,7 @@ export const suggestionPlugin = (url: string) => {
           });
         }
 
-        return { decoSet: updatedDecoSet };
+        return { decoSet: updatedDecoSet, ignoreList };
       }
     },
     props: {
@@ -208,6 +239,7 @@ export const suggestionPlugin = (url: string) => {
     }
   });
 };
+
 // ------------------------- Suggestion Menu -------------------------
 
 const suggestionTooltip = (
@@ -217,7 +249,8 @@ const suggestionTooltip = (
   const tooltip = document.createElement("div");
   view.dom.parentElement && view.dom.parentElement.appendChild(tooltip);
 
-  const render = (view: EditorView, suggestion?: ISuggestion) => {
+  const render = (view: EditorView, suggestion: IInlineSuggestion) => {
+    const { state, dispatch } = view;
     const { anchor, head, empty } = view.state.selection;
 
     // These are in screen coordinates
@@ -231,6 +264,16 @@ const suggestionTooltip = (
         head={headCoor}
         view={view}
         suggestion={suggestion}
+        onSelect={(suggestion, pos) => {
+          const tr = state.tr.insertText(suggestion, pos.from, pos.to);
+          dispatch(tr);
+        }}
+        onIgnore={() => {
+          /** remove current deco with this word */
+          dispatch(
+            state.tr.setMeta(suggestionKey, { ignore: suggestion.phrase })
+          );
+        }}
       />
     );
   };
@@ -325,21 +368,3 @@ const findSubtextPos = (
   }
   return positions;
 };
-
-/**
- * range of pos that is affected by the transaction
- */
-// const rangeFromTransform = (tr: Transaction) => {
-//   let from: number = tr.doc.nodeSize;
-//   let to: number = 0;
-
-//   tr.steps.map(step => {
-//     console.log("step: ", step);
-//     console.log("step.getMap(): ", step.getMap());
-
-//     from = Math.min(step.from, from);
-//     to = Math.max(step.to, to);
-//   });
-
-//   return { from, to };
-// };

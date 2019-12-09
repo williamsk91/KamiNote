@@ -24,7 +24,7 @@ import { inlineToolbar } from "./plugins/inlineToolbar";
 import {
   suggestionPlugin,
   suggestionPluginStyles
-} from "./plugins/suggestionPlugin/suggestion";
+} from "./plugins/suggestion/suggestion";
 
 export const Editor = () => {
   let view: EditorView | null;
