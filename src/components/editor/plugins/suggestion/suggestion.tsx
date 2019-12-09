@@ -4,8 +4,8 @@ import { css } from "styled-components";
 
 import { Plugin, PluginKey, EditorState } from "prosemirror-state";
 import { DecorationSet, Decoration, EditorView } from "prosemirror-view";
+
 import { ISuggestionTooltip, SuggestionMenu } from "./menu";
-import { start } from "repl";
 
 export interface ISuggestion {
   phrase: string;
@@ -29,12 +29,12 @@ export interface ITextPos {
   to: number;
 }
 
-const suggestionKey = new PluginKey("suggestion");
-
 interface ISuggestionPluginState {
   ignoreList: string[];
   decoSet: DecorationSet;
 }
+
+const suggestionKey = new PluginKey<ISuggestionPluginState>("suggestion");
 
 // ------------------------- Inline Decoration -------------------------
 
@@ -62,11 +62,13 @@ export const suggestionPluginStyles = css`
 `;
 
 // ------------------------- Plugin -------------------------
+/**
+ * Suggestion plugin.
+ */
 export const suggestionPlugin = (url: string) => {
   /**
    * local view is set in plugin's view.
    * This allows plugin's state to call dispatch.
-   *
    */
   let localView: EditorView;
 
@@ -74,10 +76,8 @@ export const suggestionPlugin = (url: string) => {
 
   const socket = new WebSocket(url);
   /**
-   * Create a transaction with suggestionMetadata to
+   * Create a transaction with suggestion metadata to
    * update inline decorations.
-   *
-   * Check state apply function
    */
   socket.onmessage = e => {
     localView.dispatch(
@@ -86,7 +86,7 @@ export const suggestionPlugin = (url: string) => {
   };
 
   /**
-   *
+   * Asks server for suggestions.
    */
   const sendToSocket = (key: number, text: string) => {
     socket.send(
@@ -125,13 +125,13 @@ export const suggestionPlugin = (url: string) => {
        *    1. updates decoration positions
        *
        *    if suggestion metadata is included
-       *        2.a. update that block's decoration
+       *        2. update that block's decoration
        *
        *    if ignore metadata is included
        *        3. removes this word from all decorations
        *
-       *    if suggestion metadata is NOT included
-       *        2.b. find affected blocks and send new suggestion request
+       *    if no metadata is NOT included
+       *        4. find affected blocks and send new suggestion request
        */
       apply: (tr, value, _oldState, newState) => {
         // ------------------------- 1. Update deco pos -------------------------
@@ -141,7 +141,7 @@ export const suggestionPlugin = (url: string) => {
         const suggestionMeta = tr.getMeta(suggestionKey);
 
         if (suggestionMeta && suggestionMeta.suggestion) {
-          // ------------------------- 2.a Remove & Add deco -------------------------
+          // ------------------------- 2. Remove & Add deco -------------------------
           /**
            * Suggestion from the server
            */
@@ -150,7 +150,7 @@ export const suggestionPlugin = (url: string) => {
           );
 
           /**
-           * Remove all decos from this block
+           * remove all decos from this block
            */
           const from = +blockSuggestions.key;
           const node = tr.doc.nodeAt(from);
@@ -158,7 +158,6 @@ export const suggestionPlugin = (url: string) => {
           const to = from + nodeSize;
           const currBlockDeco = updatedDecoSet.find(from, to);
 
-          // remove old deco
           updatedDecoSet = updatedDecoSet.remove(currBlockDeco);
 
           /**
@@ -183,16 +182,15 @@ export const suggestionPlugin = (url: string) => {
           // add deco
           updatedDecoSet = updatedDecoSet.add(tr.doc, newDecos);
         } else if (suggestionMeta && suggestionMeta.ignore) {
+          // ------------------------- 3. Removes ignored word from all decos -------------------------
           const ignoreWord = suggestionMeta.ignore;
 
-          /**
-           * Removes all deco from document that have `phrase` === `ignoreWord`
-           */
           const currDecoToBeIgnored = updatedDecoSet.find(
             0,
             tr.doc.content.size,
             spec => spec.phrase === ignoreWord
           );
+
           updatedDecoSet = updatedDecoSet.remove(currDecoToBeIgnored);
 
           /**
@@ -201,12 +199,10 @@ export const suggestionPlugin = (url: string) => {
            */
           ignoreList.push(ignoreWord);
         } else {
-          // ------------------------- New suggestion request -------------------------
+          // ------------------------- 4. New suggestion request -------------------------
 
           /**
-           * the max ranges affected by this transaction
-           *
-           * this is to find all affected nodes
+           * the pos range affected by this transaction
            */
           let from = tr.doc.content.size,
             to = 0;
@@ -218,7 +214,7 @@ export const suggestionPlugin = (url: string) => {
           });
 
           /**
-           * send affected nodes
+           * request suggestion on affected nodes
            */
           tr.doc.nodesBetween(from, to, (node, pos) => {
             sendToSocket(pos, node.textContent);
@@ -243,6 +239,9 @@ export const suggestionPlugin = (url: string) => {
 
 // ------------------------- Suggestion Menu -------------------------
 
+/**
+ * Wrapper that finds the positions for `ReactNode` to render.
+ */
 const suggestionTooltip = (
   view: EditorView,
   ReactNode: FC<ISuggestionTooltip>
@@ -285,7 +284,7 @@ const suggestionTooltip = (
     update(view: EditorView, lastState: EditorState) {
       const state = view.state;
 
-      // Don't do anything if the document/selection didn't change
+      // Don't do anything if the document / selection didn't change
       if (
         lastState.doc.eq(state.doc) &&
         lastState.selection.eq(state.selection)
@@ -294,21 +293,24 @@ const suggestionTooltip = (
       }
 
       /**
-       * Check that selection is in one of the misspelled phrase
+       * get deco if selection is inside it
        */
-      const { anchor } = state.selection;
-
-      const stateDecos = suggestionKey.getState(state).decoSet;
-      const decos = stateDecos && stateDecos.find(anchor, anchor);
+      const { from, to } = state.selection;
 
       /**
-       * Get the current inline decoration selected.
-       * Should only be one
+       * TODO: type suggestionKey
        */
-      const selectedDeco = decos[0] ? decos[0].spec : null;
+      const decoSet = suggestionKey.getState(state).decoSet;
+
+      const decoInFrom = decoSet && decoSet.find(from, from);
+      let singleDeco = decoInFrom[0] ? decoInFrom[0].spec : null;
+
+      if (singleDeco && singleDeco.pos.to < to) {
+        singleDeco = null;
+      }
 
       // render / update react
-      const tooltipComponent = render(view, selectedDeco);
+      const tooltipComponent = render(view, singleDeco);
       tooltipComponent && ReactDOM.render(tooltipComponent, tooltip);
     },
 
