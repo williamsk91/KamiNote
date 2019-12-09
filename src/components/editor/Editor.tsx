@@ -55,7 +55,9 @@ export const Editor = () => {
 
         placeholderPlugin(),
 
-        suggestionPlugin("wss://suggestion-next.cadmus.io")
+        suggestionPlugin("wss://suggestion-next.cadmus.io", [
+          schema.nodes.codeBlock
+        ])
       ]
     });
 

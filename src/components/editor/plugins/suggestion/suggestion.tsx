@@ -4,6 +4,7 @@ import { css } from "styled-components";
 
 import { Plugin, PluginKey, EditorState, Transaction } from "prosemirror-state";
 import { DecorationSet, Decoration, EditorView } from "prosemirror-view";
+import { Node, NodeType } from "prosemirror-model";
 
 import { ISuggestionTooltip, SuggestionMenu } from "./menu";
 import { debounce } from "./debounce";
@@ -66,7 +67,7 @@ export const suggestionPluginStyles = css`
 /**
  * Suggestion plugin.
  */
-export const suggestionPlugin = (url: string) => {
+export const suggestionPlugin = (url: string, ignoreNodeType: NodeType[]) => {
   /**
    * local view is set in plugin's view.
    * This allows plugin's state to call dispatch.
@@ -102,6 +103,11 @@ export const suggestionPlugin = (url: string) => {
 
   const debouncedSendRequest = debounce(sendRequest, 500);
 
+  /**
+   * Refer to `sendValidNode` for more info
+   */
+  const nodeCheck = sendValidNode(sendToSocket, ignoreNodeType);
+
   // ------------------------- Plugin instance -------------------------
 
   return new Plugin<ISuggestionPluginState>({
@@ -112,12 +118,7 @@ export const suggestionPlugin = (url: string) => {
          * send all immediate blocks of starting doc
          */
         socket.onopen = () => {
-          instance.doc.descendants((node, pos) => {
-            sendToSocket(pos, node.textContent);
-
-            // to not iterate deeper.
-            return false;
-          });
+          instance.doc.descendants(nodeCheck);
         };
 
         return {
@@ -205,7 +206,7 @@ export const suggestionPlugin = (url: string) => {
           ignoreList.push(ignoreWord);
         } else {
           // ------------------------- 4. New suggestion request -------------------------
-          debouncedSendRequest(tr, sendToSocket);
+          debouncedSendRequest(tr, nodeCheck);
         }
 
         return { decoSet: updatedDecoSet, ignoreList };
@@ -356,11 +357,27 @@ const findSubtextPos = (
 };
 
 /**
+ * Helper for `node.descendants` in state initialisation
+ * and `node.nodesBetween` in `sendRequest`.
+ */
+const sendValidNode = (
+  sendToSocket: (key: number, text: string) => void,
+  ignoreNodeType: NodeType[]
+) => (node: Node, pos: number) => {
+  if (ignoreNodeType.includes(node.type)) return false;
+
+  sendToSocket(pos, node.textContent);
+
+  // to not iterate deeper.
+  return false;
+};
+
+/**
  * Send suggestion requests on affected nodes
  */
 const sendRequest = (
   tr: Transaction,
-  sendToSocket: (key: number, text: string) => void
+  nodeCheck: (node: Node, pos: number) => boolean
 ) => {
   /**
    * the pos range affected by this transaction
@@ -375,12 +392,7 @@ const sendRequest = (
   });
 
   /**
-   * request suggestion on affected nodes
+   * request suggestion on valid affected nodes.
    */
-  tr.doc.nodesBetween(from, to, (node, pos) => {
-    sendToSocket(pos, node.textContent);
-
-    // to not iterate deeper.
-    return false;
-  });
+  tr.doc.nodesBetween(from, to, nodeCheck);
 };
