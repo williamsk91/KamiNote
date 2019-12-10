@@ -21,10 +21,8 @@ import { heading, hr, blockQuote, codeBlock } from "./blocks/base";
 import { buildTooltipPlugin } from "./plugins/tooltip";
 import { link, LinkTooltip } from "./blocks/link";
 import { inlineToolbar } from "./plugins/inlineToolbar";
-import {
-  suggestionPlugin,
-  suggestionPluginStyles
-} from "./plugins/suggestion/suggestion";
+import { suggestionPlugin } from "./plugins/suggestion/suggestion";
+import { suggestionPluginStyles } from "./plugins/suggestion/inlineDeco";
 
 export const Editor = () => {
   let view: EditorView | null;
@@ -55,9 +53,7 @@ export const Editor = () => {
 
         placeholderPlugin(),
 
-        suggestionPlugin("wss://suggestion-next.cadmus.io", [
-          schema.nodes.codeBlock
-        ])
+        suggestionPlugin("wss://suggestion-next.cadmus.io")
       ]
     });
 
