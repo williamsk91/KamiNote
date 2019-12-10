@@ -4,31 +4,34 @@ import { css } from "styled-components";
 
 import { Plugin, PluginKey, EditorState, Transaction } from "prosemirror-state";
 import { DecorationSet, Decoration, EditorView } from "prosemirror-view";
-import { Node, NodeType } from "prosemirror-model";
+import { NodeType } from "prosemirror-model";
 
 import { ISuggestionTooltip, SuggestionMenu } from "./menu";
 import { debounce } from "./debounce";
+
+export interface ITextPos {
+  from: number;
+  to: number;
+}
 
 export interface ISuggestion {
   phrase: string;
   candidates: string[];
 }
 
-interface IBlockSuggestion {
-  key: string;
+/**
+ * suggestions for the text in the range `from` - `to`
+ */
+interface ITextSuggestion {
+  key: ITextPos;
   suggestions: ISuggestion[];
 }
 
 /**
- * Pos is used to decorate inline
+ * `pos` of `phrase` from `ISuggestion` in doc.
  */
 export interface IInlineSuggestion extends ISuggestion {
   pos: ITextPos;
-}
-
-export interface ITextPos {
-  from: number;
-  to: number;
 }
 
 interface ISuggestionPluginState {
@@ -77,23 +80,29 @@ export const suggestionPlugin = (url: string, ignoreNodeType: NodeType[]) => {
   // ------------------------- Socket -------------------------
 
   const socket = new WebSocket(url);
+
   /**
    * Create a transaction with suggestion metadata to
    * update inline decorations.
    */
   socket.onmessage = e => {
+    const suggestions = JSON.parse(e.data);
+    const key = JSON.parse(suggestions.key);
+
     localView.dispatch(
-      localView.state.tr.setMeta(suggestionKey, { suggestion: e.data })
+      localView.state.tr.setMeta(suggestionKey, {
+        suggestion: { key, suggestions: suggestions.suggestions }
+      })
     );
   };
 
   /**
-   * Asks server for suggestions.
+   * Requests server for suggestions.
    */
-  const sendToSocket = (key: number, text: string) => {
+  const sendToSocket = (key: { from: number; to: number }, text: string) => {
     socket.send(
       JSON.stringify({
-        key: key.toString(),
+        key: JSON.stringify(key),
         text
       })
     );
@@ -101,12 +110,21 @@ export const suggestionPlugin = (url: string, ignoreNodeType: NodeType[]) => {
 
   // ------------------------- Plugin State helpers  -------------------------
 
-  const debouncedSendRequest = debounce(sendRequest, 500);
+  // affected range by the debounced transactions
+  let trFrom: number = Infinity;
+  let trTo: number = 0;
+  const debouncedSendRequest = debounce((tr: Transaction) => {
+    const { inclusiveFrom, inclusiveTo, textContent } = getInclusiveText(
+      tr,
+      trFrom,
+      trTo
+    );
 
-  /**
-   * Refer to `sendValidNode` for more info
-   */
-  const nodeCheck = sendValidNode(sendToSocket, ignoreNodeType);
+    sendToSocket({ from: inclusiveFrom, to: inclusiveTo }, textContent);
+
+    trFrom = Infinity;
+    trTo = 0;
+  }, 1000);
 
   // ------------------------- Plugin instance -------------------------
 
@@ -118,7 +136,8 @@ export const suggestionPlugin = (url: string, ignoreNodeType: NodeType[]) => {
          * send all immediate blocks of starting doc
          */
         socket.onopen = () => {
-          instance.doc.descendants(nodeCheck);
+          const { content, textContent } = instance.doc;
+          sendToSocket({ from: 1, to: content.size }, textContent);
         };
 
         return {
@@ -148,31 +167,26 @@ export const suggestionPlugin = (url: string, ignoreNodeType: NodeType[]) => {
 
         if (suggestionMeta && suggestionMeta.suggestion) {
           // ------------------------- 2. Remove & Add deco -------------------------
+
           /**
            * Suggestion from the server
            */
-          const blockSuggestions: IBlockSuggestion = JSON.parse(
-            suggestionMeta.suggestion
-          );
+          const { key } = suggestionMeta.suggestion as ITextSuggestion;
 
           /**
-           * remove all decos from this block
+           * remove all decos from this range
            */
-          const from = +blockSuggestions.key;
-          const node = tr.doc.nodeAt(from);
-          const nodeSize = node ? node.nodeSize : 0;
-          const to = from + nodeSize;
-          const currBlockDeco = updatedDecoSet.find(from, to);
-
-          updatedDecoSet = updatedDecoSet.remove(currBlockDeco);
+          const { from, to } = key;
+          const currRangeDeco = updatedDecoSet.find(from, to);
+          updatedDecoSet = updatedDecoSet.remove(currRangeDeco);
 
           /**
            * Add new decos onto the block
-           *
-           * TODO: could be improved by only changing
-           * the edited text as opposed to whole node
            */
-          const inlineSuggestions = phraseToPos(newState, blockSuggestions);
+          const inlineSuggestions: IInlineSuggestion[] = phraseToPos(
+            newState,
+            suggestionMeta.suggestion
+          );
 
           const validInlineSuggestions = inlineSuggestions.filter(
             ({ phrase }) => !ignoreList.includes(phrase)
@@ -206,7 +220,17 @@ export const suggestionPlugin = (url: string, ignoreNodeType: NodeType[]) => {
           ignoreList.push(ignoreWord);
         } else {
           // ------------------------- 4. New suggestion request -------------------------
-          debouncedSendRequest(tr, nodeCheck);
+          if (tr.docChanged) {
+            // updating range
+            tr.mapping.maps.map(stepMap => {
+              stepMap.forEach((_oldStart, _oldEnd, newStart, newEnd) => {
+                trFrom = Math.min(trFrom, newStart);
+                trTo = Math.max(trTo, newEnd);
+              });
+            });
+
+            debouncedSendRequest(tr);
+          }
         }
 
         return { decoSet: updatedDecoSet, ignoreList };
@@ -311,21 +335,22 @@ const suggestionTooltip = (
  */
 const phraseToPos = (
   state: EditorState,
-  blockSuggestions: IBlockSuggestion
+  textSuggestions: ITextSuggestion
 ): IInlineSuggestion[] => {
   const inlineSuggestions: IInlineSuggestion[] = [];
-  blockSuggestions.suggestions.map(({ phrase, candidates }) => {
-    const blockStartPos = +blockSuggestions.key;
+  const { key, suggestions } = textSuggestions;
+  const { from, to } = key;
 
-    const blockNode = state.doc.nodeAt(blockStartPos);
-    if (blockNode) {
-      const text = blockNode.textContent;
+  // blockSeparator (i.e. "||") and leafText (i.e. "|")
+  // is added to align obtained text position with
+  // editor's text position.
+  const text = state.doc.textBetween(from, to, "||", "|");
 
-      const phrasePositions = findSubtextPos(blockStartPos + 1, text, phrase);
-      phrasePositions.map(pos => {
-        inlineSuggestions.push({ pos, phrase, candidates });
-      });
-    }
+  suggestions.map(({ phrase, candidates }) => {
+    const phrasePositions = findSubtextPos(from, text, phrase);
+    phrasePositions.map(pos => {
+      inlineSuggestions.push({ pos, phrase, candidates });
+    });
   });
 
   return inlineSuggestions;
@@ -357,42 +382,26 @@ const findSubtextPos = (
 };
 
 /**
- * Helper for `node.descendants` in state initialisation
- * and `node.nodesBetween` in `sendRequest`.
+ * Get word(s) that wraps the range (`from` - `to`).
+ * Word ends when there is space.
  */
-const sendValidNode = (
-  sendToSocket: (key: number, text: string) => void,
-  ignoreNodeType: NodeType[]
-) => (node: Node, pos: number) => {
-  if (ignoreNodeType.includes(node.type)) return false;
+const getInclusiveText = (tr: Transaction, from: number, to: number) => {
+  let inclusiveFrom: number = from;
+  let inclusiveTo: number = to;
 
-  sendToSocket(pos, node.textContent);
+  let prevChar = tr.doc.textBetween(inclusiveFrom - 1, inclusiveFrom);
+  while (!(prevChar === " " || prevChar === "")) {
+    inclusiveFrom--;
+    prevChar = tr.doc.textBetween(inclusiveFrom - 1, inclusiveFrom);
+  }
 
-  // to not iterate deeper.
-  return false;
-};
+  let nextChar = tr.doc.textBetween(inclusiveTo, inclusiveTo + 1);
+  while (!(nextChar === " " || nextChar === "")) {
+    inclusiveTo++;
+    nextChar = tr.doc.textBetween(inclusiveTo, inclusiveTo + 1);
+  }
 
-/**
- * Send suggestion requests on affected nodes
- */
-const sendRequest = (
-  tr: Transaction,
-  nodeCheck: (node: Node, pos: number) => boolean
-) => {
-  /**
-   * the pos range affected by this transaction
-   */
-  let from = tr.doc.content.size,
-    to = 0;
-  tr.mapping.maps.map(stepMap => {
-    stepMap.forEach((_oldStart, _oldEnd, newStart, newEnd) => {
-      from = Math.min(from, newStart);
-      to = Math.max(to, newEnd);
-    });
-  });
+  const textContent = tr.doc.textBetween(inclusiveFrom, inclusiveTo);
 
-  /**
-   * request suggestion on valid affected nodes.
-   */
-  tr.doc.nodesBetween(from, to, nodeCheck);
+  return { inclusiveFrom, inclusiveTo, textContent };
 };
