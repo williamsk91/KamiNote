@@ -93,7 +93,7 @@ export const suggestionPlugin = (url: string) => {
           sendToSocket({ from: 1, to: content.size }, textContent);
         };
         return {
-          ignoreList: [],
+          ignoreList: getIgnoreList(),
           decoSet: DecorationSet.empty
         };
       },
@@ -160,6 +160,7 @@ export const suggestionPlugin = (url: string) => {
            *      This list is used to prevent future addition of the phrase.
            */
           ignoreList.push(ignoreWord);
+          setIgnoreList(ignoreList);
         }
 
         return { decoSet: updatedDecoSet, ignoreList };
@@ -201,3 +202,28 @@ const getInclusiveText = (tr: Transaction, from: number, to: number) => {
 
   return { inclusiveFrom, inclusiveTo, textContent };
 };
+
+// ------------------------- ignore list -------------------------
+const ignoreListLocalStorage = "ignore_spellings";
+
+/** Read the word igore list from localstorage (or fail doing nothing) */
+function getIgnoreList() {
+  try {
+    const ignoreList = window.localStorage.getItem(ignoreListLocalStorage);
+    if (ignoreList) {
+      return JSON.parse(ignoreList);
+    }
+  } catch (e) {
+    return [];
+  }
+  return [];
+}
+
+/** Update or set the Ignore list in localstorage */
+function setIgnoreList(list: string[]) {
+  try {
+    window.localStorage.setItem(ignoreListLocalStorage, JSON.stringify(list));
+  } catch (e) {
+    console.log(e);
+  }
+}
