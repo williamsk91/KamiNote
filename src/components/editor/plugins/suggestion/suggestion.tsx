@@ -131,8 +131,10 @@ export const suggestionPlugin = (url: string) => {
        */
       init: (_, instance) => {
         socket.onopen = () => {
-          const { content, textContent } = instance.doc;
-          sendToSocket({ from: 1, to: content.size }, textContent);
+          const from = 1;
+          const to = instance.doc.content.size;
+          const textContent = instance.doc.textBetween(from, to, " ");
+          sendToSocket({ from, to }, textContent);
         };
         return {
           ignoreList: getIgnoreList(),
@@ -262,7 +264,7 @@ const getInclusiveText = (tr: Transaction, from: number, to: number) => {
     nextChar = tr.doc.textBetween(inclusiveTo, inclusiveTo + 1);
   }
 
-  const textContent = tr.doc.textBetween(inclusiveFrom, inclusiveTo);
+  const textContent = tr.doc.textBetween(inclusiveFrom, inclusiveTo, " ");
 
   return { inclusiveFrom, inclusiveTo, textContent };
 };
