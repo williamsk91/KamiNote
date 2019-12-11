@@ -21,6 +21,45 @@ const suggestionKey = new PluginKey<ISuggestionPluginState>("suggestion");
  *
  * note: don't forget to add `suggestionPluginStyles` to
  *        highlight the phrases.
+ *
+ * -------------------- How it works --------------------
+ *
+ * suggestion plugin is composed of various components
+ *    1. **suggestion list** - a list of misspelled words
+ *         and possible intended words called candidates.
+ *    2. **decoration set** - a set of inline decoration that
+ *        adds a className to misspelled word.
+ *    3. **tooltip** - a tooltip menu that allows user to fix
+ *        misspelled word or ignore it.
+ *
+ * ### 1. suggestion list
+ * The suggestion list is never stored. `SuggestionPlugin`
+ *  simply sends `key` and `text` to websocket suggestion
+ *  server with endpoint specified by the `url` argument.
+ *
+ * On initialisation, `suggestionPlugin` will get all the
+ *  starting text and request a **suggestion list**.
+ *
+ * On every update, `suggestionPlugin` will only request **suggestion
+ *  list** for the updated words. i.e. if your content changes from
+ *  "Initial par" to "Initial paragraph", `suggestionPlugin` will
+ *  request a suggestion list with `text` set to `"paragraph"`.
+ *
+ * ### 2. decoration set
+ * The **decoration set** is a set on inline decoration for that
+ *  particular document.
+ *
+ * It is updated whenever the server responds. The server will responds
+ *  with the same `key` we sent. Therefore, we set `key` as identification
+ *  of changed text.
+ *
+ * ### 3. tooltip
+ * `suggestionTooltip` shows up whenever the selection is inside a misspelled word.
+ *  It will render a `SuggestionMenu` React component that allows users to
+ *  the replace misspelled word with one of the candidates. The menu also
+ *  allows user to ignore the word globally. This ignored word is stored
+ *  in window.localStorage.
+ *
  */
 export const suggestionPlugin = (url: string) => {
   /**
