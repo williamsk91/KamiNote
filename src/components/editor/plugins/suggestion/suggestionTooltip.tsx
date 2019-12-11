@@ -52,16 +52,8 @@ export const suggestionTooltip = (
   };
 
   return {
-    update(view: EditorView, lastState: EditorState) {
+    update(view: EditorView, _lastState: EditorState) {
       const state = view.state;
-
-      // Don't do anything if the document / selection didn't change
-      if (
-        lastState.doc.eq(state.doc) &&
-        lastState.selection.eq(state.selection)
-      ) {
-        return;
-      }
 
       /**
        * get deco if selection is inside it

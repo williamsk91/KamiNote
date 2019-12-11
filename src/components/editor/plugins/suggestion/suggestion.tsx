@@ -157,6 +157,21 @@ export const suggestionPlugin = (url: string) => {
         // ------------------------- 1. Update deco pos -------------------------
         let updatedDecoSet = decoSet.map(tr.mapping, tr.doc);
 
+        // deco from changed text should be removed as it becomes outdated
+        if (tr.docChanged) {
+          let from: number = Infinity;
+          let to: number = 0;
+          tr.mapping.maps.map(stepMap => {
+            stepMap.forEach((_oldStart, _oldEnd, newStart, newEnd) => {
+              from = Math.min(from, newStart);
+              to = Math.max(to, newEnd);
+            });
+          });
+
+          const outdatedDeco = updatedDecoSet.find(from, to);
+          updatedDecoSet = updatedDecoSet.remove(outdatedDeco);
+        }
+
         // ------------------------- 2. New suggestion request -------------------------
         if (!suggestionMeta) {
           if (tr.docChanged) {
