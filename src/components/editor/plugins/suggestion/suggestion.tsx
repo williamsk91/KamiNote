@@ -111,7 +111,10 @@ export const suggestionPlugin = (url: string) => {
       trTo
     );
 
-    sendToSocket({ from: inclusiveFrom, to: inclusiveTo }, textContent);
+    // don't send empty text
+    if (textContent.trim() !== "") {
+      sendToSocket({ from: inclusiveFrom, to: inclusiveTo }, textContent);
+    }
 
     trFrom = Infinity;
     trTo = 0;
@@ -233,21 +236,28 @@ export const suggestionPlugin = (url: string) => {
 // ------------------------- Helper function -------------------------
 
 /**
+ * test if char is a word boundary or not.
+ */
+const testWordBoundary = (char?: string): boolean =>
+  char ? !RegExp(/\W/).test(char) : false;
+
+/**
  * Get word(s) that wraps the range (`from` - `to`).
- * Word ends when there is space.
  */
 const getInclusiveText = (tr: Transaction, from: number, to: number) => {
   let inclusiveFrom: number = from;
   let inclusiveTo: number = to;
 
+  // grow text to the left
   let prevChar = tr.doc.textBetween(inclusiveFrom - 1, inclusiveFrom);
-  while (!(prevChar === " " || prevChar === "")) {
+  while (testWordBoundary(prevChar)) {
     inclusiveFrom--;
     prevChar = tr.doc.textBetween(inclusiveFrom - 1, inclusiveFrom);
   }
 
+  // grow text to the right
   let nextChar = tr.doc.textBetween(inclusiveTo, inclusiveTo + 1);
-  while (!(nextChar === " " || nextChar === "")) {
+  while (testWordBoundary(nextChar)) {
     inclusiveTo++;
     nextChar = tr.doc.textBetween(inclusiveTo, inclusiveTo + 1);
   }
