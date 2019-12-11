@@ -1,7 +1,7 @@
 import React, { FC, useState, useEffect } from "react";
 import styled from "styled-components";
 
-import { IInlineSuggestion, ITextPos } from "./suggestion";
+import { IInlineSuggestion, ITextPos } from "./types";
 
 export interface ISuggestionTooltip {
   /**
