@@ -1,9 +1,10 @@
 import { Plugin, PluginKey, Transaction } from "prosemirror-state";
 import { DecorationSet, EditorView } from "prosemirror-view";
+import { StepMap } from "prosemirror-transform";
 
 import { SuggestionMenu } from "./SuggestionMenu";
 import { debounce } from "./debounce";
-import { updateDecoSet, removeWordFromDecoSet } from "./inlineDeco";
+import { updateDecoSet } from "./inlineDeco";
 import { suggestionTooltip } from "./tooltip";
 
 interface ISuggestionPluginState {
@@ -137,14 +138,15 @@ export const suggestionPlugin = (url: string) => {
     key: suggestionKey,
     state: {
       /**
-       * Also sends all text of starting doc.
-       * Initialise state with empty decorationSet and empty ignoreList.
+       * Sends all text of starting doc.
+       * Initialise state with empty decorationSet and ignoreList
+       * from localStorage.
        */
       init: (_, instance) => {
         socket.onopen = () => {
           const from = 1;
           const to = instance.doc.content.size;
-          const textContent = instance.doc.textBetween(from, to, "||", "|");
+          const textContent = instance.doc.textBetween(from, to, " ");
           sendToSocket({ from, to }, textContent);
         };
         return {
@@ -166,8 +168,7 @@ export const suggestionPlugin = (url: string) => {
        *        4.a. removes `word` from all decorations
        *        4.b. add `word` to `ignoreList` to bew used in (3)
        */
-      apply: (tr, value, _, newState) => {
-        const { decoSet, ignoreList } = value;
+      apply: (tr, { decoSet, ignoreList }, _, newState) => {
         const suggestionMeta = tr.getMeta(suggestionKey);
 
         // ------------------------- 1. Update deco pos -------------------------
@@ -175,14 +176,7 @@ export const suggestionPlugin = (url: string) => {
 
         // deco from changed text should be removed as it becomes outdated
         if (tr.docChanged) {
-          let from: number = Infinity;
-          let to: number = 0;
-          tr.mapping.maps.map(stepMap => {
-            stepMap.forEach((_oldStart, _oldEnd, newStart, newEnd) => {
-              from = Math.min(from, newStart);
-              to = Math.max(to, newEnd);
-            });
-          });
+          const { from, to } = transactionRange(tr);
 
           const outdatedDeco = updatedDecoSet.find(from, to);
           updatedDecoSet = updatedDecoSet.remove(outdatedDeco);
@@ -192,12 +186,9 @@ export const suggestionPlugin = (url: string) => {
         if (!suggestionMeta) {
           if (tr.docChanged) {
             // updating range
-            tr.mapping.maps.map(stepMap => {
-              stepMap.forEach((_oldStart, _oldEnd, newStart, newEnd) => {
-                trFrom = Math.min(trFrom, newStart);
-                trTo = Math.max(trTo, newEnd);
-              });
-            });
+            const { from, to } = transactionRange(tr);
+            trFrom = Math.min(trFrom, from);
+            trTo = Math.max(trTo, to);
 
             debouncedSendRequest(tr);
           }
@@ -205,7 +196,7 @@ export const suggestionPlugin = (url: string) => {
           return { decoSet: updatedDecoSet, ignoreList };
         }
 
-        // ------------------------- 3. Update deco -------------------------
+        // ------------------------- 3. Update suggestion from server -------------------------
         if (suggestionMeta.suggestion) {
           updatedDecoSet = updateDecoSet(
             updatedDecoSet,
@@ -223,7 +214,12 @@ export const suggestionPlugin = (url: string) => {
           /**
            * 4.a. removes decos with `spec.phrase` === `ignoreWord`
            */
-          updatedDecoSet = removeWordFromDecoSet(updatedDecoSet, ignoreWord);
+          const invalidDeco = decoSet.find(
+            undefined,
+            undefined,
+            spec => spec.phrase === ignoreWord
+          );
+          updatedDecoSet = updatedDecoSet.remove(invalidDeco);
 
           /**
            * 4.b. Adds ignoreWord to the ignoreList.
@@ -246,7 +242,36 @@ export const suggestionPlugin = (url: string) => {
   });
 };
 
-// ------------------------- Helper function -------------------------
+// ------------------------- Transaction -------------------------
+
+/**
+ * get the range (i.e. from and to) of a transaction
+ */
+export const transactionRange = (tr: Transaction) =>
+  tr.mapping.maps.reduce(
+    (acc, stepMap) => {
+      const { from, to } = stepMapRange(stepMap);
+      const minFrom = Math.min(from, acc.from);
+      const maxTo = Math.max(to, acc.to);
+      return { from: minFrom, to: maxTo };
+    },
+    { from: Infinity, to: 0 }
+  );
+
+/**
+ * Get the range of the stepMap
+ */
+const stepMapRange = (stepMap: StepMap) => {
+  let from = Infinity;
+  let to = 0;
+  stepMap.forEach((_oldStart, _oldEnd, newStart, newEnd) => {
+    from = Math.min(from, newStart);
+    to = Math.max(to, newEnd);
+  });
+  return { from, to };
+};
+
+// ------------------------- Inclusive Text -------------------------
 
 /**
  * Test if char is a word boundary char or not.

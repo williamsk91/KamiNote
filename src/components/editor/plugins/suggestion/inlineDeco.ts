@@ -77,22 +77,6 @@ export const updateDecoSet = (
 };
 
 /**
- * remove decoration from decorationSet with `spec.phrase` === `word`
- */
-export const removeWordFromDecoSet = (
-  decoSet: DecorationSet,
-  word: string
-): DecorationSet => {
-  const currDecoToBeIgnored = decoSet.find(
-    undefined,
-    undefined,
-    spec => spec.phrase === word
-  );
-
-  return decoSet.remove(currDecoToBeIgnored);
-};
-
-/**
  * Get IInlineSuggestion[] (to be passed to inline decoration) from
  * ITextSuggestion[] where key is the pos phrase
  */
