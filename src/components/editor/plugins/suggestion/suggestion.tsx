@@ -91,12 +91,14 @@ export const suggestionPlugin = (url: string) => {
    * Requests server for suggestions.
    */
   const sendToSocket = (key: { from: number; to: number }, text: string) => {
-    socket.send(
-      JSON.stringify({
-        key: JSON.stringify(key),
-        text
-      })
-    );
+    if (text.trim() !== "") {
+      socket.send(
+        JSON.stringify({
+          key: JSON.stringify(key),
+          text
+        })
+      );
+    }
   };
 
   // ------------------------- Plugin State helpers  -------------------------
@@ -105,16 +107,25 @@ export const suggestionPlugin = (url: string) => {
   let trFrom: number = Infinity;
   let trTo: number = 0;
   const debouncedSendRequest = debounce((tr: Transaction) => {
+    // Get words around the changed text
     const { inclusiveFrom, inclusiveTo, textContent } = getInclusiveText(
       tr,
       trFrom,
       trTo
     );
 
-    // don't send empty text
-    if (textContent.trim() !== "") {
-      sendToSocket({ from: inclusiveFrom, to: inclusiveTo }, textContent);
+    // ensure `from` starts at a text position
+    // -1 is needed as `nodeAt` looks at node
+    // directly after the given pos
+    let from = inclusiveFrom - 1;
+    let node = localView.state.doc.nodeAt(from);
+    while (!(node && node.isText)) {
+      from++;
+      node = localView.state.doc.nodeAt(from);
     }
+    from++;
+
+    sendToSocket({ from, to: inclusiveTo }, textContent);
 
     trFrom = Infinity;
     trTo = 0;
@@ -133,7 +144,7 @@ export const suggestionPlugin = (url: string) => {
         socket.onopen = () => {
           const from = 1;
           const to = instance.doc.content.size;
-          const textContent = instance.doc.textBetween(from, to, " ");
+          const textContent = instance.doc.textBetween(from, to, "||", "|");
           sendToSocket({ from, to }, textContent);
         };
         return {
@@ -270,6 +281,7 @@ const getInclusiveText = (tr: Transaction, from: number, to: number) => {
 };
 
 // ------------------------- ignore list -------------------------
+
 const ignoreListLocalStorage = "ignore_spellings";
 
 /** Read the word igore list from localstorage (or fail doing nothing) */

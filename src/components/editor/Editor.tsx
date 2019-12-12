@@ -105,7 +105,7 @@ export const Editor = () => {
           <code>export const foo = () => </code>
         </pre>
         <hr />
-        {/* <ul>item 1 </ul>
+        <ul>item 1 </ul>
         <ul data-level={1}>item 1 wrd</ul>
         <ul data-level={2}>item wrd 1 </ul>
         <ol>item 1 </ol>
@@ -119,7 +119,7 @@ export const Editor = () => {
         </div>
         <div className="taskList" data-level={2} data-checked={true}>
           checked
-        </div> */}
+        </div>
         <hr />
       </div>
       {/* This is used to render tooltips */}

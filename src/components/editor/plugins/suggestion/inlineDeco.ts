@@ -94,7 +94,7 @@ export const removeWordFromDecoSet = (
 
 /**
  * Get IInlineSuggestion[] (to be passed to inline decoration) from
- * IBlockSuggestion[] where key is the pos of block
+ * ITextSuggestion[] where key is the pos phrase
  */
 const phraseToPos = (
   state: EditorState,
