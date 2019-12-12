@@ -249,32 +249,35 @@ export const suggestionPlugin = (url: string) => {
 // ------------------------- Helper function -------------------------
 
 /**
- * test if char is a word boundary or not.
+ * Test if char is a word boundary char or not.
  */
-const testWordBoundary = (char?: string): boolean =>
-  char ? !RegExp(/\W/).test(char) : false;
+const notWordChar = (char?: string): boolean =>
+  char ? RegExp(/\W/).test(char) : true;
+
+/**
+ * Grow pos to the left
+ */
+const leftWordBoundary = (tr: Transaction, pos: number): number => {
+  const prevChar = tr.doc.textBetween(pos - 1, pos);
+  if (notWordChar(prevChar)) return pos;
+  return leftWordBoundary(tr, pos - 1);
+};
+
+/**
+ * Grow pos to the right
+ */
+const rightWordBoundary = (tr: Transaction, pos: number): number => {
+  const nextChar = tr.doc.textBetween(pos, pos + 1);
+  if (notWordChar(nextChar)) return pos;
+  return rightWordBoundary(tr, pos + 1);
+};
 
 /**
  * Get word(s) that wraps the range (`from` - `to`).
  */
 const getInclusiveText = (tr: Transaction, from: number, to: number) => {
-  let inclusiveFrom: number = from;
-  let inclusiveTo: number = to;
-
-  // grow text to the left
-  let prevChar = tr.doc.textBetween(inclusiveFrom - 1, inclusiveFrom);
-  while (testWordBoundary(prevChar)) {
-    inclusiveFrom--;
-    prevChar = tr.doc.textBetween(inclusiveFrom - 1, inclusiveFrom);
-  }
-
-  // grow text to the right
-  let nextChar = tr.doc.textBetween(inclusiveTo, inclusiveTo + 1);
-  while (testWordBoundary(nextChar)) {
-    inclusiveTo++;
-    nextChar = tr.doc.textBetween(inclusiveTo, inclusiveTo + 1);
-  }
-
+  const inclusiveFrom = leftWordBoundary(tr, from);
+  const inclusiveTo = rightWordBoundary(tr, to);
   const textContent = tr.doc.textBetween(inclusiveFrom, inclusiveTo, " ");
 
   return { inclusiveFrom, inclusiveTo, textContent };
