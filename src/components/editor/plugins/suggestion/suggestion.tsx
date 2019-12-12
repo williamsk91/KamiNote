@@ -1,10 +1,10 @@
 import { Plugin, PluginKey, Transaction } from "prosemirror-state";
 import { DecorationSet, EditorView } from "prosemirror-view";
 
-import { SuggestionMenu } from "./menu";
+import { SuggestionMenu } from "./SuggestionMenu";
 import { debounce } from "./debounce";
 import { updateDecoSet, removeWordFromDecoSet } from "./inlineDeco";
-import { suggestionTooltip } from "./suggestionTooltip";
+import { suggestionTooltip } from "./tooltip";
 
 interface ISuggestionPluginState {
   ignoreList: string[];

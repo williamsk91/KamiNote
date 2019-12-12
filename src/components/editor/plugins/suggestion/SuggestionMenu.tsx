@@ -3,6 +3,10 @@ import styled from "styled-components";
 
 import { IInlineSuggestion, ISuggestionMenu } from "./types";
 
+/**
+ * Menu that displays selectable candidates for a misspelled word.
+ * Also displays an ignore button.
+ */
 export const SuggestionMenu: FC<ISuggestionMenu> = props => {
   const { suggestion, onSelect, onIgnore, ...tooltipProps } = props;
 
