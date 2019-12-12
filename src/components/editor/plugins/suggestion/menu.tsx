@@ -1,23 +1,9 @@
 import React, { FC, useState, useEffect } from "react";
 import styled from "styled-components";
 
-import { IInlineSuggestion, ITextPos } from "./types";
+import { IInlineSuggestion, ISuggestionMenu } from "./types";
 
-export interface ISuggestionTooltip {
-  /**
-   * left and top offset in px for
-   * absolute positioning the component
-   * just under the text
-   */
-  left: number;
-  top: number;
-
-  suggestion?: IInlineSuggestion;
-  onSelect: (suggestion: string, pos: ITextPos) => void;
-  onIgnore: (phrase: string) => void;
-}
-
-export const SuggestionMenu: FC<ISuggestionTooltip> = props => {
+export const SuggestionMenu: FC<ISuggestionMenu> = props => {
   const { suggestion, onSelect, onIgnore, ...tooltipProps } = props;
 
   /**
@@ -65,11 +51,7 @@ export const SuggestionMenu: FC<ISuggestionTooltip> = props => {
   );
 };
 
-const Container = styled.div<{ left: number; top: number }>`
-  position: absolute;
-  left: ${p => `${p.left}px`};
-  top: ${p => `${p.top}px`};
-
+const Container = styled.div`
   display: flex;
   flex-direction: column;
 

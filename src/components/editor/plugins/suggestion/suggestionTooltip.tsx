@@ -1,21 +1,23 @@
 import React, { FC } from "react";
 import ReactDOM from "react-dom";
+import styled from "styled-components";
 
 import { EditorState, PluginKey } from "prosemirror-state";
 import { EditorView } from "prosemirror-view";
 
-import { IInlineSuggestion } from "./types";
-import { ISuggestionTooltip } from "./menu";
+import { IInlineSuggestion, ISuggestionMenu } from "./types";
 
 // ------------------------- Suggestion Menu -------------------------
 
 /**
  * Wrapper that finds the positions for `ReactNode` to render.
+ *
+ * Also passes in information about the misspelled phrase.
  */
 export const suggestionTooltip = (
   view: EditorView,
   key: PluginKey,
-  ReactNode: FC<ISuggestionTooltip>
+  ReactNode: FC<ISuggestionMenu>
 ) => {
   const tooltip = document.createElement("div");
   view.dom.parentElement && view.dom.parentElement.appendChild(tooltip);
@@ -23,6 +25,8 @@ export const suggestionTooltip = (
   const render = (view: EditorView, suggestion?: IInlineSuggestion) => {
     const { state, dispatch } = view;
 
+    // calculates absolute positions for `Container`
+    // to be just under the phrase
     let left = 0;
     let top = 0;
     if (suggestion) {
@@ -37,17 +41,17 @@ export const suggestionTooltip = (
     }
 
     return (
-      <ReactNode
-        left={left}
-        top={top}
-        suggestion={suggestion}
-        onSelect={(suggestion, pos) => {
-          dispatch(state.tr.insertText(suggestion, pos.from, pos.to));
-        }}
-        onIgnore={phrase => {
-          dispatch(state.tr.setMeta(key, { ignore: phrase }));
-        }}
-      />
+      <Container left={left} top={top}>
+        <ReactNode
+          suggestion={suggestion}
+          onSelect={(suggestion, pos) => {
+            dispatch(state.tr.insertText(suggestion, pos.from, pos.to));
+          }}
+          onIgnore={phrase => {
+            dispatch(state.tr.setMeta(key, { ignore: phrase }));
+          }}
+        />
+      </Container>
     );
   };
 
@@ -80,3 +84,12 @@ export const suggestionTooltip = (
     }
   };
 };
+
+/**
+ * Positions the react component just under misspelled text.
+ */
+const Container = styled.div<{ left: number; top: number }>`
+  position: absolute;
+  left: ${p => `${p.left}px`};
+  top: ${p => `${p.top}px`};
+`;

@@ -29,3 +29,13 @@ export interface ITextSuggestion {
 export interface IInlineSuggestion extends ISuggestion {
   pos: ITextPos;
 }
+
+/**
+ * Props for react component to be
+ * passed to `suggestionTooltip`
+ */
+export interface ISuggestionMenu {
+  suggestion?: IInlineSuggestion;
+  onSelect: (suggestion: string, pos: ITextPos) => void;
+  onIgnore: (phrase: string) => void;
+}
