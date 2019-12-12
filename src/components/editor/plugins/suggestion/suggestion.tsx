@@ -1,6 +1,7 @@
 import { Plugin, PluginKey, Transaction } from "prosemirror-state";
 import { DecorationSet, EditorView } from "prosemirror-view";
 import { StepMap } from "prosemirror-transform";
+import { Node } from "prosemirror-model";
 
 import { SuggestionMenu } from "./SuggestionMenu";
 import { debounce } from "./debounce";
@@ -116,17 +117,9 @@ export const suggestionPlugin = (url: string) => {
     );
 
     // ensure `from` starts at a text position
-    // -1 is needed as `nodeAt` looks at node
-    // directly after the given pos
-    let from = inclusiveFrom - 1;
-    let node = localView.state.doc.nodeAt(from);
-    while (!(node && node.isText)) {
-      from++;
-      node = localView.state.doc.nodeAt(from);
-    }
-    from++;
+    const fromTextNode = findTextNode(localView.state.doc, inclusiveFrom);
 
-    sendToSocket({ from, to: inclusiveTo }, textContent);
+    sendToSocket({ from: fromTextNode, to: inclusiveTo }, textContent);
 
     trFrom = Infinity;
     trTo = 0;
@@ -306,6 +299,19 @@ const getInclusiveText = (tr: Transaction, from: number, to: number) => {
   const textContent = tr.doc.textBetween(inclusiveFrom, inclusiveTo, " ");
 
   return { inclusiveFrom, inclusiveTo, textContent };
+};
+
+/**
+ * Find the first pos that meets 2 conditions
+ *    1. pos > given pos
+ *    2. pos is a textNode
+ */
+const findTextNode = (doc: Node, pos: number): number => {
+  // -1 is needed as `nodeAt` looks at node
+  // directly after the given pos
+  const node = doc.nodeAt(pos - 1);
+  if (node && node.isText) return pos;
+  return findTextNode(doc, pos + 1);
 };
 
 // ------------------------- ignore list -------------------------
