@@ -1,14 +1,15 @@
 import React, { FC, useState, useEffect } from "react";
 import styled from "styled-components";
 
-import { Node, MarkType } from "prosemirror-model";
+import { Node, MarkType, Mark } from "prosemirror-model";
 import { EditorState } from "prosemirror-state";
 
 import { colors } from "components/styles/colors";
-import { ITooltip } from "../plugins/tooltip";
+import { Tooltip } from "../plugins/tooltip";
 import { IBlock, IDispatch } from "./utils";
 import { schema } from "../schema";
 import { InputRule } from "prosemirror-inputrules";
+import { EditorView } from "prosemirror-view";
 
 // -------------------- Commands --------------------
 
@@ -203,25 +204,11 @@ export const link: IBlock = {
 // ------------------------- Tooltip Plugin -------------------------
 
 /**
- * Tooltip for `link`.
- *
- * Shows [Open | Edit | Unlink] normally.
- * Shows [<href> | Cancel | Confirm] while editing.
- *
+ * link tooltip function
  */
-export const LinkTooltip: FC<ITooltip> = props => {
-  const [editing, setEditing] = useState(false);
-  const [inputVal, setInputVal] = useState("");
-
-  const { state, dispatch } = props.view;
-  const { selection, schema } = state;
+export const linkTooltip: Tooltip = view => {
+  const { selection, schema } = view.state;
   const { $from, $to } = selection;
-  /**
-   * Reset to not editing on selection change.
-   */
-  useEffect(() => {
-    setEditing(false);
-  }, [selection]);
 
   const fromMarks = $from.marks();
   const toMarks = $to.marks();
@@ -229,18 +216,48 @@ export const LinkTooltip: FC<ITooltip> = props => {
   const linkMark = schema.marks.link.isInSet(fromMarks);
 
   /**
-   * set starting href as current href
-   */
-  useEffect(() => {
-    linkMark && setInputVal(linkMark.attrs.href);
-  }, [linkMark]);
-
-  /**
    * Only shows tooltip if the selection is explicitely
    *  inside one and only one link.
    */
   const linkInBothPos = linkMark && linkMark.isInSet(toMarks);
   if (!linkInBothPos) return null;
+
+  return () => <LinkTooltip view={view} linkMark={linkMark} />;
+};
+
+interface ILinkTooltip {
+  view: EditorView;
+  linkMark: Mark;
+}
+
+/**
+ * Tooltip for `link`.
+ *
+ * Shows [Open | Edit | Unlink] normally.
+ * Shows [<href> | Cancel | Confirm] while editing.
+ *
+ */
+const LinkTooltip: FC<ILinkTooltip> = props => {
+  const { linkMark } = props;
+  const { state, dispatch } = props.view;
+  const { selection, schema } = state;
+
+  const [editing, setEditing] = useState(false);
+  const [inputVal, setInputVal] = useState("");
+
+  /**
+   * Reset to not editing on selection change.
+   */
+  useEffect(() => {
+    setEditing(false);
+  }, [selection]);
+
+  /**
+   * set starting href as current href
+   */
+  useEffect(() => {
+    linkMark && setInputVal(linkMark.attrs.href);
+  }, [linkMark]);
 
   const EditLinkBody = (
     <>
@@ -289,17 +306,12 @@ export const LinkTooltip: FC<ITooltip> = props => {
 
   const body = editing ? EditLinkBody : ShowLinkBody;
 
-  return <Container {...props}>{body}</Container>;
+  return <Container>{body}</Container>;
 };
 
 // ------------------------- Style -------------------------
 
-const Container = styled.div<ITooltip>`
-  position: absolute;
-  left: ${p => `${p.anchor.left}px`};
-  top: ${p => `${p.anchor.top}px`};
-  transform: translate(-50%, -110%);
-
+const Container = styled.div`
   padding: 3px;
 
   background: white;

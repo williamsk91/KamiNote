@@ -18,9 +18,9 @@ import { list } from "./blocks/list";
 import { marks } from "./blocks/marks";
 import { placeholderPlugin } from "./plugins/placeholder";
 import { heading, hr, blockQuote, codeBlock } from "./blocks/base";
-import { buildTooltipPlugin } from "./plugins/tooltip";
-import { link, LinkTooltip } from "./blocks/link";
-import { inlineToolbar } from "./plugins/inlineToolbar";
+import { link, linkTooltip } from "./blocks/link";
+import { tooltipPlugin } from "./plugins/tooltip";
+import { inlineToolbar } from "./component/inlineToolbar";
 
 export const Editor = () => {
   let view: EditorView | null;
@@ -46,8 +46,7 @@ export const Editor = () => {
           link
         ]),
 
-        ...buildTooltipPlugin("tooltipParent", [LinkTooltip]),
-        inlineToolbar("toolbar"),
+        tooltipPlugin("tooltip", "editor", [linkTooltip, inlineToolbar]),
 
         placeholderPlugin()
       ]
@@ -62,7 +61,7 @@ export const Editor = () => {
   }, []);
 
   return (
-    <>
+    <TooltipParent>
       <Container onClick={() => view && view.focus()} id="editor" />
       <div id="content" style={{ display: "none" }}>
         <p>
@@ -217,11 +216,18 @@ export const Editor = () => {
         <hr />
       </div>
       {/* This is used to render tooltips */}
-      <div id="tooltipParent" />
-      <div id="toolbar" />
-    </>
+      <div id="tooltip" />
+    </TooltipParent>
   );
 };
+
+/**
+ * Common parent of `tooltip` and the editor.
+ * Required to position tooltip correctly.
+ */
+const TooltipParent = styled.div`
+  position: relative;
+`;
 
 const Container = styled.div`
   position: relative;

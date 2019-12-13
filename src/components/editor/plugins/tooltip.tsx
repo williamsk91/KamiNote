@@ -2,51 +2,33 @@ import React, { FC } from "react";
 import ReactDOM from "react-dom";
 import { Plugin, EditorState } from "prosemirror-state";
 import { EditorView } from "prosemirror-view";
-
-export interface IViewPortCoords {
-  left: number;
-  right: number;
-  top: number;
-  bottom: number;
-}
+import styled from "styled-components";
 
 export interface ITooltip {
-  /**
-   * The current view
-   */
   view: EditorView;
-
-  /**
-   * The following props are helper props that are
-   * actually jsut derived from view prop itself.
-   */
-
-  /**
-   * Whether selection is empty or not.
-   * empty being no text.
-   */
-  empty: boolean;
-
-  /**
-   * the viewport coordinates of the anchor and
-   *  head of a text selection.
-   */
-  anchor: IViewPortCoords;
-  head: IViewPortCoords;
 }
 
+export type Tooltip = (view: EditorView) => FC | null;
+
 /**
- * PM plugins that renders react component with ITooltip props.
- * the component is rendered as a child of node with nodeId
+ * Render **one** React component when there is a selection.
+ *  `view` is passed to the React component.
+ *
+ * The React component is chosen from the array passed. The first one that
+ *  returns a react component and not a null gets rendered.
+ *
+ * The component is rendered as a child of node with nodeId.
  */
-export const tooltipPlugin = (nodeId: string, ReactNode: FC<ITooltip>) =>
+export const tooltipPlugin = (
+  nodeId: string,
+  editorId: string,
+  tooltips: Tooltip[]
+) =>
   new Plugin({
-    view: () => tooltip(nodeId, ReactNode)
+    view: () => tooltip(nodeId, editorId, tooltips)
   });
 
-export const tooltip = (nodeId: string, ReactNode: FC<ITooltip>) => {
-  const tooltip = document.createElement("div");
-
+const tooltip = (nodeId: string, editorId: string, tooltips: Tooltip[]) => {
   /**
    * This requires a div tag outside of the editor.
    *  By rendering it outside of the editor, the selection
@@ -55,25 +37,23 @@ export const tooltip = (nodeId: string, ReactNode: FC<ITooltip>) => {
    * For example, if tooltip is rendered inside the editor,
    *  rendering an `input` element will not be focusable.
    */
-  const tooltipParent = document.getElementById(nodeId);
-
-  // editorView.dom.parentNode && editorView.dom.parentNode.appendChild(tooltip);
-  tooltipParent && tooltipParent.appendChild(tooltip);
+  const tooltip = document.getElementById(nodeId) as HTMLDivElement;
 
   const render = (view: EditorView) => {
-    const { anchor, head, empty } = view.state.selection;
+    const anchorCoords = view.coordsAtPos(view.state.selection.anchor);
 
-    // These are in screen coordinates
-    const anchorCoor = view.coordsAtPos(anchor);
-    const headCoor = view.coordsAtPos(head);
+    const editor = document.getElementById(editorId);
+    let box = editor ? editor.getBoundingClientRect() : { left: 0, top: 0 };
+
+    const left = anchorCoords.left - box.left;
+    const top = anchorCoords.bottom - box.top;
+
+    const Component = getComponent(tooltips, view);
 
     return (
-      <ReactNode
-        empty={empty}
-        anchor={anchorCoor}
-        head={headCoor}
-        view={view}
-      />
+      <Container left={left} top={top}>
+        {Component && <Component />}
+      </Container>
     );
   };
 
@@ -81,7 +61,11 @@ export const tooltip = (nodeId: string, ReactNode: FC<ITooltip>) => {
     update(view: EditorView, lastState: EditorState | null) {
       const state = view.state;
 
-      // Don't do anything if the document/selection didn't change
+      /**
+       * Don't do anything if:
+       *  document is the same AND
+       *  selection is the same
+       */
       if (
         lastState &&
         lastState.doc.eq(state.doc) &&
@@ -102,7 +86,19 @@ export const tooltip = (nodeId: string, ReactNode: FC<ITooltip>) => {
   };
 };
 
-export const buildTooltipPlugin = (
-  nodeId: string,
-  ReactNodes: FC<ITooltip>[]
-) => ReactNodes.map(c => tooltipPlugin(nodeId, c));
+/**
+ * Get the first tooltip component that does not return null
+ */
+const getComponent = (tooltips: Tooltip[], view: EditorView): FC | null => {
+  for (let i = 0; i < tooltips.length; i++) {
+    const candidate = tooltips[i](view);
+    if (candidate) return candidate;
+  }
+  return null;
+};
+
+const Container = styled.div<{ left: number; top: number }>`
+  position: absolute;
+  left: ${p => `${p.left}px`};
+  top: ${p => `${p.top}px`};
+`;

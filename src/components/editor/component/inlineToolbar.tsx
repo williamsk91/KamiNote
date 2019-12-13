@@ -1,36 +1,24 @@
-import { Plugin } from "prosemirror-state";
-import React, { FC } from "react";
-
-import { ITooltip, tooltip } from "./tooltip";
+import React from "react";
 import styled from "styled-components";
+
 import { colors } from "components/styles/colors";
 import { toggleMark } from "prosemirror-commands";
+
+import { Tooltip } from "../plugins/tooltip";
+
 import { insertLink } from "../blocks/link";
 
 /**
- * Inline toolbar plugins that is extended from `tooltip` plugin.
- *
- * Displays a toolbar when there is a textSelection.
- *
- * similar to setting up `tooltip`, nodeId is the id of a node
- *  **outisde** of the editor.
- *
+ * Displays a toolbar
  */
-export const inlineToolbar = (nodeId: string) =>
-  new Plugin({
-    view: () => tooltip(nodeId, InlineToolbar)
-  });
-
-export const InlineToolbar: FC<ITooltip> = props => {
-  const { view, empty } = props;
-
+export const inlineToolbar: Tooltip = view => {
   // empty
-  if (empty) return null;
+  if (view.state.selection.empty) return null;
 
   const { schema } = view.state;
 
-  return (
-    <Container {...props}>
+  return () => (
+    <Container>
       <ActionButton
         onClick={() => toggleMark(schema.marks.bold)(view.state, view.dispatch)}
       >
@@ -67,12 +55,7 @@ export const InlineToolbar: FC<ITooltip> = props => {
 /**
  * Positions the toolbar on top of the head cursor.
  */
-const Container = styled.div<ITooltip>`
-  position: absolute;
-  left: ${p => `${p.head.left}px`};
-  top: ${p => `${p.head.top}px`};
-  transform: translate(-50%, -110%);
-
+const Container = styled.div`
   padding: 0 1.5px;
 
   background: white;
