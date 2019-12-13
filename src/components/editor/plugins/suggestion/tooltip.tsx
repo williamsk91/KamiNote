@@ -29,6 +29,7 @@ export const suggestionTooltip = (
     const [suggestion, setSuggestion] = useState<IInlineSuggestion | null>(
       null
     );
+    const [fromContextMenu, setFromContextMenu] = useState(false);
 
     /**IInlineSuggestion
      * open suggestion menu on right click
@@ -39,6 +40,7 @@ export const suggestionTooltip = (
         const deco = getFirstDecoInCoord(view, key, { left: e.x, top: e.y });
 
         setSuggestion(deco ? deco.spec : null);
+        setFromContextMenu(true);
       },
       [setSuggestion]
     );
@@ -51,22 +53,19 @@ export const suggestionTooltip = (
     }, [contextmenuCallback]);
 
     /**
-     * Close suggestion menu on click
+     * Close menu when selection changes.
+     * Don't immediately close menu if context menu was just executed.
      */
-    const handleClick = useCallback(() => {
-      setSuggestion(null);
-    }, [setSuggestion]);
-
     useEffect(() => {
-      document.addEventListener("click", handleClick);
-      return () => {
-        document.removeEventListener("click", handleClick);
-      };
-    }, [handleClick]);
-
-    const { state, dispatch } = props.view;
+      if (!fromContextMenu) {
+        setSuggestion(null);
+      }
+      setFromContextMenu(false);
+    }, [setSuggestion, view.state.selection]);
 
     if (!suggestion) return null;
+
+    const { state, dispatch } = props.view;
 
     // calculates absolute positions for `Container`
     // to be just under the phrase
