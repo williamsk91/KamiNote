@@ -1,13 +1,13 @@
 import { css } from "styled-components";
 
-import { Decoration, DecorationSet } from "prosemirror-view";
-import { Transaction, EditorState } from "prosemirror-state";
+import { Decoration, DecorationSet, EditorView } from "prosemirror-view";
+import { Transaction, EditorState, PluginKey } from "prosemirror-state";
 
 import { ITextSuggestion, IInlineSuggestion, ITextPos } from "./types";
 
 // ------------------------- Creation -------------------------
 
-const decoClass = "suggestionClass";
+export const decoClass = "suggestionClass";
 
 export const suggestionDeco = (
   from: number,
@@ -37,6 +37,30 @@ export const suggestionPluginStyles = css`
 `;
 
 // ------------------------- Helper Functions -------------------------
+
+export const getFirstDecoInCoord = (
+  view: EditorView,
+  key: PluginKey,
+  coords: { left: number; top: number }
+): Decoration<IInlineSuggestion> | null => {
+  const pos = view.posAtCoords(coords);
+  if (!pos) return null;
+
+  const decoSet = key.getState(view.state).decoSet;
+  return getFirstDeco(decoSet, pos.pos, pos.pos);
+};
+
+/**
+ * get the first deco from a range
+ */
+export const getFirstDeco = (
+  decoSet: DecorationSet,
+  from: number,
+  to: number
+): Decoration<IInlineSuggestion> | null => {
+  const decos: Decoration[] = decoSet.find(from, to);
+  return decos[0] ? (decos[0] as Decoration<IInlineSuggestion>) : null;
+};
 
 /**
  * Remove decos from `decoSet` and add new decos using `textSuggestion`
