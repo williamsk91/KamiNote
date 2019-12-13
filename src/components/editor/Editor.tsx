@@ -46,7 +46,7 @@ export const Editor = () => {
           link
         ]),
 
-        tooltipPlugin("tooltip", "editor", [linkTooltip, inlineToolbar]),
+        tooltipPlugin([linkTooltip, inlineToolbar]),
 
         placeholderPlugin()
       ]
@@ -61,8 +61,8 @@ export const Editor = () => {
   }, []);
 
   return (
-    <TooltipParent>
-      <Container onClick={() => view && view.focus()} id="editor" />
+    <Container>
+      <EditorContainer onClick={() => view && view.focus()} id="editor" />
       <div id="content" style={{ display: "none" }}>
         <p>
           hmmmm{" "}
@@ -215,27 +215,23 @@ export const Editor = () => {
         </div>
         <hr />
       </div>
-      {/* This is used to render tooltips */}
-      <div id="tooltip" />
-    </TooltipParent>
+    </Container>
   );
 };
 
 /**
- * Common parent of `tooltip` and the editor.
- * Required to position tooltip correctly.
+ * This is styled as opposed to the `EditorContainer`
+ * to allows plugins like `tooltip` to position itself correctly.
  */
-const TooltipParent = styled.div`
-  position: relative;
-`;
-
 const Container = styled.div`
   position: relative;
 
   max-width: 720px;
   margin: auto;
   padding: 96px;
+`;
 
+const EditorContainer = styled.div`
   & :focus {
     outline: none;
   }

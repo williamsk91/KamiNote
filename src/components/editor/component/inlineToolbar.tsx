@@ -52,9 +52,6 @@ export const inlineToolbar: Tooltip = view => {
   );
 };
 
-/**
- * Positions the toolbar on top of the head cursor.
- */
 const Container = styled.div`
   padding: 0 1.5px;
 

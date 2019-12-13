@@ -19,31 +19,29 @@ export type Tooltip = (view: EditorView) => FC | null;
  *
  * The component is rendered as a child of node with nodeId.
  */
-export const tooltipPlugin = (
-  nodeId: string,
-  editorId: string,
-  tooltips: Tooltip[]
-) =>
+export const tooltipPlugin = (tooltips: Tooltip[]) =>
   new Plugin({
-    view: () => tooltip(nodeId, editorId, tooltips)
+    view: view => tooltip(view, tooltips)
   });
 
-const tooltip = (nodeId: string, editorId: string, tooltips: Tooltip[]) => {
+const tooltip = (view: EditorView, tooltips: Tooltip[]) => {
   /**
-   * This requires a div tag outside of the editor.
-   *  By rendering it outside of the editor, the selection
-   *  made inside the tooltip won't be intervened by the editor.
-   *
-   * For example, if tooltip is rendered inside the editor,
-   *  rendering an `input` element will not be focusable.
+   * This is a tooltip node rendered inside the editor.
+   * This is only used to get the position to render the actual tooltip
+   * that is rendered as sibling of the editor
    */
-  const tooltip = document.getElementById(nodeId) as HTMLDivElement;
+  const tooltip = document.createElement("div");
+  view.dom.parentNode &&
+    view.dom.parentNode.parentNode &&
+    view.dom.parentNode.parentNode.appendChild(tooltip);
 
   const render = (view: EditorView) => {
     const anchorCoords = view.coordsAtPos(view.state.selection.anchor);
 
-    const editor = document.getElementById(editorId);
-    let box = editor ? editor.getBoundingClientRect() : { left: 0, top: 0 };
+    const parentNode = tooltip.parentElement;
+    let box = parentNode
+      ? parentNode.getBoundingClientRect()
+      : { left: 0, top: 0 };
 
     const left = anchorCoords.left - box.left;
     const top = anchorCoords.bottom - box.top;
