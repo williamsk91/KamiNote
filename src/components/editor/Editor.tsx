@@ -1,9 +1,8 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef, FC, useMemo } from "react";
 import styled from "styled-components";
 
-import { EditorState } from "prosemirror-state";
+import { EditorState, Transaction } from "prosemirror-state";
 import { EditorView } from "prosemirror-view";
-import { DOMParser } from "prosemirror-model";
 import { keymap } from "prosemirror-keymap";
 import { undo, redo, history } from "prosemirror-history";
 import { dropCursor } from "prosemirror-dropcursor";
@@ -22,14 +21,25 @@ import { link, linkTooltip } from "./blocks/link";
 import { tooltipPlugin } from "./plugins/tooltip";
 import { inlineToolbar } from "./component/inlineToolbar";
 
-export const Editor = () => {
+export interface IEditor {
+  /** Json string */
+  initState?: string;
+
+  /**
+   * Callback every time state changes
+   */
+  onChange: (state: EditorState) => void;
+}
+
+export const Editor: FC<IEditor> = props => {
+  const { initState, onChange } = props;
+
+  const ref = useRef<HTMLDivElement>(null);
   let view: EditorView | null;
-  useEffect(() => {
-    const state = EditorState.create({
+
+  const stateConfig = useMemo(
+    () => ({
       schema,
-      doc: DOMParser.fromSchema(schema).parse(
-        document.querySelector("#content") as Node
-      ),
       plugins: [
         history(),
         keymap({ "Mod-z": undo, "Mod-y": redo }),
@@ -50,19 +60,44 @@ export const Editor = () => {
 
         placeholderPlugin()
       ]
-    });
+    }),
+    []
+  );
 
-    view = new EditorView(document.querySelector("#editor") as Node, {
-      state,
-      nodeViews: buildViews([taskList])
-    });
+  let state: EditorState;
+  if (initState) {
+    // check for invalid initState
+    try {
+      state = EditorState.fromJSON(stateConfig, JSON.parse(initState));
+    } catch (err) {
+      state = EditorState.create(stateConfig);
+    }
+  } else {
+    state = EditorState.create(stateConfig);
+  }
 
-    applyDevTools(view);
+  const dispatchTransaction = (tr: Transaction) => {
+    state = state.apply(tr);
+    view && view.updateState(state);
+
+    tr.docChanged && onChange(state);
+  };
+
+  useEffect(() => {
+    if (ref.current) {
+      view = new EditorView(ref.current, {
+        state,
+        nodeViews: buildViews([taskList]),
+        dispatchTransaction
+      });
+
+      applyDevTools(view);
+    }
   }, []);
 
   return (
     <Container>
-      <EditorContainer onClick={() => view && view.focus()} id="editor" />
+      <EditorContainer id="editor" ref={ref} />
       <div id="content" style={{ display: "none" }}>
         <p>
           hmmmm{" "}
