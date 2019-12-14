@@ -10,7 +10,7 @@ import {
 
 export const schema = new Schema({
   nodes: {
-    doc: { content: "block+ paragraph" },
+    doc: { content: "block+" },
     paragraph: {
       group: "block",
       content: "inline*",
