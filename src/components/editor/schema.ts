@@ -19,6 +19,7 @@ export const schema = new Schema({
     },
     hr: {
       group: "block",
+      selectable: false,
       parseDOM: [{ tag: "hr" }],
       toDOM: () => ["hr"]
     },
