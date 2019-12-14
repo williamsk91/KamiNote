@@ -1,12 +1,20 @@
-import React from "react";
+import React, { FC } from "react";
 import styled from "styled-components";
 
-import { colors } from "components/styles/colors";
+import { FiCode } from "react-icons/fi";
+import {
+  AiOutlineBold,
+  AiOutlineItalic,
+  AiOutlineStrikethrough,
+  AiOutlineLink
+} from "react-icons/ai";
+
 import { toggleMark } from "prosemirror-commands";
+import { EditorView } from "prosemirror-view";
 
 import { Tooltip } from "../plugins/tooltip";
-
 import { insertLink } from "../blocks/link";
+import { IconButton } from "./IconButton";
 
 /**
  * Displays a toolbar
@@ -15,39 +23,44 @@ export const inlineToolbar: Tooltip = view => {
   // empty
   if (view.state.selection.empty) return null;
 
+  return () => <InlineToolbar view={view} />;
+};
+
+const InlineToolbar: FC<{ view: EditorView }> = props => {
+  const { view } = props;
   const { schema } = view.state;
 
-  return () => (
+  return (
     <Container>
-      <ActionButton
+      <IconButton
         onClick={() => toggleMark(schema.marks.bold)(view.state, view.dispatch)}
       >
-        B
-      </ActionButton>
-      <ActionButton
+        <AiOutlineBold />
+      </IconButton>
+      <IconButton
         onClick={() =>
           toggleMark(schema.marks.italic)(view.state, view.dispatch)
         }
       >
-        I
-      </ActionButton>
-      <ActionButton
+        <AiOutlineItalic />
+      </IconButton>
+      <IconButton
         onClick={() =>
           toggleMark(schema.marks.strike)(view.state, view.dispatch)
         }
       >
-        S
-      </ActionButton>
-      <ActionButton
+        <AiOutlineStrikethrough />
+      </IconButton>
+      <IconButton
         onClick={() => toggleMark(schema.marks.code)(view.state, view.dispatch)}
       >
-        C
-      </ActionButton>
-      <ActionButton
+        <FiCode />
+      </IconButton>
+      <IconButton
         onClick={() => insertLink(schema.marks.link)(view.state, view.dispatch)}
       >
-        L
-      </ActionButton>
+        <AiOutlineLink />
+      </IconButton>
     </Container>
   );
 };
@@ -58,27 +71,4 @@ const Container = styled.div`
   background: white;
   border: 1px solid silver;
   border-radius: 6px;
-`;
-
-/**
- * buttons that call commands
- */
-const ActionButton = styled.button<{ active?: boolean }>`
-  width: 24px;
-  height: 24px;
-
-  padding: 6px;
-  margin: 3px 1.5px;
-  box-sizing: border-box;
-
-  border: none;
-  border-radius: 6px;
-
-  background: ${p => (p.active ? colors.clouds : "none")};
-  outline: none;
-
-  :hover {
-    background: ${colors.clouds};
-    cursor: pointer;
-  }
 `;

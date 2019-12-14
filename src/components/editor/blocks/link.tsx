@@ -1,15 +1,18 @@
 import React, { FC, useState, useEffect } from "react";
 import styled from "styled-components";
 
+import { FiExternalLink, FiEdit3, FiX, FiCheck, FiTrash } from "react-icons/fi";
+
 import { Node, MarkType, Mark } from "prosemirror-model";
 import { EditorState } from "prosemirror-state";
+import { InputRule } from "prosemirror-inputrules";
+import { EditorView } from "prosemirror-view";
 
-import { colors } from "components/styles/colors";
 import { Tooltip } from "../plugins/tooltip";
 import { IBlock, IDispatch } from "./utils";
 import { schema } from "../schema";
-import { InputRule } from "prosemirror-inputrules";
-import { EditorView } from "prosemirror-view";
+import { IconButton } from "../component/IconButton";
+import { colors } from "components/styles/colors";
 
 // -------------------- Commands --------------------
 
@@ -267,40 +270,38 @@ const LinkTooltip: FC<ILinkTooltip> = props => {
           setInputVal(e.currentTarget.value);
         }}
       />
-      <Spacer>|</Spacer>
-      <LinkActions
+      <IconButton
         onClick={() => {
           setInputVal(linkMark.attrs.href);
           setEditing(false);
         }}
       >
-        Cancel
-      </LinkActions>
-      <Spacer>|</Spacer>
-      <LinkActions
+        <FiX />
+      </IconButton>
+      <IconButton
         onClick={() => {
           updateHref(schema.marks.link, inputVal)(state, dispatch);
           setEditing(false);
         }}
       >
-        Confirm
-      </LinkActions>
+        <FiCheck />
+      </IconButton>
     </>
   );
 
   const ShowLinkBody = (
     <>
-      <LinkActions onClick={() => window.open(linkMark.attrs.href, "_blank")}>
-        Open
-      </LinkActions>
-      <Spacer>|</Spacer>
-      <LinkActions onClick={() => setEditing(true)}>Edit</LinkActions>
-      <Spacer>|</Spacer>
-      <LinkActions
+      <IconButton onClick={() => window.open(linkMark.attrs.href, "_blank")}>
+        <FiExternalLink />
+      </IconButton>
+      <IconButton onClick={() => setEditing(true)}>
+        <FiEdit3 />
+      </IconButton>
+      <IconButton
         onClick={() => removeMarkText(schema.marks.link)(state, dispatch)}
       >
-        Unlink
-      </LinkActions>
+        <FiTrash />
+      </IconButton>
     </>
   );
 
@@ -312,6 +313,7 @@ const LinkTooltip: FC<ILinkTooltip> = props => {
 // ------------------------- Style -------------------------
 
 const Container = styled.div`
+  display: flex;
   padding: 3px;
 
   background: white;
@@ -319,31 +321,24 @@ const Container = styled.div`
   border-radius: 6px;
 `;
 
-const LinkActions = styled.button`
-  padding: 6px 12px;
-  box-sizing: border-box;
-
-  background: none;
-  border: none;
-  border-radius: 3px;
-
-  outline: none;
-  :hover {
-    background-color: ${colors.clouds};
-    cursor: pointer;
-  }
-`;
-
 const Spacer = styled.span`
   margin: 0 3px;
 `;
 
-const NewHrefInput = styled(LinkActions).attrs({
-  as: "input"
-})`
+const NewHrefInput = styled.input`
   min-width: 60px;
 
+  padding: 6px;
+  margin: 3px 1.5px;
+  box-sizing: border-box;
+
+  border: none;
+  border-radius: 6px;
+
+  outline: none;
+
   :hover {
+    background: ${colors.clouds};
     cursor: text;
   }
 `;
