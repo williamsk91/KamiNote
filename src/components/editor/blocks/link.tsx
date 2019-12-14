@@ -11,7 +11,7 @@ import { EditorView } from "prosemirror-view";
 import { Tooltip } from "../plugins/tooltip";
 import { IBlock, IDispatch } from "./utils";
 import { schema } from "../schema";
-import { IconButton } from "../component/IconButton";
+import { IconButton } from "../../IconButton";
 import { colors } from "components/styles/colors";
 
 // -------------------- Commands --------------------

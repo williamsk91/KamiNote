@@ -14,7 +14,7 @@ import { EditorView } from "prosemirror-view";
 
 import { Tooltip } from "../plugins/tooltip";
 import { insertLink } from "../blocks/link";
-import { IconButton } from "./IconButton";
+import { IconButton } from "../../IconButton";
 
 /**
  * Displays a toolbar
