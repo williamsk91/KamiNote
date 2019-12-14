@@ -43,7 +43,6 @@ export const editorStyles = css`
 
   blockquote {
     margin: 0;
-    height: 28px;
     font-size: 24px;
 
     padding-left: 12px;
