@@ -18,9 +18,9 @@ import { list } from "./blocks/list";
 import { marks } from "./blocks/marks";
 import { placeholderPlugin } from "./plugins/placeholder";
 import { heading, hr, blockQuote, codeBlock } from "./blocks/base";
-import { buildTooltipPlugin } from "./plugins/tooltip";
-import { link, LinkTooltip } from "./blocks/link";
-import { inlineToolbar } from "./plugins/inlineToolbar";
+import { link, linkTooltip } from "./blocks/link";
+import { tooltipPlugin } from "./plugins/tooltip";
+import { inlineToolbar } from "./component/inlineToolbar";
 
 export const Editor = () => {
   let view: EditorView | null;
@@ -46,8 +46,7 @@ export const Editor = () => {
           link
         ]),
 
-        ...buildTooltipPlugin("tooltipParent", [LinkTooltip]),
-        inlineToolbar("toolbar"),
+        tooltipPlugin([linkTooltip, inlineToolbar]),
 
         placeholderPlugin()
       ]
@@ -62,8 +61,8 @@ export const Editor = () => {
   }, []);
 
   return (
-    <>
-      <Container onClick={() => view && view.focus()} id="editor" />
+    <Container>
+      <EditorContainer onClick={() => view && view.focus()} id="editor" />
       <div id="content" style={{ display: "none" }}>
         <p>
           hmmmm{" "}
@@ -92,6 +91,105 @@ export const Editor = () => {
           also <code>code</code>
         </p>
         <hr />
+        <p>
+          Hello{" "}
+          <span className="color" color="red">
+            colored
+          </span>{" "}
+          text
+        </p>
+        <p>
+          Hello{" "}
+          <span className="color" color="orange">
+            colored
+          </span>{" "}
+          text
+        </p>
+        <p>
+          Hello{" "}
+          <span className="color" color="yellow">
+            colored
+          </span>{" "}
+          text
+        </p>
+        <p>
+          Hello{" "}
+          <span className="color" color="green">
+            colored
+          </span>{" "}
+          text
+        </p>
+        <p>
+          Hello{" "}
+          <span className="color" color="blue">
+            colored
+          </span>{" "}
+          text
+        </p>
+        <p>
+          Hello{" "}
+          <span className="color" color="purple">
+            colored
+          </span>{" "}
+          text
+        </p>
+        <p>
+          Hello{" "}
+          <span className="color" color="pink">
+            colored
+          </span>{" "}
+          text
+        </p>
+        <hr />
+        <p>
+          Hello{" "}
+          <span className="highlight" color="red">
+            colored
+          </span>{" "}
+          text
+        </p>
+        <p>
+          Hello{" "}
+          <span className="highlight" color="orange">
+            colored
+          </span>{" "}
+          text
+        </p>
+        <p>
+          Hello{" "}
+          <span className="highlight" color="yellow">
+            colored
+          </span>{" "}
+          text
+        </p>
+        <p>
+          Hello{" "}
+          <span className="highlight" color="green">
+            colored
+          </span>{" "}
+          text
+        </p>
+        <p>
+          Hello{" "}
+          <span className="highlight" color="blue">
+            colored
+          </span>{" "}
+          text
+        </p>
+        <p>
+          Hello{" "}
+          <span className="highlight" color="purple">
+            colored
+          </span>{" "}
+          text
+        </p>
+        <p>
+          Hello{" "}
+          <span className="highlight" color="pink">
+            colored
+          </span>{" "}
+          text
+        </p>
         <hr />
         <hr />
         <blockquote>Quote</blockquote>
@@ -117,20 +215,23 @@ export const Editor = () => {
         </div>
         <hr />
       </div>
-      {/* This is used to render tooltips */}
-      <div id="tooltipParent" />
-      <div id="toolbar" />
-    </>
+    </Container>
   );
 };
 
+/**
+ * This is styled as opposed to the `EditorContainer`
+ * to allows plugins like `tooltip` to position itself correctly.
+ */
 const Container = styled.div`
   position: relative;
 
   max-width: 720px;
   margin: auto;
   padding: 96px;
+`;
 
+const EditorContainer = styled.div`
   & :focus {
     outline: none;
   }

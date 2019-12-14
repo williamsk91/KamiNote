@@ -1,14 +1,18 @@
 import React, { FC, useState, useEffect } from "react";
 import styled from "styled-components";
 
-import { Node, MarkType } from "prosemirror-model";
-import { EditorState } from "prosemirror-state";
+import { FiExternalLink, FiEdit3, FiX, FiCheck, FiTrash } from "react-icons/fi";
 
-import { colors } from "components/styles/colors";
-import { ITooltip } from "../plugins/tooltip";
+import { Node, MarkType, Mark } from "prosemirror-model";
+import { EditorState } from "prosemirror-state";
+import { InputRule } from "prosemirror-inputrules";
+import { EditorView } from "prosemirror-view";
+
+import { Tooltip } from "../plugins/tooltip";
 import { IBlock, IDispatch } from "./utils";
 import { schema } from "../schema";
-import { InputRule } from "prosemirror-inputrules";
+import { IconButton } from "../component/IconButton";
+import { colors } from "components/styles/colors";
 
 // -------------------- Commands --------------------
 
@@ -203,25 +207,11 @@ export const link: IBlock = {
 // ------------------------- Tooltip Plugin -------------------------
 
 /**
- * Tooltip for `link`.
- *
- * Shows [Open | Edit | Unlink] normally.
- * Shows [<href> | Cancel | Confirm] while editing.
- *
+ * link tooltip function
  */
-export const LinkTooltip: FC<ITooltip> = props => {
-  const [editing, setEditing] = useState(false);
-  const [inputVal, setInputVal] = useState("");
-
-  const { state, dispatch } = props.view;
-  const { selection, schema } = state;
+export const linkTooltip: Tooltip = view => {
+  const { selection, schema } = view.state;
   const { $from, $to } = selection;
-  /**
-   * Reset to not editing on selection change.
-   */
-  useEffect(() => {
-    setEditing(false);
-  }, [selection]);
 
   const fromMarks = $from.marks();
   const toMarks = $to.marks();
@@ -229,18 +219,48 @@ export const LinkTooltip: FC<ITooltip> = props => {
   const linkMark = schema.marks.link.isInSet(fromMarks);
 
   /**
-   * set starting href as current href
-   */
-  useEffect(() => {
-    linkMark && setInputVal(linkMark.attrs.href);
-  }, [linkMark]);
-
-  /**
    * Only shows tooltip if the selection is explicitely
    *  inside one and only one link.
    */
   const linkInBothPos = linkMark && linkMark.isInSet(toMarks);
   if (!linkInBothPos) return null;
+
+  return () => <LinkTooltip view={view} linkMark={linkMark} />;
+};
+
+interface ILinkTooltip {
+  view: EditorView;
+  linkMark: Mark;
+}
+
+/**
+ * Tooltip for `link`.
+ *
+ * Shows [Open | Edit | Unlink] normally.
+ * Shows [<href> | Cancel | Confirm] while editing.
+ *
+ */
+const LinkTooltip: FC<ILinkTooltip> = props => {
+  const { linkMark } = props;
+  const { state, dispatch } = props.view;
+  const { selection, schema } = state;
+
+  const [editing, setEditing] = useState(false);
+  const [inputVal, setInputVal] = useState("");
+
+  /**
+   * Reset to not editing on selection change.
+   */
+  useEffect(() => {
+    setEditing(false);
+  }, [selection]);
+
+  /**
+   * set starting href as current href
+   */
+  useEffect(() => {
+    linkMark && setInputVal(linkMark.attrs.href);
+  }, [linkMark]);
 
   const EditLinkBody = (
     <>
@@ -250,56 +270,50 @@ export const LinkTooltip: FC<ITooltip> = props => {
           setInputVal(e.currentTarget.value);
         }}
       />
-      <Spacer>|</Spacer>
-      <LinkActions
+      <IconButton
         onClick={() => {
           setInputVal(linkMark.attrs.href);
           setEditing(false);
         }}
       >
-        Cancel
-      </LinkActions>
-      <Spacer>|</Spacer>
-      <LinkActions
+        <FiX />
+      </IconButton>
+      <IconButton
         onClick={() => {
           updateHref(schema.marks.link, inputVal)(state, dispatch);
           setEditing(false);
         }}
       >
-        Confirm
-      </LinkActions>
+        <FiCheck />
+      </IconButton>
     </>
   );
 
   const ShowLinkBody = (
     <>
-      <LinkActions onClick={() => window.open(linkMark.attrs.href, "_blank")}>
-        Open
-      </LinkActions>
-      <Spacer>|</Spacer>
-      <LinkActions onClick={() => setEditing(true)}>Edit</LinkActions>
-      <Spacer>|</Spacer>
-      <LinkActions
+      <IconButton onClick={() => window.open(linkMark.attrs.href, "_blank")}>
+        <FiExternalLink />
+      </IconButton>
+      <IconButton onClick={() => setEditing(true)}>
+        <FiEdit3 />
+      </IconButton>
+      <IconButton
         onClick={() => removeMarkText(schema.marks.link)(state, dispatch)}
       >
-        Unlink
-      </LinkActions>
+        <FiTrash />
+      </IconButton>
     </>
   );
 
   const body = editing ? EditLinkBody : ShowLinkBody;
 
-  return <Container {...props}>{body}</Container>;
+  return <Container>{body}</Container>;
 };
 
 // ------------------------- Style -------------------------
 
-const Container = styled.div<ITooltip>`
-  position: absolute;
-  left: ${p => `${p.anchor.left}px`};
-  top: ${p => `${p.anchor.top}px`};
-  transform: translate(-50%, -110%);
-
+const Container = styled.div`
+  display: flex;
   padding: 3px;
 
   background: white;
@@ -307,31 +321,24 @@ const Container = styled.div<ITooltip>`
   border-radius: 6px;
 `;
 
-const LinkActions = styled.button`
-  padding: 6px 12px;
-  box-sizing: border-box;
-
-  background: none;
-  border: none;
-  border-radius: 3px;
-
-  outline: none;
-  :hover {
-    background-color: ${colors.clouds};
-    cursor: pointer;
-  }
-`;
-
 const Spacer = styled.span`
   margin: 0 3px;
 `;
 
-const NewHrefInput = styled(LinkActions).attrs({
-  as: "input"
-})`
+const NewHrefInput = styled.input`
   min-width: 60px;
 
+  padding: 6px;
+  margin: 3px 1.5px;
+  box-sizing: border-box;
+
+  border: none;
+  border-radius: 6px;
+
+  outline: none;
+
   :hover {
+    background: ${colors.clouds};
     cursor: text;
   }
 `;
