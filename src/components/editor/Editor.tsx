@@ -91,7 +91,9 @@ export const Editor: FC<IEditor> = props => {
         dispatchTransaction
       });
 
-      applyDevTools(viewRef.current);
+      if (process.env.NODE_ENV === "development") {
+        applyDevTools(viewRef.current);
+      }
     }
   }, [dispatchTransaction]);
 

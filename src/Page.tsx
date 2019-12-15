@@ -1,18 +1,19 @@
-import React, { FC } from "react";
+import React from "react";
 import { Editor } from "components/editor/Editor";
 import { debounce } from "components/editor/utils/debounce";
 import { EditorState } from "prosemirror-state";
+import { useParams } from "react-router";
 
-interface IProp {}
+export const Page = () => {
+  const { id } = useParams<{ id: string }>();
 
-export const Page: FC<IProp> = prop => {
-  const initState = load();
+  const initState = load(id);
 
   return (
     <Editor
       initState={initState ? initState : undefined}
       onChange={state => {
-        saveToServer(state);
+        saveToServer(id, state);
       }}
     />
   );
@@ -21,14 +22,14 @@ export const Page: FC<IProp> = prop => {
 /**
  * save locally
  */
-const saveToServer = debounce((state: EditorState) => {
-  save(JSON.stringify(state.toJSON()));
+const saveToServer = debounce((id: string, state: EditorState) => {
+  save(id, JSON.stringify(state.toJSON()));
 }, 1000);
 
-const save = (state: string) => {
-  window.localStorage.setItem("state", state);
+const save = (id: string, state: string) => {
+  window.localStorage.setItem(`kaminote-${id}`, state);
 };
 
-const load = () => {
-  return window.localStorage.getItem("state");
+const load = (id: string) => {
+  return window.localStorage.getItem(`kaminote-${id}`);
 };
