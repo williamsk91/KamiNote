@@ -1,7 +1,3 @@
-import { EditorState } from "prosemirror-state";
-import { IDispatch } from "./utils";
-import { MarkType } from "prosemirror-model";
-
 // ------------------------- Pallete -------------------------
 
 export const colorPallete = {

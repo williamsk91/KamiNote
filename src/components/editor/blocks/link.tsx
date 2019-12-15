@@ -177,7 +177,7 @@ const linkMDInputRule = new InputRule(
  *  by @stephenhay
  */
 const linkInputRule = new InputRule(
-  /((?:https?|ftp)\:\/\/[^\s/$.?#].[^\s]*)\s$/,
+  /((?:https?|ftp):\/\/[^\s/$.?#].[^\s]*)\s$/,
   (state, match, start, end) => {
     const { tr } = state;
     const attrs = { href: match[1] };
@@ -319,10 +319,6 @@ const Container = styled.div`
   background: white;
   border: 1px solid silver;
   border-radius: 6px;
-`;
-
-const Spacer = styled.span`
-  margin: 0 3px;
 `;
 
 const NewHrefInput = styled.input`

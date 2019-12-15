@@ -34,7 +34,7 @@ const markInputRule = (
   markType: MarkType,
   getAttrs?: { [key: string]: any }
 ) => {
-  const newRegexp = new RegExp(regexp.source.replace(/\$$/, "") + "(.)" + "$");
+  const newRegexp = new RegExp(`${regexp.source.replace(/\$$/, "")}(.)$`);
 
   return new InputRule(newRegexp, (state, match, start, end) => {
     const attrs = getAttrs instanceof Function ? getAttrs(match) : getAttrs;
@@ -58,7 +58,7 @@ const markInputRule = (
 /**
  * *bold*
  */
-const boldInputRule = markInputRule(/\*([^\*]+)\*$/, schema.marks.bold);
+const boldInputRule = markInputRule(/\*([^*]+)\*$/, schema.marks.bold);
 
 /**
  * _italic_

@@ -35,7 +35,7 @@ export const Editor: FC<IEditor> = props => {
   const { initState, onChange } = props;
 
   const ref = useRef<HTMLDivElement>(null);
-  let view: EditorView | null;
+  const viewRef = useRef<null | EditorView>(null);
 
   const stateConfig = useMemo(
     () => ({
@@ -78,22 +78,22 @@ export const Editor: FC<IEditor> = props => {
 
   const dispatchTransaction = (tr: Transaction) => {
     state = state.apply(tr);
-    view && view.updateState(state);
+    viewRef.current && viewRef.current.updateState(state);
 
     tr.docChanged && onChange(state);
   };
 
   useEffect(() => {
     if (ref.current) {
-      view = new EditorView(ref.current, {
+      viewRef.current = new EditorView(ref.current, {
         state,
         nodeViews: buildViews([taskList]),
         dispatchTransaction
       });
 
-      applyDevTools(view);
+      applyDevTools(viewRef.current);
     }
-  }, []);
+  }, [dispatchTransaction]);
 
   return (
     <Container>
