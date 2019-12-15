@@ -3,7 +3,6 @@ import { DecorationSet, EditorView } from "prosemirror-view";
 import { StepMap } from "prosemirror-transform";
 import { Node } from "prosemirror-model";
 
-import { SuggestionMenu } from "./SuggestionMenu";
 import { debounce } from "./debounce";
 import { updateDecoSet } from "./inlineDeco";
 import { suggestionTooltip } from "./tooltip";
@@ -230,17 +229,19 @@ export const suggestionPlugin = (url: string) => {
     },
     view: view => {
       localView = view;
-      return suggestionTooltip(view, suggestionKey, SuggestionMenu);
+      return suggestionTooltip(view, suggestionKey);
     }
   });
 };
 
-// ------------------------- Transaction -------------------------
+// ------------------------- Transaction helpers -------------------------
 
 /**
  * get the range (i.e. from and to) of a transaction
  */
-export const transactionRange = (tr: Transaction) =>
+export const transactionRange = (
+  tr: Transaction
+): { from: number; to: number } =>
   tr.mapping.maps.reduce(
     (acc, stepMap) => {
       const { from, to } = stepMapRange(stepMap);
@@ -252,9 +253,9 @@ export const transactionRange = (tr: Transaction) =>
   );
 
 /**
- * Get the range of the stepMap
+ * Get the range of a stepMap
  */
-const stepMapRange = (stepMap: StepMap) => {
+const stepMapRange = (stepMap: StepMap): { from: number; to: number } => {
   let from = Infinity;
   let to = 0;
   stepMap.forEach((_oldStart, _oldEnd, newStart, newEnd) => {
@@ -264,7 +265,7 @@ const stepMapRange = (stepMap: StepMap) => {
   return { from, to };
 };
 
-// ------------------------- Inclusive Text -------------------------
+// ------------------------- Inclusive Text helpers -------------------------
 
 /**
  * Test if char is a word boundary char or not.
@@ -314,7 +315,7 @@ const findTextNode = (doc: Node, pos: number): number => {
   return findTextNode(doc, pos + 1);
 };
 
-// ------------------------- ignore list -------------------------
+// ------------------------- ignore list helpers -------------------------
 
 const ignoreListLocalStorage = "ignore_spellings";
 

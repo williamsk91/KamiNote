@@ -1,7 +1,13 @@
 import React, { FC, useState, useEffect } from "react";
 import styled from "styled-components";
 
-import { IInlineSuggestion, ISuggestionMenu } from "./types";
+import { IInlineSuggestion, ITextPos } from "./types";
+
+interface ISuggestionMenu {
+  suggestion?: IInlineSuggestion;
+  onSelect: (suggestion: string, pos: ITextPos) => void;
+  onIgnore: (phrase: string) => void;
+}
 
 /**
  * Menu that displays selectable candidates for a misspelled word.
