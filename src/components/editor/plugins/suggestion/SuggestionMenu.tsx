@@ -1,10 +1,10 @@
-import React, { FC, useState, useEffect } from "react";
+import React, { FC } from "react";
 import styled from "styled-components";
 
 import { IInlineSuggestion, ITextPos } from "./types";
 
 interface ISuggestionMenu {
-  suggestion?: IInlineSuggestion;
+  suggestion: IInlineSuggestion;
   onSelect: (suggestion: string, pos: ITextPos) => void;
   onIgnore: (phrase: string) => void;
 }
@@ -14,26 +14,11 @@ interface ISuggestionMenu {
  * Also displays an ignore button.
  */
 export const SuggestionMenu: FC<ISuggestionMenu> = props => {
-  const { suggestion, onSelect, onIgnore, ...tooltipProps } = props;
-
-  /**
-   * Close the menu (i.e. render null).
-   *
-   * This is used to close the menu after selecting one
-   * of the suggested phrase or ignoring the phrase.
-   */
-  const [close, setClose] = useState(false);
-
-  useEffect(() => {
-    setClose(false);
-  }, [suggestion]);
-
-  if (!suggestion || close) return null;
-
-  const { phrase, candidates, pos } = suggestion as IInlineSuggestion;
+  const { suggestion, onSelect, onIgnore } = props;
+  const { phrase, candidates, pos } = suggestion;
 
   return (
-    <Container {...tooltipProps}>
+    <Container>
       <div>
         <b>Suggestions</b>
       </div>
@@ -42,7 +27,6 @@ export const SuggestionMenu: FC<ISuggestionMenu> = props => {
           key={i}
           onClick={() => {
             onSelect(c, pos);
-            setClose(true);
           }}
         >
           {c}
@@ -52,7 +36,6 @@ export const SuggestionMenu: FC<ISuggestionMenu> = props => {
       <ActionButton
         onClick={() => {
           onIgnore(phrase);
-          setClose(true);
         }}
       >
         Ignore list
