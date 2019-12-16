@@ -3,17 +3,13 @@ import { css } from "styled-components";
 import { Decoration, DecorationSet, EditorView } from "prosemirror-view";
 import { Transaction, EditorState, PluginKey } from "prosemirror-state";
 
-import { ITextSuggestion, IInlineSuggestion, ITextPos } from "./types";
+import { ITextSuggestion, ITextPos, ISuggestion } from "./types";
 
 // ------------------------- Creation -------------------------
 
 export const decoClass = "suggestionClass";
 
-export const suggestionDeco = (
-  from: number,
-  to: number,
-  spec: IInlineSuggestion
-) => {
+export const suggestionDeco = (from: number, to: number, spec: ISuggestion) => {
   return Decoration.inline(
     from,
     to,
@@ -38,11 +34,15 @@ export const suggestionPluginStyles = css`
 
 // ------------------------- Helper Functions -------------------------
 
+interface IInlineSuggestion extends ISuggestion {
+  pos: ITextPos;
+}
+
 export const getFirstDecoInCoord = (
   view: EditorView,
   key: PluginKey,
   coords: { left: number; top: number }
-): Decoration<IInlineSuggestion> | null => {
+): Decoration<ISuggestion> | null => {
   const pos = view.posAtCoords(coords);
   if (!pos) return null;
 
@@ -57,9 +57,9 @@ export const getFirstDeco = (
   decoSet: DecorationSet,
   from: number,
   to: number
-): Decoration<IInlineSuggestion> | null => {
-  const decos: Decoration[] = decoSet.find(from, to);
-  return decos[0] ? (decos[0] as Decoration<IInlineSuggestion>) : null;
+): Decoration<ISuggestion> | null => {
+  const decos = decoSet.find(from, to);
+  return decos[0] ? (decos[0] as Decoration<ISuggestion>) : null;
 };
 
 /**
@@ -82,10 +82,7 @@ export const updateDecoSet = (
   const outdatedDeco = decoSet.find(from, to);
 
   // all inline suggestions
-  const inlineSuggestions: IInlineSuggestion[] = phraseToPos(
-    state,
-    textSuggestion
-  );
+  const inlineSuggestions = phraseToPos(state, textSuggestion);
 
   // remove `phrase` in `ignoreList`
   const validInlineSuggestions = inlineSuggestions.filter(
@@ -94,14 +91,14 @@ export const updateDecoSet = (
 
   // new decos
   const newDecos = validInlineSuggestions.map(({ pos, phrase, candidates }) =>
-    suggestionDeco(pos.from, pos.to, { phrase, candidates, pos })
+    suggestionDeco(pos.from, pos.to, { phrase, candidates })
   );
 
   return decoSet.remove(outdatedDeco).add(tr.doc, newDecos);
 };
 
 /**
- * Get IInlineSuggestion[] (to be passed to inline decoration) from
+ * Get ISuggestion[] (to be passed to inline decoration) from
  * ITextSuggestion[] where key is the pos phrase
  */
 const phraseToPos = (
