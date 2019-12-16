@@ -1,10 +1,11 @@
 import React, { FC } from "react";
 import styled from "styled-components";
 
-import { IInlineSuggestion, ITextPos } from "./types";
+import { ISuggestion, ITextPos } from "./types";
+import { Decoration } from "prosemirror-view";
 
 interface ISuggestionMenu {
-  suggestion: IInlineSuggestion;
+  suggestion: Decoration<ISuggestion>;
   onSelect: (suggestion: string, pos: ITextPos) => void;
   onIgnore: (phrase: string) => void;
 }
@@ -15,7 +16,7 @@ interface ISuggestionMenu {
  */
 export const SuggestionMenu: FC<ISuggestionMenu> = props => {
   const { suggestion, onSelect, onIgnore } = props;
-  const { phrase, candidates, pos } = suggestion;
+  const { phrase, candidates } = suggestion.spec;
 
   return (
     <Container>
@@ -26,7 +27,7 @@ export const SuggestionMenu: FC<ISuggestionMenu> = props => {
         <ActionButton
           key={i}
           onClick={() => {
-            onSelect(c, pos);
+            onSelect(c, { from: suggestion.from, to: suggestion.to });
           }}
         >
           {c}

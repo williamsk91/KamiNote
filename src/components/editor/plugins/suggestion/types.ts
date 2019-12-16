@@ -22,10 +22,3 @@ export interface ITextSuggestion {
   key: ITextPos;
   suggestions: ISuggestion[];
 }
-
-/**
- * `pos` is the position of `phrase` in doc.
- */
-export interface IInlineSuggestion extends ISuggestion {
-  pos: ITextPos;
-}

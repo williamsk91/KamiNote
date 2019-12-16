@@ -5,7 +5,7 @@ import { Node } from "prosemirror-model";
 
 import { debounce } from "./debounce";
 import { updateDecoSet } from "./inlineDeco";
-import { suggestionTooltip } from "./tooltip";
+import { suggestionTooltip } from "./suggestionTooltip";
 
 interface ISuggestionPluginState {
   ignoreList: string[];
