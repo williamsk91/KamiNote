@@ -127,7 +127,15 @@ const keymaps = {
 
 // ------------------------- Style -------------------------
 
-const listLevelIndent = (indent: number) => css`
+const BULLET_TYPES = ["disc", "circle", "square"];
+const NUMBER_TYPES = ["decimal", "lower-alpha", "lower-roman"];
+
+/**
+ * Styles list depending on level.
+ *    - indentation
+ *    - list-style-type
+ */
+const listLevelStyle = (indent: number) => css`
   ul,
   ol,
   div.taskList {
@@ -135,6 +143,16 @@ const listLevelIndent = (indent: number) => css`
       margin-left: ${`${24 * indent}px`};
     }
   }
+
+  ul[data-level="${indent}"]{
+    list-style-type: ${BULLET_TYPES[indent % BULLET_TYPES.length]}
+  }
+
+  ol[data-level="${indent}"]{
+    list-style-type: ${NUMBER_TYPES[indent % NUMBER_TYPES.length]}
+  }
+
+  
 `;
 
 // -------------------- Export --------------------
@@ -166,14 +184,14 @@ export const listStyle = css`
   ${taskListStyle}
   
   /* indentation */
-  ${listLevelIndent(0)}
-  ${listLevelIndent(1)}
-  ${listLevelIndent(2)}
-  ${listLevelIndent(3)}
-  ${listLevelIndent(4)}
-  ${listLevelIndent(5)}
-  ${listLevelIndent(6)}
-  ${listLevelIndent(7)}
-  ${listLevelIndent(8)}
+  ${listLevelStyle(0)}
+  ${listLevelStyle(1)}
+  ${listLevelStyle(2)}
+  ${listLevelStyle(3)}
+  ${listLevelStyle(4)}
+  ${listLevelStyle(5)}
+  ${listLevelStyle(6)}
+  ${listLevelStyle(7)}
+  ${listLevelStyle(8)}
 
 `;
