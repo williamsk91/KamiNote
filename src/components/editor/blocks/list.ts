@@ -6,6 +6,7 @@ import { EditorState, TextSelection } from "prosemirror-state";
 import { chainCommands } from "prosemirror-commands";
 import { canSplit } from "prosemirror-transform";
 import { css } from "styled-components";
+import { taskListStyle } from "./taskList";
 
 // ------------------------- Commands -------------------------
 
@@ -158,8 +159,11 @@ export const listStyle = css`
   ul,
   ol,
   div.taskList {
-  margin: 6px 0;
+    margin: 6px 0;
+    padding: 0 0 0 24px;
   }
+
+  ${taskListStyle}
   
   /* indentation */
   ${listLevelIndent(0)}
