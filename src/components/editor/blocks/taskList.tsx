@@ -62,19 +62,21 @@ const TaskListView = (
   dom.setAttribute("data-checked", node.attrs["data-checked"]);
 
   // react
-  const render = (checked: boolean, onClick: () => void) => {
-    return <StyledCheckbox checked={checked} onClick={onClick} />;
-  };
+  const reactComponent = (
+    <StyledCheckbox
+      checked={node.attrs["data-checked"]}
+      onClick={() => {
+        // update `data-checked`
+        const tr = view.state.tr.setNodeMarkup(getPos(), undefined, {
+          ...node.attrs,
+          "data-checked": !node.attrs["data-checked"]
+        });
 
-  const reactComponent = render(node.attrs["data-checked"], () => {
-    // update `data-checked`
-    const tr = view.state.tr.setNodeMarkup(getPos(), undefined, {
-      ...node.attrs,
-      "data-checked": !node.attrs["data-checked"]
-    });
+        view.dispatch(tr);
+      }}
+    />
+  );
 
-    view.dispatch(tr);
-  });
   ReactDOM.render(reactComponent, dom);
 
   // content

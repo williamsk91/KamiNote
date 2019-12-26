@@ -44,7 +44,9 @@ const splitList = (listType: NodeType) => (
   let tr = state.tr.deleteSelection();
   if (!canSplit(tr.doc, $from.pos, 1)) return false;
 
-  if (dispatch) dispatch(tr.split($from.pos, 1).scrollIntoView());
+  tr.split($from.pos, 1).scrollIntoView();
+
+  if (dispatch) dispatch(tr);
   return true;
 };
 
