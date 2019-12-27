@@ -114,6 +114,10 @@ const Container = styled.div`
   max-width: 720px;
   margin: auto;
   padding: 96px;
+
+  @media screen and (max-width: 600px) {
+    padding: 12px;
+  }
 `;
 
 const EditorContainer = styled.div`
