@@ -1,7 +1,11 @@
+import React from "react";
+import ReactDOM from "react-dom";
+import { Checkbox } from "../component/Checkbox";
+
 import { EditorState } from "prosemirror-state";
 import { NodeView, EditorView } from "prosemirror-view";
 import { Node, NodeType } from "prosemirror-model";
-import { css } from "styled-components";
+import styled, { css } from "styled-components";
 
 import { IBlock, IDispatch } from "./utils";
 import { schema } from "../schema";
@@ -57,22 +61,23 @@ const TaskListView = (
   dom.setAttribute("data-level", node.attrs["data-level"]);
   dom.setAttribute("data-checked", node.attrs["data-checked"]);
 
-  // icon
-  // update this div with an icon
-  const icon = dom.appendChild(document.createElement("div"));
-  icon.setAttribute("contenteditable", "false");
-  icon.classList.add("checkbox");
+  // react
+  const reactComponent = (
+    <StyledCheckbox
+      checked={node.attrs["data-checked"]}
+      onClick={() => {
+        // update `data-checked`
+        const tr = view.state.tr.setNodeMarkup(getPos(), undefined, {
+          ...node.attrs,
+          "data-checked": !node.attrs["data-checked"]
+        });
 
-  // toggle `data-checked` onClick
-  icon.addEventListener("click", e => {
-    e.preventDefault();
-    view.dispatch(
-      view.state.tr.setNodeMarkup(getPos(), undefined, {
-        ...node.attrs,
-        "data-checked": !node.attrs["data-checked"]
-      })
-    );
-  });
+        view.dispatch(tr);
+      }}
+    />
+  );
+
+  ReactDOM.render(reactComponent, dom);
 
   // content
   const contentDOM = dom.appendChild(document.createElement("div"));
@@ -94,28 +99,18 @@ const keymaps = {
 
 // ------------------------- Style -------------------------
 
+const StyledCheckbox = styled(Checkbox).attrs({
+  className: "checkbox"
+})`
+  position: absolute;
+  right: calc(100% - 21px);
+`;
+
 export const taskListStyle = css`
   div.taskList {
     position: relative;
-    padding-left: 40px;
-
-    div.checkbox {
-      position: absolute;
-      left: 18px;
-
-      width: 15px;
-      height: 15px;
-
-      border: 2px solid rgb(55, 53, 47);
-      border-radius: 5px;
-      cursor: pointer;
-    }
 
     &[data-checked="true"] {
-      div.checkbox {
-        background: rgb(55, 53, 47);
-      }
-
       text-decoration: line-through;
       color: #aaa;
     }

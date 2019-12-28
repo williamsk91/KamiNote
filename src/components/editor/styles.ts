@@ -1,7 +1,6 @@
 import { css } from "styled-components";
 import { placeholderPluginStyles } from "./plugins/placeholder";
 import { listStyle } from "./blocks/list";
-import { taskListStyle } from "./blocks/taskList";
 import { markStyles } from "./blocks/marks";
 
 export const editorStyles = css`
@@ -17,7 +16,6 @@ export const editorStyles = css`
     font-size: 40px;
     font-weight: 700;
   }
-  
 
   p {
     margin: 0;
@@ -56,7 +54,6 @@ export const editorStyles = css`
   }
 
   ${listStyle}
-  ${taskListStyle}
   ${markStyles}
 `;
 
