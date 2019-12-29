@@ -1,13 +1,19 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import App from "./App";
 import { BrowserRouter as Router } from "react-router-dom";
+
+import App from "./App";
 import * as serviceWorker from "./serviceWorker";
 
+import { ApolloProvider } from "@apollo/react-hooks";
+import { apolloClient } from "./graphql/client";
+
 ReactDOM.render(
-  <Router>
-    <App />
-  </Router>,
+  <ApolloProvider client={apolloClient}>
+    <Router>
+      <App />
+    </Router>
+  </ApolloProvider>,
   document.getElementById("root")
 );
 

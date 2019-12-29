@@ -1,35 +1,51 @@
 import React from "react";
 import { Editor } from "components/editor/Editor";
-import { debounce } from "components/editor/utils/debounce";
-import { EditorState } from "prosemirror-state";
 import { useParams } from "react-router";
+import { LoadingScreen } from "components/data/LoadingScreen";
+import { ErrorScreen } from "components/data/ErrorScreen";
+import { usePageQuery, usePageMutation } from "graphql/page";
 
 export const Page = () => {
   const { id } = useParams<{ id: string }>();
 
-  const initState = load(id);
+  const { loading, data } = usePageQuery(id);
+  const [saveContent] = usePageMutation();
 
-  return (
-    <Editor
-      initState={initState ? initState : undefined}
-      onChange={state => {
-        saveToServer(id, state);
-      }}
-    />
-  );
+  const save = (pageId: string, content: string) =>
+    saveContent({
+      variables: {
+        pageId,
+        content
+      }
+    });
+  if (loading) return <LoadingScreen />;
+
+  if (data) {
+    const { id, content } = data.getPage;
+
+    return (
+      <Editor
+        initState={content}
+        onChange={state => {
+          save(id, JSON.stringify(state.toJSON()));
+        }}
+      />
+    );
+  }
+
+  return <ErrorScreen />;
 };
 
 /**
- * save locally
+ * debounce saves
  */
-const saveToServer = debounce((id: string, state: EditorState) => {
-  save(id, JSON.stringify(state.toJSON()));
-}, 1000);
-
-const save = (id: string, state: string) => {
-  window.localStorage.setItem(`kaminote-${id}`, state);
-};
-
-const load = (id: string) => {
-  return window.localStorage.getItem(`kaminote-${id}`);
-};
+// const saveToServer = debounce(
+//   (
+//     save: (pageId: string, content: string) => void,
+//     id: string,
+//     state: EditorState
+//   ) => {
+//     save(id, JSON.stringify(state.toJSON()));
+//   },
+//   1000
+// );

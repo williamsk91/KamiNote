@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, FC, useMemo } from "react";
+import React, { useEffect, useRef, FC } from "react";
 import styled from "styled-components";
 
 import { EditorState, Transaction } from "prosemirror-state";
@@ -23,7 +23,7 @@ import { inlineToolbar } from "./component/inlineToolbar";
 
 export interface IEditor {
   /** Json string */
-  initState?: string;
+  initState: string;
 
   /**
    * Callback every time state changes
@@ -31,54 +31,46 @@ export interface IEditor {
   onChange: (state: EditorState) => void;
 }
 
+const stateConfig = {
+  schema,
+  plugins: [
+    history(),
+    keymap({ "Mod-z": undo, "Mod-y": redo }),
+    dropCursor(),
+
+    ...buildBlockPlugins([
+      taskList,
+      list,
+      marks,
+      heading,
+      hr,
+      blockQuote,
+      codeBlock,
+      link
+    ]),
+
+    tooltipPlugin([linkTooltip, inlineToolbar]),
+
+    placeholderPlugin()
+  ]
+};
+
 export const Editor: FC<IEditor> = props => {
   const { initState, onChange } = props;
 
   const ref = useRef<HTMLDivElement>(null);
   const viewRef = useRef<null | EditorView>(null);
 
-  const stateConfig = useMemo(
-    () => ({
-      schema,
-      plugins: [
-        history(),
-        keymap({ "Mod-z": undo, "Mod-y": redo }),
-        dropCursor(),
-
-        ...buildBlockPlugins([
-          taskList,
-          list,
-          marks,
-          heading,
-          hr,
-          blockQuote,
-          codeBlock,
-          link
-        ]),
-
-        tooltipPlugin([linkTooltip, inlineToolbar]),
-
-        placeholderPlugin()
-      ]
-    }),
-    []
-  );
-
   let state: EditorState;
-  if (initState) {
-    // check for invalid initState
-    try {
-      state = EditorState.fromJSON(stateConfig, JSON.parse(initState));
-    } catch (err) {
-      state = EditorState.create(stateConfig);
-    }
-  } else {
+  // check for invalid initState
+  try {
+    state = EditorState.fromJSON(stateConfig, JSON.parse(initState));
+  } catch (err) {
     state = EditorState.create(stateConfig);
   }
-
   const dispatchTransaction = (tr: Transaction) => {
     state = state.apply(tr);
-    viewRef.current && viewRef.current.updateState(state);
+    viewRef.current?.updateState(state);
 
     tr.docChanged && onChange(state);
   };

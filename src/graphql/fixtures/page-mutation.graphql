@@ -1,0 +1,3 @@
+mutation SaveContent($pageId: String!, $content: String!) {
+  saveContent(pageId: $pageId, content: $content)
+}

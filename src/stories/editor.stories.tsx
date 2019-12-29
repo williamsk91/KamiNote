@@ -10,7 +10,7 @@ export const base = () => {
 
   return (
     <Editor
-      initState={initState ? initState : undefined}
+      initState={initState ? initState : ""}
       onChange={state => {
         saveToServer(state);
       }}

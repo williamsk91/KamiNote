@@ -1,0 +1,8 @@
+query GetPage($id: String!) {
+  getPage(id: $id) {
+    id
+    title
+    path
+    content
+  }
+}
