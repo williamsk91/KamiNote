@@ -4,6 +4,7 @@ import { useParams } from "react-router";
 import { LoadingScreen } from "components/data/LoadingScreen";
 import { ErrorScreen } from "components/data/ErrorScreen";
 import { usePageQuery, usePageMutation } from "graphql/page";
+import { debounce } from "components/editor/utils/debounce";
 
 export const Page = () => {
   const { id } = useParams<{ id: string }>();
@@ -26,8 +27,8 @@ export const Page = () => {
     return (
       <Editor
         initState={content}
-        onChange={state => {
-          save(id, JSON.stringify(state.toJSON()));
+        onChange={content => {
+          saveToServer(save, id, content);
         }}
       />
     );
@@ -39,13 +40,13 @@ export const Page = () => {
 /**
  * debounce saves
  */
-// const saveToServer = debounce(
-//   (
-//     save: (pageId: string, content: string) => void,
-//     id: string,
-//     state: EditorState
-//   ) => {
-//     save(id, JSON.stringify(state.toJSON()));
-//   },
-//   1000
-// );
+const saveToServer = debounce(
+  (
+    save: (pageId: string, content: string) => void,
+    id: string,
+    content: string
+  ) => {
+    save(id, content);
+  },
+  1000
+);

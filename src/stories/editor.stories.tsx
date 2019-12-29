@@ -1,7 +1,6 @@
 import React from "react";
 import { Editor } from "components/editor/Editor";
 import { debounce } from "components/editor/utils/debounce";
-import { EditorState } from "prosemirror-state";
 
 export default { title: "Editor|Editor", component: Editor };
 
@@ -11,8 +10,8 @@ export const base = () => {
   return (
     <Editor
       initState={initState ? initState : ""}
-      onChange={state => {
-        saveToServer(state);
+      onChange={content => {
+        saveToServer(content);
       }}
     />
   );
@@ -21,8 +20,8 @@ export const base = () => {
 /**
  * Mocked server calls
  */
-const saveToServer = debounce((state: EditorState) => {
-  save(JSON.stringify(state.toJSON()));
+const saveToServer = debounce((content: string) => {
+  save(content);
 }, 1000);
 
 const save = (state: string) => {

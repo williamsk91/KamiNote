@@ -28,7 +28,7 @@ export interface IEditor {
   /**
    * Callback every time state changes
    */
-  onChange: (state: EditorState) => void;
+  onChange: (content: string) => void;
 }
 
 const stateConfig = {
@@ -62,19 +62,25 @@ export const Editor: FC<IEditor> = props => {
   const viewRef = useRef<null | EditorView>(null);
 
   let state: EditorState;
-  // check for invalid initState
+  /**
+   * check for invalid initState
+   */
   try {
     state = EditorState.fromJSON(stateConfig, JSON.parse(initState));
   } catch (err) {
     state = EditorState.create(stateConfig);
   }
+
   const dispatchTransaction = (tr: Transaction) => {
     state = state.apply(tr);
     viewRef.current?.updateState(state);
 
-    tr.docChanged && onChange(state);
+    tr.docChanged && onChange(JSON.stringify(state.toJSON()));
   };
 
+  /**
+   * Initialises editor
+   */
   useEffect(() => {
     if (ref.current) {
       viewRef.current = new EditorView(ref.current, {
@@ -87,7 +93,7 @@ export const Editor: FC<IEditor> = props => {
         applyDevTools(viewRef.current);
       }
     }
-  }, [dispatchTransaction]);
+  }, []);
 
   return (
     <Container>
