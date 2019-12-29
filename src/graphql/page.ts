@@ -27,5 +27,14 @@ interface SaveContentVariables {
 export const usePageQuery = (id: string) =>
   useQuery<getPageData>(GET_PAGE, { variables: { id } });
 
-export const usePageMutation = () =>
-  useMutation<any, SaveContentVariables>(SAVE_CONTENT);
+export const usePageMutation = ({
+  onCompleted,
+  onError
+}: {
+  onCompleted?: () => void;
+  onError?: () => void;
+}) =>
+  useMutation<any, SaveContentVariables>(SAVE_CONTENT, {
+    onCompleted,
+    onError
+  });
