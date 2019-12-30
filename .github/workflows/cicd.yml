@@ -14,6 +14,8 @@ jobs:
         with:
           version: 10.x
       - name: Build
+        env:
+          REACT_APP_GRAPHQL_SERVER_URI: ${{ secrets.REACT_APP_GRAPHQL_SERVER_URI }}
         run: |
           yarn
           yarn build --if-present
