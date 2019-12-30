@@ -1,3 +1,11 @@
+/**
+ * Copied from
+ *    https://github.com/3stacks/github-actions-react-s3/blob/master/scripts/deploy.js
+ *
+ * Following this tutorial
+ *    https://lukeboyle.com/blog-posts/2019/08/github-actions-for-web-apps/
+ */
+
 const AWS = require("aws-sdk");
 const fs = require("fs");
 const glob = require("glob");
