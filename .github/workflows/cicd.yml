@@ -17,19 +17,19 @@ jobs:
         run: |
           yarn
           yarn build --if-present
-      - name: Deploy
+      - name: Deploy to S3
         if: github.event_name == 'push' && github.ref == 'refs/heads/master'
         env:
-          AWS_DEFAULT_REGION: ap-southeast-1
+          AWS_DEFAULT_REGION: "ap-southeast-1"
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET }}
         run: node scripts/deploy.js
       - name: Invalidate Cloudfront CDN
         if: github.event_name == 'push' && github.ref == 'refs/heads/master'
-        uses: actions/aws/cli@master
-        with:
-          args: cloudfront create-invalidation --distribution-id=$CLOUDFRONT_DISTRIBUTION_ID --paths '/*'
+        uses: chetan/invalidate-cloudfront-action@master
         env:
+          DISTRIBUTION: ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }}
+          PATHS: "/index.html"
+          AWS_REGION: "ap-southeast-1"
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          CLOUDFRONT_DISTRIBUTION_ID: ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET }}
