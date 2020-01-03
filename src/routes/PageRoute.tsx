@@ -9,7 +9,6 @@ import { Navbar, SaveStatus } from "components/Navbar";
 
 export const PageRoute = () => {
   const { id } = useParams<{ id: string }>();
-
   const { loading, data } = usePageQuery(id);
 
   const [saveStatus, setSaveStatus] = useState(SaveStatus.Saved);
@@ -33,7 +32,7 @@ export const PageRoute = () => {
 
   if (loading) return <LoadingScreen />;
 
-  if (data) {
+  if (data?.getPage) {
     const { id, path, content } = data.getPage;
 
     return (
