@@ -1,5 +1,6 @@
 import React from "react";
 import { Switch, Route } from "react-router";
+import "antd/dist/antd.css";
 
 import { PageRoute } from "routes/PageRoute";
 import { LoginRoute } from "routes/LoginRoute";

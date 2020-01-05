@@ -1,6 +1,7 @@
 import React from "react";
 import { configure, addDecorator } from "@storybook/react";
 import { ThemeProvider } from "styled-components";
+import "antd/dist/antd.css";
 
 import { theme } from "../src/components/styles/theme";
 import { addParameters } from "@storybook/react";
