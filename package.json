@@ -29,6 +29,7 @@
   },
   "scripts": {
     "start": "react-scripts start",
+    "genGraphql": "graphql-codegen",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "storybook": "start-storybook -p 6006"
@@ -50,6 +51,10 @@
   },
   "devDependencies": {
     "@babel/core": "^7.4.5",
+    "@graphql-codegen/cli": "^1.11.2",
+    "@graphql-codegen/typescript": "^1.11.2",
+    "@graphql-codegen/typescript-operations": "^1.11.2",
+    "@graphql-codegen/typescript-react-apollo": "^1.11.2",
     "@storybook/addon-actions": "^5.2.6",
     "@storybook/addon-links": "^5.2.6",
     "@storybook/addons": "^5.2.6",

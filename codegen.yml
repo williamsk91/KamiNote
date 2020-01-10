@@ -1,0 +1,14 @@
+schema: "http://localhost:4000"
+documents: "src/**/*.graphql"
+generates:
+  src/graphql/generatedGraphql.ts:
+    plugins:
+      - typescript
+      - typescript-operations
+      - typescript-react-apollo
+    config:
+      withHooks: true
+      withComponent: false
+      withHOC: false
+      avoidOptionals: true
+      gqlImport: graphql.macro#gql

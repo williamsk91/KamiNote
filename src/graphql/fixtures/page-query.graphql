@@ -5,4 +5,9 @@ query GetPage($id: String!) {
     path
     content
   }
+
+  getUserPages {
+    id
+    title
+  }
 }
