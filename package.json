@@ -80,8 +80,17 @@
     "@types/styled-components": "^4.1.16",
     "aws-sdk": "^2.596.0",
     "glob": "^7.1.6",
+    "import-sort-style-react2": "^0.3.6",
     "mime-types": "^2.1.25",
+    "prettier": "^1.19.1",
+    "prettier-plugin-import-sort": "^0.0.3",
     "prosemirror-dev-tools": "^2.1.1",
     "typescript": "3.7.4"
+  },
+  "importSort": {
+    ".js, .jsx, .ts, .tsx": {
+      "style": "react2",
+      "parser": "typescript"
+    }
   }
 }

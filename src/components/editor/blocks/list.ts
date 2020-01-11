@@ -1,12 +1,13 @@
-import { textblockTypeInputRule } from "prosemirror-inputrules";
-import { schema } from "../schema";
-import { IBlock, IDispatch } from "./utils";
-import { NodeType, Node } from "prosemirror-model";
-import { EditorState, TextSelection } from "prosemirror-state";
 import { chainCommands } from "prosemirror-commands";
+import { textblockTypeInputRule } from "prosemirror-inputrules";
+import { Node, NodeType } from "prosemirror-model";
+import { EditorState, TextSelection } from "prosemirror-state";
 import { canSplit } from "prosemirror-transform";
 import { css } from "styled-components";
+
+import { schema } from "../schema";
 import { taskListStyle } from "./taskList";
+import { IBlock, IDispatch } from "./utils";
 
 // ------------------------- Commands -------------------------
 

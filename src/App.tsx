@@ -1,9 +1,10 @@
-import React from "react";
-import { Switch, Route } from "react-router";
 import "antd/dist/antd.css";
 
-import { PageRoute } from "routes/PageRoute";
+import React from "react";
+import { Route, Switch } from "react-router";
+
 import { LoginRoute } from "routes/LoginRoute";
+import { PageRoute } from "routes/PageRoute";
 
 const App: React.FC = () => {
   return (

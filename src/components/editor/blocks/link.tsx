@@ -1,18 +1,17 @@
-import React, { FC, useState, useEffect } from "react";
+import React, { FC, useEffect, useState } from "react";
+import { FiCheck, FiEdit3, FiExternalLink, FiTrash, FiX } from "react-icons/fi";
+import { InputRule } from "prosemirror-inputrules";
+import { Mark, MarkType, Node } from "prosemirror-model";
+import { EditorState } from "prosemirror-state";
+import { EditorView } from "prosemirror-view";
 import styled from "styled-components";
 
-import { FiExternalLink, FiEdit3, FiX, FiCheck, FiTrash } from "react-icons/fi";
-
-import { Node, MarkType, Mark } from "prosemirror-model";
-import { EditorState } from "prosemirror-state";
-import { InputRule } from "prosemirror-inputrules";
-import { EditorView } from "prosemirror-view";
-
-import { Tooltip } from "../plugins/tooltip";
-import { IBlock, IDispatch } from "./utils";
-import { schema } from "../schema";
-import { IconButton } from "../../IconButton";
 import { colors } from "components/styles/colors";
+
+import { IconButton } from "../../IconButton";
+import { Tooltip } from "../plugins/tooltip";
+import { schema } from "../schema";
+import { IBlock, IDispatch } from "./utils";
 
 // -------------------- Commands --------------------
 

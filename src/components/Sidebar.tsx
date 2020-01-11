@@ -1,9 +1,9 @@
 import React, { FC } from "react";
-import { Menu, Icon } from "antd";
-
 import { useHistory } from "react-router-dom";
-import { pageUrl } from "routes/pagePath";
+import { Icon, Menu } from "antd";
 import styled from "styled-components";
+
+import { pageUrl } from "routes/pagePath";
 
 interface IProp {
   pages: {

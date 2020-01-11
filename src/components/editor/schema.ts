@@ -1,9 +1,10 @@
 import { Schema } from "prosemirror-model";
+
 import {
-  colorPallete,
-  highlightPallete,
   ColorPallete,
-  HighlightPallete
+  HighlightPallete,
+  colorPallete,
+  highlightPallete
 } from "./blocks/color";
 
 // ------------------------- Schema -------------------------

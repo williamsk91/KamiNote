@@ -1,6 +1,6 @@
 import React from "react";
 
-import { SaveStatus, SaveState } from "components/SaveState";
+import { SaveState, SaveStatus } from "components/SaveState";
 
 export default { title: "Page|Navbar", component: SaveState };
 

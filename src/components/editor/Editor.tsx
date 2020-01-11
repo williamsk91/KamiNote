@@ -1,23 +1,21 @@
-import React, { useEffect, useRef, FC } from "react";
-import styled from "styled-components";
-
+import React, { FC, useEffect, useRef } from "react";
+import applyDevTools from "prosemirror-dev-tools";
+import { dropCursor } from "prosemirror-dropcursor";
+import { history, redo, undo } from "prosemirror-history";
+import { keymap } from "prosemirror-keymap";
 import { EditorState, Transaction } from "prosemirror-state";
 import { EditorView } from "prosemirror-view";
-import { keymap } from "prosemirror-keymap";
-import { undo, redo, history } from "prosemirror-history";
-import { dropCursor } from "prosemirror-dropcursor";
+import styled from "styled-components";
 
-import applyDevTools from "prosemirror-dev-tools";
-
-import { schema } from "./schema";
-import { editorStyles } from "./styles";
-import { buildViews, buildBlockPlugins } from "./blocks/utils";
-import { taskList } from "./blocks/taskList";
+import { blockQuote, codeBlock, heading, hr } from "./blocks/base";
+import { link } from "./blocks/link";
 import { list } from "./blocks/list";
 import { marks } from "./blocks/marks";
+import { taskList } from "./blocks/taskList";
+import { buildBlockPlugins, buildViews } from "./blocks/utils";
 import { placeholderPlugin } from "./plugins/placeholder";
-import { heading, hr, blockQuote, codeBlock } from "./blocks/base";
-import { link } from "./blocks/link";
+import { schema } from "./schema";
+import { editorStyles } from "./styles";
 
 export interface IEditor {
   initState: string;

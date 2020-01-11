@@ -1,23 +1,24 @@
 import React, { FC, useState } from "react";
-import { Editor } from "components/editor/Editor";
 import { useParams } from "react-router";
-import { LoadingScreen } from "components/data/LoadingScreen";
+import { Icon, Layout } from "antd";
+
 import { ErrorScreen } from "components/data/ErrorScreen";
+import { LoadingScreen } from "components/data/LoadingScreen";
+import { Editor } from "components/editor/Editor";
 import { debounce } from "components/editor/utils/debounce";
-import { SaveStatus, SaveState } from "components/SaveState";
-import { Sidebar } from "components/Sidebar";
-import {
-  useGetPageQuery,
-  GetPageQuery,
-  useSaveContentMutation,
-  useCreatePageMutation,
-  useSavePageTitleMutation,
-  GetPageDocument
-} from "graphql/generatedGraphql";
-import { Layout, Icon } from "antd";
-import { Sider, Header, Content, Navbar } from "components/Layout";
+import { Content, Header, Navbar, Sider } from "components/Layout";
 import { PageTitleBlock } from "components/PageTitle";
+import { SaveState, SaveStatus } from "components/SaveState";
+import { Sidebar } from "components/Sidebar";
 import { apolloClient } from "graphql/client";
+import {
+  GetPageDocument,
+  GetPageQuery,
+  useCreatePageMutation,
+  useGetPageQuery,
+  useSaveContentMutation,
+  useSavePageTitleMutation
+} from "graphql/generatedGraphql";
 
 export const PageRoute = () => {
   const { id } = useParams<{ id: string }>();

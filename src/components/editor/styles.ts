@@ -1,7 +1,8 @@
 import { css } from "styled-components";
-import { placeholderPluginStyles } from "./plugins/placeholder";
+
 import { listStyle } from "./blocks/list";
 import { markStyles } from "./blocks/marks";
+import { placeholderPluginStyles } from "./plugins/placeholder";
 
 export const editorStyles = css`
   & ::selection {

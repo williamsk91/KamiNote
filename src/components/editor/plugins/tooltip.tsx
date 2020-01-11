@@ -1,6 +1,6 @@
 import React, { FC } from "react";
 import ReactDOM from "react-dom";
-import { Plugin, EditorState } from "prosemirror-state";
+import { EditorState, Plugin } from "prosemirror-state";
 import { EditorView } from "prosemirror-view";
 import styled from "styled-components";
 

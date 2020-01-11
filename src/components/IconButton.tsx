@@ -1,5 +1,6 @@
-import { colors } from "components/styles/colors";
 import styled from "styled-components";
+
+import { colors } from "components/styles/colors";
 
 export const IconButton = styled.button<{ active?: boolean }>`
   width: 24px;
