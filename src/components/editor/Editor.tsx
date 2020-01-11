@@ -1,5 +1,4 @@
 import React, { useEffect, useRef, FC } from "react";
-import { unmountComponentAtNode } from "react-dom";
 import styled from "styled-components";
 
 import { EditorState, Transaction } from "prosemirror-state";
@@ -18,9 +17,7 @@ import { list } from "./blocks/list";
 import { marks } from "./blocks/marks";
 import { placeholderPlugin } from "./plugins/placeholder";
 import { heading, hr, blockQuote, codeBlock } from "./blocks/base";
-import { link, linkTooltip } from "./blocks/link";
-import { tooltipPlugin } from "./plugins/tooltip";
-import { inlineToolbar } from "./component/inlineToolbar";
+import { link } from "./blocks/link";
 
 export interface IEditor {
   initState: string;
@@ -87,7 +84,7 @@ const stateConfig = {
       link
     ]),
 
-    tooltipPlugin([linkTooltip, inlineToolbar]),
+    // tooltipPlugin([linkTooltip, inlineToolbar]),
 
     placeholderPlugin()
   ]
