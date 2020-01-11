@@ -20,8 +20,7 @@ export const placeholderPlugin = () =>
             node.type.isBlock &&
             node.childCount === 0 &&
             // focus
-            (state.selection.$anchor.parent === node ||
-              node.type === state.schema.nodes.title)
+            state.selection.$anchor.parent === node
           ) {
             decorations.push(
               Decoration.node(pos, pos + node.nodeSize, {
@@ -57,8 +56,6 @@ export const placeholderPluginStyles = css`
       z-index: -1;
     }
   }
-
-  ${placeholderPluginNodeContent("div.title", "Untitled")}
 
   ${placeholderPluginNodeContent("p", "Insert some content")}
 

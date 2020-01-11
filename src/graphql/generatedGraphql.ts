@@ -13,7 +13,8 @@ export type Scalars = {
 
 export type Mutation = {
    __typename?: 'Mutation',
-  createPage: Maybe<Page>,
+  createPage: Page,
+  savePageTitle: Scalars['String'],
   saveContent: Scalars['String'],
   invalidateTokens: Scalars['Boolean'],
 };
@@ -21,6 +22,12 @@ export type Mutation = {
 
 export type MutationCreatePageArgs = {
   path: Array<Scalars['String']>
+};
+
+
+export type MutationSavePageTitleArgs = {
+  pageId: Scalars['String'],
+  title: Scalars['String']
 };
 
 
@@ -69,10 +76,10 @@ export type CreatePageMutationVariables = {
 
 export type CreatePageMutation = (
   { __typename?: 'Mutation' }
-  & { createPage: Maybe<(
+  & { createPage: (
     { __typename?: 'Page' }
     & Pick<Page, 'id' | 'title' | 'path' | 'content'>
-  )> }
+  ) }
 );
 
 export type GetPageQueryVariables = {

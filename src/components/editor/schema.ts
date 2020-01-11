@@ -10,13 +10,7 @@ import {
 
 export const schema = new Schema({
   nodes: {
-    doc: { content: "title block+" },
-    title: {
-      content: "inline*",
-      marks: "",
-      parseDOM: [{ tag: "div.title" }],
-      toDOM: () => ["div", { class: "title" }, 0]
-    },
+    doc: { content: "block+" },
     paragraph: {
       group: "block",
       content: "inline*",

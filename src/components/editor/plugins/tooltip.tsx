@@ -72,16 +72,6 @@ const tooltip = (view: EditorView, tooltips: Tooltip[]) => {
         return;
       }
 
-      /**
-       * Don't show any tooltip on title
-       */
-      if (
-        lastState &&
-        lastState.selection.$from.parent.type === lastState.schema.nodes.title
-      ) {
-        return;
-      }
-
       // render / update react
       const tooltipComponent = render(view);
       tooltipComponent && ReactDOM.render(tooltipComponent, tooltip);

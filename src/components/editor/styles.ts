@@ -12,11 +12,6 @@ export const editorStyles = css`
 
   font-size: 16px;
 
-  div.title {
-    font-size: 40px;
-    font-weight: 700;
-  }
-
   p {
     margin: 0;
     padding: 3px 2px;
