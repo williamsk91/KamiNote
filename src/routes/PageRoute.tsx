@@ -4,8 +4,7 @@ import { useParams } from "react-router";
 import { LoadingScreen } from "components/data/LoadingScreen";
 import { ErrorScreen } from "components/data/ErrorScreen";
 import { debounce } from "components/editor/utils/debounce";
-import { Navbar, SaveStatus } from "components/Navbar";
-import { Layout } from "antd";
+import { SaveStatus, SaveState } from "components/SaveState";
 import { Sidebar } from "components/Sidebar";
 import {
   useGetPageQuery,
@@ -13,8 +12,8 @@ import {
   useSaveContentMutation,
   useCreatePageMutation
 } from "graphql/generatedGraphql";
-
-const { Sider, Header, Content } = Layout;
+import { Layout, Icon } from "antd";
+import { Sider, Header, Content, Navbar } from "components/Layout";
 
 export const PageRoute = () => {
   const { id } = useParams<{ id: string }>();
@@ -99,16 +98,29 @@ interface IProp {
 }
 
 const Page: FC<IProp> = props => {
-  const { path, content, saveStatus, onChange, userPages, onAddPage } = props;
+  const { content, saveStatus, onChange, userPages, onAddPage } = props;
+
+  const [collapsed, setCollapsed] = useState(false);
 
   return (
-    <Layout style={{ background: "white" }}>
-      <Sider>
+    <Layout>
+      <Sider
+        collapsible
+        trigger={null}
+        collapsedWidth={0}
+        collapsed={collapsed}
+      >
         <Sidebar pages={userPages} onAddPage={onAddPage} />
       </Sider>
       <Layout>
         <Header>
-          <Navbar path={path} saveStatus={saveStatus} />
+          <Navbar>
+            <Icon
+              type={collapsed ? "menu-unfold" : "menu-fold"}
+              onClick={() => setCollapsed(!collapsed)}
+            />
+            <SaveState saveStatus={saveStatus} />
+          </Navbar>
         </Header>
         <Content>
           <Editor initState={content} onChange={onChange} />

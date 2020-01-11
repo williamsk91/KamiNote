@@ -8,13 +8,11 @@ export enum SaveStatus {
 }
 
 interface IProp {
-  path: string[];
   saveStatus: SaveStatus;
 }
 
-export const Navbar: FC<IProp> = props => {
-  const { path, saveStatus } = props;
-  const pathString = path.join(" / ");
+export const SaveState: FC<IProp> = props => {
+  const { saveStatus } = props;
 
   let state: string;
   switch (saveStatus) {
@@ -23,7 +21,7 @@ export const Navbar: FC<IProp> = props => {
       break;
 
     case SaveStatus.Saving:
-      state = "saving...";
+      state = "saving";
       break;
 
     case SaveStatus.ErrorSaving:
@@ -31,22 +29,8 @@ export const Navbar: FC<IProp> = props => {
       break;
   }
 
-  return (
-    <Container>
-      <Path>{pathString}</Path>
-      <Save>{state}</Save>
-    </Container>
-  );
+  return <Save>{state}</Save>;
 };
-
-const Container = styled.div`
-  display: grid;
-  grid-template-areas: "path saveState";
-`;
-
-const Path = styled.div`
-  grid-area: path;
-`;
 
 const Save = styled.div`
   grid-area: saveState;
