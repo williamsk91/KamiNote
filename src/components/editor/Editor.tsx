@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, FC } from "react";
+import { unmountComponentAtNode } from "react-dom";
 import styled from "styled-components";
 
 import { EditorState, Transaction } from "prosemirror-state";
@@ -22,14 +23,51 @@ import { tooltipPlugin } from "./plugins/tooltip";
 import { inlineToolbar } from "./component/inlineToolbar";
 
 export interface IEditor {
-  /** Json string */
   initState: string;
-
-  /**
-   * Callback every time state changes
-   */
   onChange: (content: string) => void;
 }
+
+export const Editor: FC<IEditor> = props => {
+  const { initState, onChange } = props;
+
+  const ref = useRef<HTMLDivElement>(null);
+  const viewRef = useRef<null | EditorView>(null);
+
+  let state: EditorState;
+  try {
+    state = EditorState.fromJSON(stateConfig, JSON.parse(initState));
+  } catch (err) {
+    state = EditorState.create(stateConfig);
+  }
+
+  const dispatchTransaction = (tr: Transaction) => {
+    state = state.apply(tr);
+    viewRef.current?.updateState(state);
+
+    tr.docChanged && onChange(JSON.stringify(state.toJSON()));
+  };
+
+  useEffect(() => {
+    if (ref.current) {
+      viewRef.current?.destroy();
+      viewRef.current = new EditorView(ref.current, {
+        state,
+        nodeViews: buildViews([taskList]),
+        dispatchTransaction
+      });
+
+      if (process.env.NODE_ENV === "development") {
+        applyDevTools(viewRef.current);
+      }
+    }
+  }, [initState]);
+
+  return (
+    <Container>
+      <EditorContainer id="editor" ref={ref} />
+    </Container>
+  );
+};
 
 const stateConfig = {
   schema,
@@ -53,53 +91,6 @@ const stateConfig = {
 
     placeholderPlugin()
   ]
-};
-
-export const Editor: FC<IEditor> = props => {
-  const { initState, onChange } = props;
-
-  const ref = useRef<HTMLDivElement>(null);
-  const viewRef = useRef<null | EditorView>(null);
-
-  let state: EditorState;
-  /**
-   * check for invalid initState
-   */
-  try {
-    state = EditorState.fromJSON(stateConfig, JSON.parse(initState));
-  } catch (err) {
-    state = EditorState.create(stateConfig);
-  }
-
-  const dispatchTransaction = (tr: Transaction) => {
-    state = state.apply(tr);
-    viewRef.current?.updateState(state);
-
-    tr.docChanged && onChange(JSON.stringify(state.toJSON()));
-  };
-
-  /**
-   * Initialises editor
-   */
-  useEffect(() => {
-    if (ref.current) {
-      viewRef.current = new EditorView(ref.current, {
-        state,
-        nodeViews: buildViews([taskList]),
-        dispatchTransaction
-      });
-
-      if (process.env.NODE_ENV === "development") {
-        applyDevTools(viewRef.current);
-      }
-    }
-  }, []);
-
-  return (
-    <Container>
-      <EditorContainer id="editor" ref={ref} />
-    </Container>
-  );
 };
 
 /**

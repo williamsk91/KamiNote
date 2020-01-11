@@ -24,7 +24,6 @@ export const PageRoute = () => {
   const { loading, data } = useGetPageQuery({
     variables: { id }
   });
-
   const [saveStatus, setSaveStatus] = useState(SaveStatus.Saved);
 
   const [savePageTitle] = useSavePageTitleMutation({});
@@ -53,6 +52,8 @@ export const PageRoute = () => {
         content
       }
     });
+
+    updatePageContentCache(pageId, content);
   }, 1000);
 
   const [createPage] = useCreatePageMutation({});
@@ -67,7 +68,7 @@ export const PageRoute = () => {
         title={title}
         onTitleChange={newTitle => {
           saveTitle(id, newTitle);
-          updateSidebarTitle(id, newTitle);
+          updateSidebarTitleCache(id, newTitle);
         }}
         path={path}
         saveStatus={saveStatus}
@@ -96,7 +97,7 @@ export const PageRoute = () => {
  *
  * This is done using Apollo cache operations
  */
-const updateSidebarTitle = (pageId: string, title: string) => {
+const updateSidebarTitleCache = (pageId: string, title: string) => {
   const cache = apolloClient.readQuery({
     query: GetPageDocument,
     variables: { id: pageId }
@@ -106,6 +107,23 @@ const updateSidebarTitle = (pageId: string, title: string) => {
     pageTitle => pageTitle.id === pageId
   );
   cache.getUserPages[pageTitleIndex].title = title;
+  apolloClient.writeQuery({
+    query: GetPageDocument,
+    variables: { id: pageId },
+    data: cache
+  });
+};
+
+/**
+ * Updates page content cache when saving to server
+ */
+const updatePageContentCache = (pageId: string, content: string) => {
+  const cache = apolloClient.readQuery({
+    query: GetPageDocument,
+    variables: { id: pageId }
+  });
+
+  cache.getPage.content = content;
   apolloClient.writeQuery({
     query: GetPageDocument,
     variables: { id: pageId },

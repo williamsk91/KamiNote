@@ -1,4 +1,4 @@
-import React, { FC, useState } from "react";
+import React, { FC, useState, useEffect } from "react";
 import styled from "styled-components";
 
 interface IProp {
@@ -10,6 +10,10 @@ export const PageTitleBlock: FC<IProp> = props => {
   const { title, onChange } = props;
 
   const [localTitle, setLocalTitle] = useState(title);
+
+  useEffect(() => {
+    setLocalTitle(title);
+  }, [title]);
 
   return (
     <Container>
