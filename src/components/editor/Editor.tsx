@@ -30,23 +30,26 @@ export const Editor: FC<IEditor> = props => {
   const ref = useRef<HTMLDivElement>(null);
   const viewRef = useRef<null | EditorView>(null);
 
-  let state: EditorState;
-  try {
-    state = EditorState.fromJSON(stateConfig, JSON.parse(initState));
-  } catch (err) {
-    state = EditorState.create(stateConfig);
-  }
-
   const dispatchTransaction = (tr: Transaction) => {
-    state = state.apply(tr);
-    viewRef.current?.updateState(state);
+    if (viewRef.current) {
+      const newState = viewRef.current.state.apply(tr);
 
-    tr.docChanged && onChange(JSON.stringify(state.toJSON()));
+      viewRef.current.updateState(newState);
+      tr.docChanged && onChange(JSON.stringify(newState.toJSON()));
+    }
   };
 
   useEffect(() => {
+    let state: EditorState;
+    try {
+      state = EditorState.fromJSON(stateConfig, JSON.parse(initState));
+    } catch (err) {
+      state = EditorState.create(stateConfig);
+    }
+
     if (ref.current) {
       viewRef.current?.destroy();
+
       viewRef.current = new EditorView(ref.current, {
         state,
         nodeViews: buildViews([taskList]),
@@ -57,7 +60,7 @@ export const Editor: FC<IEditor> = props => {
         applyDevTools(viewRef.current);
       }
     }
-  }, [initState]);
+  }, []);
 
   return (
     <Container>

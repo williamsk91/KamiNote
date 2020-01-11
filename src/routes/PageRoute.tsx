@@ -50,10 +50,22 @@ export const PageRoute = () => {
       variables: {
         pageId,
         content
+      },
+      update: (cache, _) => {
+        const data: GetPageQuery | null = cache.readQuery({
+          query: GetPageDocument,
+          variables: { id: pageId }
+        });
+        if (data?.getPage) {
+          data.getPage.content = content;
+          cache.writeQuery({
+            query: GetPageDocument,
+            variables: { id: pageId },
+            data
+          });
+        }
       }
     });
-
-    updatePageContentCache(pageId, content);
   }, 1000);
 
   const [createPage] = useCreatePageMutation({});
@@ -65,6 +77,7 @@ export const PageRoute = () => {
 
     return (
       <Page
+        id={id}
         title={title}
         onTitleChange={newTitle => {
           saveTitle(id, newTitle);
@@ -114,24 +127,8 @@ const updateSidebarTitleCache = (pageId: string, title: string) => {
   });
 };
 
-/**
- * Updates page content cache when saving to server
- */
-const updatePageContentCache = (pageId: string, content: string) => {
-  const cache = apolloClient.readQuery({
-    query: GetPageDocument,
-    variables: { id: pageId }
-  });
-
-  cache.getPage.content = content;
-  apolloClient.writeQuery({
-    query: GetPageDocument,
-    variables: { id: pageId },
-    data: cache
-  });
-};
-
 interface IProp {
+  id: string;
   title: string;
   onTitleChange: (title: string) => void;
 
@@ -150,6 +147,7 @@ interface IProp {
 
 const Page: FC<IProp> = props => {
   const {
+    id,
     title,
     onTitleChange,
     content,
@@ -183,7 +181,7 @@ const Page: FC<IProp> = props => {
         </Header>
         <Content>
           <PageTitleBlock title={title} onChange={onTitleChange} />
-          <Editor initState={content} onChange={onChange} />
+          <Editor key={id} initState={content} onChange={onChange} />
         </Content>
       </Layout>
     </Layout>
