@@ -10,10 +10,12 @@ import {
   useGetPageQuery,
   GetPageQuery,
   useSaveContentMutation,
-  useCreatePageMutation
+  useCreatePageMutation,
+  useSavePageTitleMutation
 } from "graphql/generatedGraphql";
 import { Layout, Icon } from "antd";
 import { Sider, Header, Content, Navbar } from "components/Layout";
+import { PageTitle } from "components/PageTitle";
 
 export const PageRoute = () => {
   const { id } = useParams<{ id: string }>();
@@ -22,6 +24,17 @@ export const PageRoute = () => {
   });
 
   const [saveStatus, setSaveStatus] = useState(SaveStatus.Saved);
+
+  const [savePageTitle] = useSavePageTitleMutation({});
+  const saveTitle = debounce((pageId: string, title: string) => {
+    savePageTitle({
+      variables: {
+        pageId,
+        title
+      }
+    });
+  }, 1000);
+
   const [saveContent] = useSaveContentMutation({
     onCompleted: () => {
       setSaveStatus(SaveStatus.Saved);
@@ -30,30 +43,33 @@ export const PageRoute = () => {
       setSaveStatus(SaveStatus.ErrorSaving);
     }
   });
-  const [createPage] = useCreatePageMutation({});
 
-  const save = (pageId: string, content: string) => {
+  const save = debounce((pageId: string, content: string) => {
     saveContent({
       variables: {
         pageId,
         content
       }
     });
-  };
+  }, 1000);
+
+  const [createPage] = useCreatePageMutation({});
 
   if (loading) return <LoadingScreen />;
 
   if (data?.getPage) {
-    const { id, path, content } = data.getPage;
+    const { id, path, title, content } = data.getPage;
 
     return (
       <Page
+        title={title}
+        onTitleChange={newTitle => saveTitle(id, newTitle)}
         path={path}
         saveStatus={saveStatus}
         content={content}
         onChange={newContent => {
           setSaveStatus(SaveStatus.Saving);
-          saveToServer(save, id, newContent);
+          save(id, newContent);
         }}
         userPages={data.getUserPages}
         onAddPage={() => {
@@ -70,23 +86,13 @@ export const PageRoute = () => {
   return <ErrorScreen />;
 };
 
-/**
- * debounce saves
- */
-const saveToServer = debounce(
-  (
-    save: (pageId: string, content: string) => void,
-    id: string,
-    content: string
-  ) => {
-    save(id, content);
-  },
-  1000
-);
-
 interface IProp {
+  title: string;
+  onTitleChange: (title: string) => void;
+
   path: string[];
   saveStatus: SaveStatus;
+
   content: string;
   onChange: (content: string) => void;
 
@@ -98,7 +104,15 @@ interface IProp {
 }
 
 const Page: FC<IProp> = props => {
-  const { content, saveStatus, onChange, userPages, onAddPage } = props;
+  const {
+    title,
+    onTitleChange,
+    content,
+    saveStatus,
+    onChange,
+    userPages,
+    onAddPage
+  } = props;
 
   const [collapsed, setCollapsed] = useState(false);
 
@@ -123,6 +137,7 @@ const Page: FC<IProp> = props => {
           </Navbar>
         </Header>
         <Content>
+          <PageTitle title={title} onChange={onTitleChange} />
           <Editor initState={content} onChange={onChange} />
         </Content>
       </Layout>

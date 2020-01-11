@@ -1,0 +1,3 @@
+mutation SavePageTitle($pageId: String!, $title: String!) {
+  savePageTitle(pageId: $pageId, title: $title)
+}

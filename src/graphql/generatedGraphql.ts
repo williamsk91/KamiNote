@@ -109,6 +109,17 @@ export type SaveContentMutation = (
   & Pick<Mutation, 'saveContent'>
 );
 
+export type SavePageTitleMutationVariables = {
+  pageId: Scalars['String'],
+  title: Scalars['String']
+};
+
+
+export type SavePageTitleMutation = (
+  { __typename?: 'Mutation' }
+  & Pick<Mutation, 'savePageTitle'>
+);
+
 
 export const CreatePageDocument = gql`
     mutation createPage($path: [String!]!) {
@@ -216,3 +227,34 @@ export function useSaveContentMutation(baseOptions?: ApolloReactHooks.MutationHo
 export type SaveContentMutationHookResult = ReturnType<typeof useSaveContentMutation>;
 export type SaveContentMutationResult = ApolloReactCommon.MutationResult<SaveContentMutation>;
 export type SaveContentMutationOptions = ApolloReactCommon.BaseMutationOptions<SaveContentMutation, SaveContentMutationVariables>;
+export const SavePageTitleDocument = gql`
+    mutation SavePageTitle($pageId: String!, $title: String!) {
+  savePageTitle(pageId: $pageId, title: $title)
+}
+    `;
+export type SavePageTitleMutationFn = ApolloReactCommon.MutationFunction<SavePageTitleMutation, SavePageTitleMutationVariables>;
+
+/**
+ * __useSavePageTitleMutation__
+ *
+ * To run a mutation, you first call `useSavePageTitleMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useSavePageTitleMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [savePageTitleMutation, { data, loading, error }] = useSavePageTitleMutation({
+ *   variables: {
+ *      pageId: // value for 'pageId'
+ *      title: // value for 'title'
+ *   },
+ * });
+ */
+export function useSavePageTitleMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<SavePageTitleMutation, SavePageTitleMutationVariables>) {
+        return ApolloReactHooks.useMutation<SavePageTitleMutation, SavePageTitleMutationVariables>(SavePageTitleDocument, baseOptions);
+      }
+export type SavePageTitleMutationHookResult = ReturnType<typeof useSavePageTitleMutation>;
+export type SavePageTitleMutationResult = ApolloReactCommon.MutationResult<SavePageTitleMutation>;
+export type SavePageTitleMutationOptions = ApolloReactCommon.BaseMutationOptions<SavePageTitleMutation, SavePageTitleMutationVariables>;
