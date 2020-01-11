@@ -32,5 +32,5 @@ export const Sidebar: FC<IProp> = props => {
 const Item = styled(Menu.Item)`
   display: flex;
   justify-content: space-between;
-  align-items: baseline;
+  align-items: center;
 `;

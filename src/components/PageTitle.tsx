@@ -6,7 +6,7 @@ interface IProp {
   onChange: (title: string) => void;
 }
 
-export const PageTitle: FC<IProp> = props => {
+export const PageTitleBlock: FC<IProp> = props => {
   const { title, onChange } = props;
 
   const [localTitle, setLocalTitle] = useState(title);

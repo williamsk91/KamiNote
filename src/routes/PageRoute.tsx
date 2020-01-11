@@ -11,11 +11,13 @@ import {
   GetPageQuery,
   useSaveContentMutation,
   useCreatePageMutation,
-  useSavePageTitleMutation
+  useSavePageTitleMutation,
+  GetPageDocument
 } from "graphql/generatedGraphql";
 import { Layout, Icon } from "antd";
 import { Sider, Header, Content, Navbar } from "components/Layout";
-import { PageTitle } from "components/PageTitle";
+import { PageTitleBlock } from "components/PageTitle";
+import { apolloClient } from "graphql/client";
 
 export const PageRoute = () => {
   const { id } = useParams<{ id: string }>();
@@ -63,7 +65,10 @@ export const PageRoute = () => {
     return (
       <Page
         title={title}
-        onTitleChange={newTitle => saveTitle(id, newTitle)}
+        onTitleChange={newTitle => {
+          saveTitle(id, newTitle);
+          updateSidebarTitle(id, newTitle);
+        }}
         path={path}
         saveStatus={saveStatus}
         content={content}
@@ -84,6 +89,28 @@ export const PageRoute = () => {
   }
 
   return <ErrorScreen />;
+};
+
+/**
+ * Updates Sidebar page title when title is updated.
+ *
+ * This is done using Apollo cache operations
+ */
+const updateSidebarTitle = (pageId: string, title: string) => {
+  const cache = apolloClient.readQuery({
+    query: GetPageDocument,
+    variables: { id: pageId }
+  });
+
+  const pageTitleIndex = (cache.getUserPages as GetPageQuery["getUserPages"]).findIndex(
+    pageTitle => pageTitle.id === pageId
+  );
+  cache.getUserPages[pageTitleIndex].title = title;
+  apolloClient.writeQuery({
+    query: GetPageDocument,
+    variables: { id: pageId },
+    data: cache
+  });
 };
 
 interface IProp {
@@ -137,7 +164,7 @@ const Page: FC<IProp> = props => {
           </Navbar>
         </Header>
         <Content>
-          <PageTitle title={title} onChange={onTitleChange} />
+          <PageTitleBlock title={title} onChange={onTitleChange} />
           <Editor initState={content} onChange={onChange} />
         </Content>
       </Layout>
