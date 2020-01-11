@@ -26,6 +26,7 @@ export const PageTitle: FC<IProp> = props => {
 
 const Container = styled.div`
   max-width: 720px;
+  box-sizing: content-box;
   margin: auto;
   padding: 0 96px;
 
