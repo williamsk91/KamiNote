@@ -1,16 +1,16 @@
-import React from "react";
-import { configure, addDecorator } from "@storybook/react";
-import { ThemeProvider } from "styled-components";
-import { BrowserRouter as Router } from "react-router-dom";
 import "antd/dist/antd.css";
 
-import { theme } from "../src/components/styles/theme";
+import React from "react";
+import { BrowserRouter as Router } from "react-router-dom";
+import { addDecorator, configure } from "@storybook/react";
 import { addParameters } from "@storybook/react";
+import { ThemeProvider } from "styled-components";
+
+import { theme } from "../src/components/styles/theme";
 
 addParameters({
   options: {
-    showAddonPanel: false,
-    showStoriesPanel: false
+    showAddonPanel: false
   }
 });
 // add theme and padding
