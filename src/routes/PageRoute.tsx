@@ -1,5 +1,5 @@
 import React, { FC, useState } from "react";
-import { useParams } from "react-router";
+import { useHistory, useParams } from "react-router";
 import { Icon, Layout } from "antd";
 
 import { ErrorScreen } from "components/data/ErrorScreen";
@@ -15,13 +15,18 @@ import {
   GetPageDocument,
   GetPageQuery,
   useCreatePageMutation,
+  useDeletePageMutation,
   useGetPageQuery,
   useSaveContentMutation,
   useSavePageTitleMutation
 } from "graphql/generatedGraphql";
 
+import { pageUrl } from "./pagePath";
+
 export const PageRoute = () => {
   const { id } = useParams<{ id: string }>();
+  const history = useHistory();
+
   const { loading, data } = useGetPageQuery({
     variables: { id }
   });
@@ -69,7 +74,12 @@ export const PageRoute = () => {
     });
   }, 1000);
 
-  const [createPage] = useCreatePageMutation({});
+  const [createPage] = useCreatePageMutation({
+    onCompleted: data => {
+      history.push(pageUrl(data.createPage.id));
+    }
+  });
+  const [deletePage] = useDeletePageMutation();
 
   if (loading) return <LoadingScreen />;
 
@@ -98,6 +108,60 @@ export const PageRoute = () => {
               path: []
             }
           });
+        }}
+        onDeletePage={pageId => {
+          deletePage({
+            variables: { pageId },
+            update: (cache, _) => {
+              const data: GetPageQuery | null = cache.readQuery({
+                query: GetPageDocument,
+                variables: { id: pageId }
+              });
+              if (!data?.getUserPages) return;
+
+              const removeIndex = data.getUserPages.findIndex(
+                ({ id }) => id === pageId
+              );
+              data.getUserPages.splice(removeIndex, 1);
+              cache.writeQuery({
+                query: GetPageDocument,
+                variables: { id: pageId },
+                data
+              });
+            }
+          });
+
+          /**
+           * Create an empty page if there are no pages left.
+           *
+           * note: length is 1 as `deletePage` optimistic response has not updated the
+           * cache yet
+           */
+          if (data.getUserPages.length === 1) {
+            createPage({
+              variables: {
+                path: []
+              }
+            });
+            return;
+          }
+
+          /**
+           * routing after deletion
+           *    if deleted page is not current page, do nothing
+           *    if deleted page is current page, route to previous
+           *        page
+           */
+          if (pageId !== id) {
+            return;
+          } else {
+            const removeIndex = data.getUserPages.findIndex(
+              ({ id }) => id === pageId
+            );
+            const nextPageIndex = removeIndex === 0 ? 1 : removeIndex - 1;
+            const nextPageId = data.getUserPages[nextPageIndex].id;
+            history.push(pageUrl(nextPageId));
+          }
         }}
       />
     );
@@ -144,6 +208,7 @@ interface IProp {
    */
   userPages: GetPageQuery["getUserPages"];
   onAddPage: () => void;
+  onDeletePage: (pageId: string) => void;
 }
 
 const Page: FC<IProp> = props => {
@@ -155,7 +220,8 @@ const Page: FC<IProp> = props => {
     saveStatus,
     onChange,
     userPages,
-    onAddPage
+    onAddPage,
+    onDeletePage
   } = props;
 
   const [collapsed, setCollapsed] = useState(false);
@@ -168,7 +234,11 @@ const Page: FC<IProp> = props => {
         collapsedWidth={0}
         collapsed={collapsed}
       >
-        <Sidebar pages={userPages} onAddPage={onAddPage} />
+        <Sidebar
+          pages={userPages}
+          onAddPage={onAddPage}
+          onDeletePage={onDeletePage}
+        />
       </Sider>
       <Layout>
         <Header>

@@ -1,0 +1,3 @@
+mutation DeletePage($pageId: String!) {
+  deletePage(pageId: $pageId)
+}

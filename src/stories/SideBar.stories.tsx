@@ -12,5 +12,6 @@ export const sidebar = () => (
       { title: "page 3", id: "id 3" }
     ]}
     onAddPage={() => null}
+    onDeletePage={() => null}
   />
 );

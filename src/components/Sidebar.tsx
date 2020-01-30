@@ -15,29 +15,32 @@ interface IProp {
     id: string;
   }[];
   onAddPage: () => void;
+  onDeletePage: (pageId: string) => void;
 }
 
 export const Sidebar: FC<IProp> = props => {
-  const { pages, onAddPage } = props;
+  const { pages, onAddPage, onDeletePage } = props;
   const history = useHistory();
 
   return (
-    <Tree
-      onSelect={key => {
-        key[0] && history.push(pageUrl(key[0]));
-      }}
-    >
+    <Tree>
       {pages.map(p => (
         <Tree.TreeNode
           key={p.id}
           title={
             <TreeNodeContainer>
-              <NodeText>{p.title ? p.title : "Untitled"}</NodeText>
+              <NodeText
+                onClick={() => {
+                  history.push(pageUrl(p.id));
+                }}
+              >
+                {p.title ? p.title : "Untitled"}
+              </NodeText>
               <NodeIcons>
                 <IconButton onClick={onAddPage}>
                   <FiPlusSquare />
                 </IconButton>
-                <IconButton>
+                <IconButton onClick={() => onDeletePage(p.id)}>
                   <FiTrash2 />
                 </IconButton>
               </NodeIcons>

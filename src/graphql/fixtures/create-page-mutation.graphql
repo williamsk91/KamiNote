@@ -1,4 +1,4 @@
-mutation createPage($path: [String!]!) {
+mutation CreatePage($path: [String!]!) {
   createPage(path: $path) {
     id
     title
