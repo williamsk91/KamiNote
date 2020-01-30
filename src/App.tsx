@@ -1,4 +1,5 @@
 import "antd/dist/antd.css";
+import "prosemirror-view/style/prosemirror.css";
 
 import React from "react";
 import { Route, Switch } from "react-router";

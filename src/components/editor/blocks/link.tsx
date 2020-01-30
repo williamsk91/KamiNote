@@ -149,7 +149,7 @@ const removeMarkText = (markType: MarkType) => (
  * [name](link)
  */
 const linkMDInputRule = new InputRule(
-  /(?:^|[^!])\[(.*?)\]\((\S+)\)$/,
+  /\[(.*?)\]\((\S+)\)$/,
   (state, match, start, end) => {
     const { tr } = state;
     const attrs = { href: match[2] };
@@ -158,7 +158,7 @@ const linkMDInputRule = new InputRule(
 
     const linkStart = start;
     // minus length of <link> and []()
-    const linkEnd = end - match[2].length - 4;
+    const linkEnd = end - match[2].length - 3;
 
     return tr
       .insert(linkStart, schema.text(match[1]))
