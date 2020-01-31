@@ -84,6 +84,25 @@ const decreaseLevelAttr = (node: Node) =>
 const outdentList = (listTypes: NodeType[]) =>
   adjustListLevel(listTypes, decreaseLevelAttr);
 
+const removeList = (listTypes: NodeType[]) => (
+  state: EditorState,
+  dispatch?: IDispatch
+) => {
+  let { from, to } = state.selection;
+  let dispatched = false;
+
+  const tr = state.tr;
+  state.doc.nodesBetween(from, to, (node, pos) => {
+    if (listTypes.includes(node.type) && node.textContent.length === 0) {
+      dispatched = true;
+      tr.setNodeMarkup(pos, state.schema.nodes.paragraph);
+    }
+  });
+
+  if (dispatch) dispatch(tr);
+  return dispatched;
+};
+
 // -------------------- Input Rule --------------------
 
 // Given a list node type, returns an input rule that turns a box
@@ -125,7 +144,12 @@ const keymaps = {
       schema.nodes.numberList,
       schema.nodes.bulletList
     ])
-  )
+  ),
+  Backspace: removeList([
+    schema.nodes.taskList,
+    schema.nodes.numberList,
+    schema.nodes.bulletList
+  ])
 };
 
 // ------------------------- Style -------------------------
