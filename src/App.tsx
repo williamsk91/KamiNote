@@ -4,14 +4,16 @@ import "prosemirror-view/style/prosemirror.css";
 import React from "react";
 import { Route, Switch } from "react-router";
 
+import { loginPath } from "routes/loginPath";
 import { LoginRoute } from "routes/LoginRoute";
+import { pagePath } from "routes/pagePath";
 import { PageRoute } from "routes/PageRoute";
 
 const App: React.FC = () => {
   return (
     <Switch>
-      <Route path="/page/:id" component={PageRoute} />
-      <Route path="/login" component={LoginRoute} />
+      <Route path={pagePath} component={PageRoute} />
+      <Route path={loginPath} component={LoginRoute} />
     </Switch>
   );
 };
