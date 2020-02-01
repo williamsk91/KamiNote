@@ -6,6 +6,7 @@ import { ErrorScreen } from "components/data/ErrorScreen";
 import { LoadingScreen } from "components/data/LoadingScreen";
 import { Editor } from "components/editor/Editor";
 import { debounce } from "components/editor/utils/debounce";
+import { useSaveProtection } from "components/hooks/useSaveProtection";
 import { Content, Header, Navbar, Sider } from "components/Layout";
 import { PageTitleBlock } from "components/PageTitle";
 import { SaveState, SaveStatus } from "components/SaveState";
@@ -50,6 +51,8 @@ export const PageRoute = () => {
       setSaveStatus(SaveStatus.ErrorSaving);
     }
   });
+
+  useSaveProtection(saveStatus !== SaveStatus.Saved);
 
   const save = debounce((pageId: string, content: string) => {
     saveContent({
