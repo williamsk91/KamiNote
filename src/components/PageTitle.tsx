@@ -50,4 +50,5 @@ const Input = styled.input.attrs({
 
   border: none;
   outline: none;
+  color: rgb(55, 53, 47);
 `;
