@@ -1,6 +1,6 @@
 import React, { FC, useState } from "react";
 import { useHistory, useParams } from "react-router";
-import { Icon, Layout } from "antd";
+import { Layout } from "antd";
 import styled from "styled-components";
 
 import { ErrorScreen } from "components/data/ErrorScreen";
@@ -11,7 +11,7 @@ import { useSaveProtection } from "components/hooks/useSaveProtection";
 import { Content, Header, Sider } from "components/Layout";
 import { Navbar } from "components/Navbar";
 import { PageTitleBlock } from "components/PageTitle";
-import { SaveState, SaveStatus } from "components/SaveState";
+import { SaveStatus } from "components/SaveState";
 import { Sidebar } from "components/Sidebar";
 import { apolloClient } from "graphql/client";
 import {
