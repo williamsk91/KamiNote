@@ -9,18 +9,12 @@ export const Layout = styled(AntdLayout)`
 export const Sider = styled(AntdLayout.Sider).attrs({
   theme: "light"
 })`
-  height: 100vh;
   border-right: 1px solid lightgrey;
 `;
 
 export const Header = styled(AntdLayout.Header)`
+  height: 45px;
   background: white;
-`;
-
-export const Navbar = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
 `;
 
 export const Content = styled(AntdLayout.Content)`

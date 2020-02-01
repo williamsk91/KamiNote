@@ -1,13 +1,15 @@
 import React, { FC, useState } from "react";
 import { useHistory, useParams } from "react-router";
 import { Icon, Layout } from "antd";
+import styled from "styled-components";
 
 import { ErrorScreen } from "components/data/ErrorScreen";
 import { LoadingScreen } from "components/data/LoadingScreen";
 import { Editor } from "components/editor/Editor";
 import { debounce } from "components/editor/utils/debounce";
 import { useSaveProtection } from "components/hooks/useSaveProtection";
-import { Content, Header, Navbar, Sider } from "components/Layout";
+import { Content, Header, Sider } from "components/Layout";
+import { Navbar } from "components/Navbar";
 import { PageTitleBlock } from "components/PageTitle";
 import { SaveState, SaveStatus } from "components/SaveState";
 import { Sidebar } from "components/Sidebar";
@@ -231,7 +233,7 @@ const Page: FC<IProp> = props => {
 
   return (
     <Layout>
-      <Sider
+      <PageSider
         collapsible
         trigger={null}
         collapsedWidth={0}
@@ -242,22 +244,45 @@ const Page: FC<IProp> = props => {
           onAddPage={onAddPage}
           onDeletePage={onDeletePage}
         />
-      </Sider>
-      <Layout>
-        <Header>
-          <Navbar>
-            <Icon
-              type={collapsed ? "menu-unfold" : "menu-fold"}
-              onClick={() => setCollapsed(!collapsed)}
-            />
-            <SaveState saveStatus={saveStatus} />
-          </Navbar>
-        </Header>
-        <Content>
+      </PageSider>
+      <PageMain collapsed={collapsed}>
+        <PageHeader>
+          <Navbar
+            collapsed={collapsed}
+            setCollapsed={setCollapsed}
+            saveStatus={saveStatus}
+          />
+        </PageHeader>
+        <PageContent>
           <PageTitleBlock title={title} onChange={onTitleChange} />
           <Editor key={id} initState={content} onChange={onChange} />
-        </Content>
-      </Layout>
+        </PageContent>
+      </PageMain>
     </Layout>
   );
 };
+
+const PageSider = styled(Sider)`
+  height: 100vh;
+
+  position: fixed;
+  left: 0;
+
+  overflow: auto;
+`;
+
+const PageMain = styled(Layout)<{ collapsed: boolean }>`
+  margin-left: ${p => `${p.collapsed ? 0 : 200}px`};
+
+  height: 100vh;
+`;
+
+const PageHeader = styled(Header)`
+  width: 100%;
+`;
+
+const PageContent = styled(Content)`
+  height: 100%;
+
+  overflow: auto;
+`;
