@@ -269,6 +269,8 @@ const PageSider = styled(Sider)`
   left: 0;
 
   overflow: auto;
+
+  background: rgb(247, 246, 243);
 `;
 
 const PageMain = styled(Layout)<{ collapsed: boolean }>`

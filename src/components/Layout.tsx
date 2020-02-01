@@ -8,9 +8,7 @@ export const Layout = styled(AntdLayout)`
 
 export const Sider = styled(AntdLayout.Sider).attrs({
   theme: "light"
-})`
-  border-right: 1px solid lightgrey;
-`;
+})``;
 
 export const Header = styled(AntdLayout.Header)`
   height: 45px;
