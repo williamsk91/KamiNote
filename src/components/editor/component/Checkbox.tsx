@@ -1,5 +1,5 @@
 import React, { FC } from "react";
-import { FiSquare, FiCheckSquare } from "react-icons/fi";
+import { FiCheckSquare, FiSquare } from "react-icons/fi";
 import styled from "styled-components";
 
 interface IProp {

@@ -1,12 +1,7 @@
 import React from "react";
 
-import { Navbar, SaveStatus } from "components/Navbar";
+import { SaveState, SaveStatus } from "components/SaveState";
 
-export default { title: "Page|Navbar", component: Navbar };
+export default { title: "Page|Navbar", component: SaveState };
 
-export const base = () => (
-  <Navbar
-    path={["Ideas", "Kaminote", "Front-End"]}
-    saveStatus={SaveStatus.Saved}
-  />
-);
+export const base = () => <SaveState saveStatus={SaveStatus.Saved} />;

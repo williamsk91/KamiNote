@@ -1,8 +1,9 @@
-import { IBlock } from "./utils";
-import { schema } from "../schema";
-import { NodeType, Fragment } from "prosemirror-model";
-import { textblockTypeInputRule, InputRule } from "prosemirror-inputrules";
+import { InputRule, textblockTypeInputRule } from "prosemirror-inputrules";
+import { Fragment, NodeType } from "prosemirror-model";
 import { TextSelection } from "prosemirror-state";
+
+import { schema } from "../schema";
+import { IBlock } from "./utils";
 
 /**
  * A collection of *Input Rules* and *Keymaps* for the following

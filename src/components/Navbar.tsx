@@ -1,54 +1,34 @@
 import React, { FC } from "react";
+import { Icon } from "antd";
 import styled from "styled-components";
 
-export enum SaveStatus {
-  Saved,
-  Saving,
-  ErrorSaving
-}
+import { SaveState, SaveStatus } from "./SaveState";
 
 interface IProp {
-  path: string[];
+  collapsed: boolean;
+  setCollapsed: (collapsed: boolean) => void;
   saveStatus: SaveStatus;
 }
 
 export const Navbar: FC<IProp> = props => {
-  const { path, saveStatus } = props;
-  const pathString = path.join(" / ");
-
-  let state: string;
-  switch (saveStatus) {
-    case SaveStatus.Saved:
-      state = "saved";
-      break;
-
-    case SaveStatus.Saving:
-      state = "saving...";
-      break;
-
-    case SaveStatus.ErrorSaving:
-      state = "error";
-      break;
-  }
-
+  const { collapsed, setCollapsed, saveStatus } = props;
   return (
     <Container>
-      <Path>{pathString}</Path>
-      <Save>{state}</Save>
+      <Icon
+        type={collapsed ? "menu-unfold" : "menu-fold"}
+        onClick={() => setCollapsed(!collapsed)}
+      />
+      <SaveState saveStatus={saveStatus} />
     </Container>
   );
 };
 
 const Container = styled.div`
-  display: grid;
-  grid-template-areas: "path saveState";
-`;
+  height: 100%;
 
-const Path = styled.div`
-  grid-area: path;
-`;
+  padding: 6px;
 
-const Save = styled.div`
-  grid-area: saveState;
-  justify-self: right;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 `;

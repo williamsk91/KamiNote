@@ -1,0 +1,8 @@
+mutation CreatePage($path: [String!]!) {
+  createPage(path: $path) {
+    id
+    title
+    path
+    content
+  }
+}

@@ -1,20 +1,18 @@
 import React, { FC } from "react";
-import styled from "styled-components";
-
-import { FiCode } from "react-icons/fi";
 import {
   AiOutlineBold,
   AiOutlineItalic,
-  AiOutlineStrikethrough,
-  AiOutlineLink
+  AiOutlineLink,
+  AiOutlineStrikethrough
 } from "react-icons/ai";
-
+import { FiCode } from "react-icons/fi";
 import { toggleMark } from "prosemirror-commands";
 import { EditorView } from "prosemirror-view";
+import styled from "styled-components";
 
-import { Tooltip } from "../plugins/tooltip";
-import { insertLink } from "../blocks/link";
 import { IconButton } from "../../IconButton";
+import { insertLink } from "../blocks/link";
+import { Tooltip } from "../plugins/tooltip";
 
 /**
  * Displays a toolbar

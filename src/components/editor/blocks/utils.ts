@@ -1,14 +1,14 @@
+import { baseKeymap } from "prosemirror-commands";
 import {
   InputRule,
-  smartQuotes,
   ellipsis,
-  inputRules
+  inputRules,
+  smartQuotes
 } from "prosemirror-inputrules";
-import { EditorState, Transaction, Plugin } from "prosemirror-state";
-import { Node } from "prosemirror-model";
-import { EditorView } from "prosemirror-view";
 import { keymap } from "prosemirror-keymap";
-import { baseKeymap } from "prosemirror-commands";
+import { Node } from "prosemirror-model";
+import { EditorState, Plugin, Transaction } from "prosemirror-state";
+import { EditorView } from "prosemirror-view";
 
 export type IDispatch = (tr: Transaction) => void;
 

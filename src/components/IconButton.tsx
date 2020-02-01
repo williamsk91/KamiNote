@@ -1,12 +1,12 @@
-import { colors } from "components/styles/colors";
 import styled from "styled-components";
+
+import { colors } from "components/styles/colors";
 
 export const IconButton = styled.button<{ active?: boolean }>`
   width: 24px;
   height: 24px;
 
-  padding: 6px;
-  margin: 3px 1.5px;
+  padding: 3px;
   box-sizing: border-box;
 
   border: none;
@@ -19,4 +19,11 @@ export const IconButton = styled.button<{ active?: boolean }>`
     background: ${colors.clouds};
     cursor: pointer;
   }
+
+  :active {
+    opacity: 0.5;
+    transition: 0.1s;
+  }
+
+  transition: 0.3s;
 `;

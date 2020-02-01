@@ -1,18 +1,17 @@
-import React, { FC, useState, useEffect } from "react";
+import React, { FC, useEffect, useState } from "react";
+import { FiCheck, FiEdit3, FiExternalLink, FiTrash, FiX } from "react-icons/fi";
+import { InputRule } from "prosemirror-inputrules";
+import { Mark, MarkType, Node } from "prosemirror-model";
+import { EditorState } from "prosemirror-state";
+import { EditorView } from "prosemirror-view";
 import styled from "styled-components";
 
-import { FiExternalLink, FiEdit3, FiX, FiCheck, FiTrash } from "react-icons/fi";
-
-import { Node, MarkType, Mark } from "prosemirror-model";
-import { EditorState } from "prosemirror-state";
-import { InputRule } from "prosemirror-inputrules";
-import { EditorView } from "prosemirror-view";
-
-import { Tooltip } from "../plugins/tooltip";
-import { IBlock, IDispatch } from "./utils";
-import { schema } from "../schema";
-import { IconButton } from "../../IconButton";
 import { colors } from "components/styles/colors";
+
+import { IconButton } from "../../IconButton";
+import { Tooltip } from "../plugins/tooltip";
+import { schema } from "../schema";
+import { IBlock, IDispatch } from "./utils";
 
 // -------------------- Commands --------------------
 
@@ -150,7 +149,7 @@ const removeMarkText = (markType: MarkType) => (
  * [name](link)
  */
 const linkMDInputRule = new InputRule(
-  /(?:^|[^!])\[(.*?)\]\((\S+)\)$/,
+  /\[(.*?)\]\((\S+)\)$/,
   (state, match, start, end) => {
     const { tr } = state;
     const attrs = { href: match[2] };
@@ -159,7 +158,7 @@ const linkMDInputRule = new InputRule(
 
     const linkStart = start;
     // minus length of <link> and []()
-    const linkEnd = end - match[2].length - 4;
+    const linkEnd = end - match[2].length - 3;
 
     return tr
       .insert(linkStart, schema.text(match[1]))

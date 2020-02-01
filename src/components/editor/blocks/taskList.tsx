@@ -1,14 +1,13 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import { Checkbox } from "../component/Checkbox";
-
-import { EditorState } from "prosemirror-state";
-import { NodeView, EditorView } from "prosemirror-view";
 import { Node, NodeType } from "prosemirror-model";
+import { EditorState } from "prosemirror-state";
+import { EditorView, NodeView } from "prosemirror-view";
 import styled, { css } from "styled-components";
 
-import { IBlock, IDispatch } from "./utils";
+import { Checkbox } from "../component/Checkbox";
 import { schema } from "../schema";
+import { IBlock, IDispatch } from "./utils";
 
 // -------------------- Commands --------------------
 
@@ -104,6 +103,7 @@ const StyledCheckbox = styled(Checkbox).attrs({
 })`
   position: absolute;
   right: calc(100% - 21px);
+  top: 0;
 `;
 
 export const taskListStyle = css`

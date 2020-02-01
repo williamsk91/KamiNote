@@ -1,10 +1,12 @@
 import { toggleMark } from "prosemirror-commands";
+import { InputRule } from "prosemirror-inputrules";
+import { MarkType } from "prosemirror-model";
+import { css } from "styled-components";
+
+import { colors } from "components/styles/colors";
+
 import { schema } from "../schema";
 import { IBlock } from "./utils";
-import { css } from "styled-components";
-import { colors } from "components/styles/colors";
-import { MarkType } from "prosemirror-model";
-import { InputRule } from "prosemirror-inputrules";
 
 /**
  * Common files for marks.

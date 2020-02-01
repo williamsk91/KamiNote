@@ -1,12 +1,19 @@
-import React from "react";
-import { Switch, Route } from "react-router";
+import "antd/dist/antd.css";
+import "prosemirror-view/style/prosemirror.css";
 
-import { PageRoute } from "Page";
+import React from "react";
+import { Route, Switch } from "react-router";
+
+import { loginPath } from "routes/loginPath";
+import { LoginRoute } from "routes/LoginRoute";
+import { pagePath } from "routes/pagePath";
+import { PageRoute } from "routes/PageRoute";
 
 const App: React.FC = () => {
   return (
     <Switch>
-      <Route path="/page/:id" component={PageRoute} />
+      <Route path={pagePath} component={PageRoute} />
+      <Route path={loginPath} component={LoginRoute} />
     </Switch>
   );
 };

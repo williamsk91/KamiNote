@@ -1,59 +1,26 @@
-import React, { useEffect, useRef, FC } from "react";
-import styled from "styled-components";
-
+import React, { FC, useEffect, useRef } from "react";
+import applyDevTools from "prosemirror-dev-tools";
+import { dropCursor } from "prosemirror-dropcursor";
+import { history, redo, undo } from "prosemirror-history";
+import { keymap } from "prosemirror-keymap";
 import { EditorState, Transaction } from "prosemirror-state";
 import { EditorView } from "prosemirror-view";
-import { keymap } from "prosemirror-keymap";
-import { undo, redo, history } from "prosemirror-history";
-import { dropCursor } from "prosemirror-dropcursor";
+import styled from "styled-components";
 
-import applyDevTools from "prosemirror-dev-tools";
-
-import { schema } from "./schema";
-import { editorStyles } from "./styles";
-import { buildViews, buildBlockPlugins } from "./blocks/utils";
-import { taskList } from "./blocks/taskList";
+import { blockQuote, codeBlock, heading, hr } from "./blocks/base";
+import { link } from "./blocks/link";
 import { list } from "./blocks/list";
 import { marks } from "./blocks/marks";
+import { taskList } from "./blocks/taskList";
+import { buildBlockPlugins, buildViews } from "./blocks/utils";
 import { placeholderPlugin } from "./plugins/placeholder";
-import { heading, hr, blockQuote, codeBlock } from "./blocks/base";
-import { link, linkTooltip } from "./blocks/link";
-import { tooltipPlugin } from "./plugins/tooltip";
-import { inlineToolbar } from "./component/inlineToolbar";
+import { schema } from "./schema";
+import { editorStyles } from "./styles";
 
 export interface IEditor {
-  /** Json string */
   initState: string;
-
-  /**
-   * Callback every time state changes
-   */
   onChange: (content: string) => void;
 }
-
-const stateConfig = {
-  schema,
-  plugins: [
-    history(),
-    keymap({ "Mod-z": undo, "Mod-y": redo }),
-    dropCursor(),
-
-    ...buildBlockPlugins([
-      taskList,
-      list,
-      marks,
-      heading,
-      hr,
-      blockQuote,
-      codeBlock,
-      link
-    ]),
-
-    tooltipPlugin([linkTooltip, inlineToolbar]),
-
-    placeholderPlugin()
-  ]
-};
 
 export const Editor: FC<IEditor> = props => {
   const { initState, onChange } = props;
@@ -61,28 +28,26 @@ export const Editor: FC<IEditor> = props => {
   const ref = useRef<HTMLDivElement>(null);
   const viewRef = useRef<null | EditorView>(null);
 
-  let state: EditorState;
-  /**
-   * check for invalid initState
-   */
-  try {
-    state = EditorState.fromJSON(stateConfig, JSON.parse(initState));
-  } catch (err) {
-    state = EditorState.create(stateConfig);
-  }
-
   const dispatchTransaction = (tr: Transaction) => {
-    state = state.apply(tr);
-    viewRef.current?.updateState(state);
+    if (viewRef.current) {
+      const newState = viewRef.current.state.apply(tr);
 
-    tr.docChanged && onChange(JSON.stringify(state.toJSON()));
+      viewRef.current.updateState(newState);
+      tr.docChanged && onChange(JSON.stringify(newState.toJSON()));
+    }
   };
 
-  /**
-   * Initialises editor
-   */
   useEffect(() => {
+    let state: EditorState;
+    try {
+      state = EditorState.fromJSON(stateConfig, JSON.parse(initState));
+    } catch (err) {
+      state = EditorState.create(stateConfig);
+    }
+
     if (ref.current) {
+      viewRef.current?.destroy();
+
       viewRef.current = new EditorView(ref.current, {
         state,
         nodeViews: buildViews([taskList]),
@@ -102,6 +67,30 @@ export const Editor: FC<IEditor> = props => {
   );
 };
 
+const stateConfig = {
+  schema,
+  plugins: [
+    history(),
+    keymap({ "Mod-z": undo, "Mod-y": redo }),
+    dropCursor(),
+
+    ...buildBlockPlugins([
+      taskList,
+      list,
+      marks,
+      heading,
+      hr,
+      blockQuote,
+      codeBlock,
+      link
+    ]),
+
+    // tooltipPlugin([linkTooltip, inlineToolbar]),
+
+    placeholderPlugin()
+  ]
+};
+
 /**
  * This is styled as opposed to the `EditorContainer`
  * to allows plugins like `tooltip` to position itself correctly.
@@ -112,8 +101,10 @@ const Container = styled.div`
   max-width: 720px;
   margin: auto;
   padding: 96px;
+  box-sizing: content-box;
+  padding-top: 24px;
 
-  @media screen and (max-width: 600px) {
+  @media screen and (max-width: 720px) {
     padding: 12px;
   }
 `;
