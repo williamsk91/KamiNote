@@ -12,10 +12,26 @@ export const editorStyles = css`
   ${placeholderPluginStyles}
 
   font-size: 16px;
+  color: rgb(55, 53, 47);
 
   p {
     margin: 0;
     padding: 3px 2px;
+  }
+
+  h1 {
+    font-size: 30px;
+    font-weight: 600;
+  }
+
+  h2 {
+    font-size: 24px;
+    font-weight: 600;
+  }
+
+  h3 {
+    font-size: 20px;
+    font-weight: 600;
   }
 
   code {

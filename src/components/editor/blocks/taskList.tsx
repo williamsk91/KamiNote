@@ -103,6 +103,7 @@ const StyledCheckbox = styled(Checkbox).attrs({
 })`
   position: absolute;
   right: calc(100% - 21px);
+  top: 0;
 `;
 
 export const taskListStyle = css`

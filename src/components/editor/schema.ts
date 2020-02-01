@@ -168,7 +168,7 @@ export const schema = new Schema({
       ],
       toDOM: node => ["span.color", { style: `color: ${node.attrs.color}` }]
     },
-    higlight: {
+    highlight: {
       attrs: { color: {} },
       parseDOM: [
         {
@@ -184,7 +184,7 @@ export const schema = new Schema({
         }
       ],
       toDOM: node => [
-        "span.higlight",
+        "span.highlight",
         { style: `background-color: ${node.attrs.color}` }
       ]
     },
