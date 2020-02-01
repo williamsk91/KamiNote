@@ -43,6 +43,8 @@ const Input = styled.input.attrs({
   type: "text",
   placeholder: "Untitled"
 })`
+  width: 100%;
+
   font-size: 40px;
   font-weight: 700;
 
