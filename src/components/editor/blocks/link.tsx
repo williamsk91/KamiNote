@@ -6,8 +6,6 @@ import { EditorState } from "prosemirror-state";
 import { EditorView } from "prosemirror-view";
 import styled from "styled-components";
 
-import { colors } from "components/styles/colors";
-
 import { IconButton } from "../../IconButton";
 import { Tooltip } from "../plugins/tooltip";
 import { schema } from "../schema";

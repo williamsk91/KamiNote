@@ -1,14 +1,13 @@
 import React, { FC } from "react";
 import { FiPlusSquare, FiTrash2 } from "react-icons/fi";
 import { useHistory } from "react-router-dom";
-import { Icon, Tag, Tree, Typography } from "antd";
+import { Icon, Tree, Typography } from "antd";
 import styled from "styled-components";
 
 import { pageUrl } from "routes/pagePath";
 
 import { IconButton } from "./IconButton";
 import { Header } from "./Layout";
-import { Spacer } from "./Spacer";
 import { colors } from "./styles/colors";
 
 interface IProp {
