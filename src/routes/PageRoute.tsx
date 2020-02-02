@@ -99,7 +99,6 @@ export const PageRoute = () => {
           updateSidebarTitleCache(id, newTitle);
         }}
         path={path}
-        saveStatus={saveStatus}
         content={content}
         onChange={newContent => {
           setSaveStatus(SaveStatus.Saving);
@@ -202,7 +201,6 @@ interface IProp {
   onTitleChange: (title: string) => void;
 
   path: string[];
-  saveStatus: SaveStatus;
 
   content: string;
   onChange: (content: string) => void;
@@ -221,7 +219,6 @@ const Page: FC<IProp> = props => {
     title,
     onTitleChange,
     content,
-    saveStatus,
     onChange,
     userPages,
     onAddPage,
@@ -247,11 +244,7 @@ const Page: FC<IProp> = props => {
       </PageSider>
       <PageMain collapsed={collapsed}>
         <PageHeader>
-          <Navbar
-            collapsed={collapsed}
-            setCollapsed={setCollapsed}
-            saveStatus={saveStatus}
-          />
+          <Navbar collapsed={collapsed} setCollapsed={setCollapsed} />
         </PageHeader>
         <PageContent>
           <PageTitleBlock title={title} onChange={onTitleChange} />

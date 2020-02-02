@@ -71,8 +71,6 @@ const Container = styled.div`
 `;
 
 const SidebarHeader = styled(Header)`
-  padding: 0px;
-
   background: ${p => p.theme.background.secondary};
 `;
 

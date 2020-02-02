@@ -2,27 +2,21 @@ import React, { FC } from "react";
 import { Icon } from "antd";
 import styled from "styled-components";
 
-import { SaveState, SaveStatus } from "./SaveState";
-
 interface IProp {
   collapsed: boolean;
   setCollapsed: (collapsed: boolean) => void;
-  saveStatus: SaveStatus;
 }
 
 export const Navbar: FC<IProp> = props => {
-  const { collapsed, setCollapsed, saveStatus } = props;
+  const { collapsed, setCollapsed } = props;
   return (
     <Container>
-      {collapsed ? (
+      {collapsed && (
         <OpenSidebar
           type="menu-unfold"
           onClick={() => setCollapsed(!collapsed)}
         />
-      ) : (
-        <div />
       )}
-      <SaveState saveStatus={saveStatus} />
     </Container>
   );
 };
@@ -33,7 +27,6 @@ const Container = styled.div`
   padding: 6px;
 
   display: flex;
-  justify-content: space-between;
   align-items: center;
 `;
 
