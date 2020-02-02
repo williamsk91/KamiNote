@@ -8,6 +8,7 @@ import { EditorView } from "prosemirror-view";
 import styled from "styled-components";
 
 import { blockQuote, codeBlock, heading, hr } from "./blocks/base";
+import { color, highlight } from "./blocks/color";
 import { link } from "./blocks/link";
 import { list } from "./blocks/list";
 import { marks } from "./blocks/marks";
@@ -86,7 +87,9 @@ const stateConfig = {
       hr,
       blockQuote,
       codeBlock,
-      link
+      link,
+      color,
+      highlight
     ]),
 
     // tooltipPlugin([linkTooltip, inlineToolbar]),
