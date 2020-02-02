@@ -7,6 +7,8 @@ import { markStyles } from "./blocks/marks";
 import { placeholderPluginStyles } from "./plugins/placeholder";
 
 export const editorStyles = css`
+  font-family: "Open Sans", sans-serif;
+
   & ::selection {
     background: rgba(45, 170, 219, 0.3);
   }
@@ -37,6 +39,8 @@ export const editorStyles = css`
   }
 
   code {
+    font-family: "Fira Mono", monospace;
+
     padding: 0 3px;
     border-radius: 3px;
 
@@ -48,6 +52,7 @@ export const editorStyles = css`
     background-color: ${colors.clouds};
     padding: 20px;
     code {
+      padding: 0;
       background-color: transparent;
     }
   }
