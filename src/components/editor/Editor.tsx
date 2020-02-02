@@ -62,11 +62,7 @@ export const Editor: FC<IEditor> = props => {
   }, []);
 
   return (
-    <Container
-      onClick={() => {
-        viewRef.current?.focus();
-      }}
-    >
+    <Container>
       <EditorContainer id="editor" ref={ref} />
     </Container>
   );
