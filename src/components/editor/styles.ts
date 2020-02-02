@@ -1,5 +1,7 @@
 import { css } from "styled-components";
 
+import { colors } from "components/styles/colors";
+
 import { listStyle } from "./blocks/list";
 import { markStyles } from "./blocks/marks";
 import { placeholderPluginStyles } from "./plugins/placeholder";
@@ -12,7 +14,7 @@ export const editorStyles = css`
   ${placeholderPluginStyles}
 
   font-size: 16px;
-  color: rgb(55, 53, 47);
+  color: ${p => p.theme.text.main};
 
   p {
     margin: 0;
@@ -38,12 +40,12 @@ export const editorStyles = css`
     padding: 0 3px;
     border-radius: 3px;
 
-    color: #eb5757;
-    background-color: rgba(135, 131, 120, 0.15);
+    color: ${colors.alizarin};
+    background-color: ${colors.clouds};
   }
 
   pre {
-    background-color: rgba(135, 131, 120, 0.15);
+    background-color: ${colors.clouds};
     padding: 20px;
     code {
       background-color: transparent;
@@ -53,7 +55,7 @@ export const editorStyles = css`
   hr {
     height: 1px;
     margin: 12px 0;
-    background-color: rgb(228, 227, 226);
+    background-color: ${colors.silver};
     border: none;
   }
 

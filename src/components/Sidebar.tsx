@@ -97,7 +97,7 @@ const SectionTitle = styled(Typography.Text)`
   padding-left: 5px;
   margin-left: 24px;
 
-  color: rgba(55, 53, 47, 0.4);
+  color: ${p => p.theme.text.disabled};
 `;
 
 const TreeNodeContainer = styled.div`

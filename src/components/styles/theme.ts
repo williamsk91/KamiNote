@@ -2,7 +2,11 @@ import { colors } from "./colors";
 
 export interface ITheme {
   name: Theme;
-  accent: string;
+  text: {
+    main: string;
+    accent: string;
+    disabled: string;
+  };
   background: {
     primary: string;
     secondary: string;
@@ -17,7 +21,11 @@ export enum Theme {
 /** light theme is also the dafault theme */
 const lightTheme: ITheme = {
   name: Theme.light,
-  accent: colors.turqoise,
+  text: {
+    main: "rgb(55, 53, 47)",
+    accent: colors.turqoise,
+    disabled: "#aaa"
+  },
   background: {
     primary: colors.silver,
     secondary: colors.beige,
