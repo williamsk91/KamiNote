@@ -1,0 +1,6 @@
+query GetUserPages {
+  getUserPages {
+    id
+    title
+  }
+}

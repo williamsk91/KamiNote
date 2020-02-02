@@ -98,6 +98,17 @@ export type DeletePageMutation = (
   & Pick<Mutation, 'deletePage'>
 );
 
+export type GetUserPagesQueryVariables = {};
+
+
+export type GetUserPagesQuery = (
+  { __typename?: 'Query' }
+  & { getUserPages: Array<(
+    { __typename?: 'Page' }
+    & Pick<Page, 'id' | 'title'>
+  )> }
+);
+
 export type GetPageQueryVariables = {
   id: Scalars['String']
 };
@@ -202,6 +213,39 @@ export function useDeletePageMutation(baseOptions?: ApolloReactHooks.MutationHoo
 export type DeletePageMutationHookResult = ReturnType<typeof useDeletePageMutation>;
 export type DeletePageMutationResult = ApolloReactCommon.MutationResult<DeletePageMutation>;
 export type DeletePageMutationOptions = ApolloReactCommon.BaseMutationOptions<DeletePageMutation, DeletePageMutationVariables>;
+export const GetUserPagesDocument = gql`
+    query GetUserPages {
+  getUserPages {
+    id
+    title
+  }
+}
+    `;
+
+/**
+ * __useGetUserPagesQuery__
+ *
+ * To run a query within a React component, call `useGetUserPagesQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetUserPagesQuery` returns an object from Apollo Client that contains loading, error, and data properties 
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetUserPagesQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetUserPagesQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<GetUserPagesQuery, GetUserPagesQueryVariables>) {
+        return ApolloReactHooks.useQuery<GetUserPagesQuery, GetUserPagesQueryVariables>(GetUserPagesDocument, baseOptions);
+      }
+export function useGetUserPagesLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<GetUserPagesQuery, GetUserPagesQueryVariables>) {
+          return ApolloReactHooks.useLazyQuery<GetUserPagesQuery, GetUserPagesQueryVariables>(GetUserPagesDocument, baseOptions);
+        }
+export type GetUserPagesQueryHookResult = ReturnType<typeof useGetUserPagesQuery>;
+export type GetUserPagesLazyQueryHookResult = ReturnType<typeof useGetUserPagesLazyQuery>;
+export type GetUserPagesQueryResult = ApolloReactCommon.QueryResult<GetUserPagesQuery, GetUserPagesQueryVariables>;
 export const GetPageDocument = gql`
     query GetPage($id: String!) {
   getPage(id: $id) {
