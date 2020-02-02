@@ -15,11 +15,11 @@ addParameters({
 });
 // add theme and padding
 addDecorator((storyFn, opts) => (
-  <Router>
-    <ThemeProvider theme={theme}>
+  <ThemeProvider theme={theme}>
+    <Router>
       <div style={{ padding: "18px" }}>{storyFn()}</div>
-    </ThemeProvider>
-  </Router>
+    </Router>
+  </ThemeProvider>
 ));
 
 configure(require.context("../src", true, /.stories.tsx?$/), module);

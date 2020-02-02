@@ -74,6 +74,8 @@ const Container = styled.div`
   height: 100%;
 
   background: ${p => p.theme.background.secondary};
+
+  border-right: 1px solid ${p => p.theme.text.accent};
 `;
 
 const SidebarHeader = styled(Header)`

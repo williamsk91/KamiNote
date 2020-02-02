@@ -10,7 +10,7 @@ export const editorStyles = css`
   font-family: "Open Sans", sans-serif;
 
   & ::selection {
-    background: rgba(45, 170, 219, 0.3);
+    background: ${p => p.theme.text.accent};
   }
 
   ${placeholderPluginStyles}
@@ -44,7 +44,7 @@ export const editorStyles = css`
     padding: 0 3px;
     border-radius: 3px;
 
-    color: ${colors.alizarin};
+    color: ${p => p.theme.text.accent};
     background-color: ${colors.clouds};
   }
 
@@ -60,7 +60,7 @@ export const editorStyles = css`
   hr {
     height: 1px;
     margin: 12px 0;
-    background-color: ${colors.silver};
+    background-color: ${p => p.theme.text.accent};
     border: none;
   }
 
@@ -69,7 +69,7 @@ export const editorStyles = css`
     font-size: 24px;
 
     padding-left: 12px;
-    border-left: 3px solid rgb(55, 53, 47);
+    border-left: 3px solid ${p => p.theme.text.accent};
   }
 
   ${listStyle}

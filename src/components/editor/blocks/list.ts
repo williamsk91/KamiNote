@@ -45,8 +45,9 @@ const splitList = (listType: NodeType) => (
   let tr = state.tr.deleteSelection();
   if (!canSplit(tr.doc, $from.pos, 1)) return false;
 
-  if ($from)
-    tr.split($from.pos, 1, [
+  let typesAfter = undefined;
+  if ($from.parent.type === state.schema.nodes.numberList) {
+    typesAfter = [
       {
         // if number list -> set order to undefined
         type: state.schema.nodes.numberList,
@@ -55,7 +56,10 @@ const splitList = (listType: NodeType) => (
           "data-level": $from.parent.attrs["data-level"]
         }
       }
-    ]).scrollIntoView();
+    ];
+  }
+
+  tr.split($from.pos, 1, typesAfter).scrollIntoView();
 
   if (dispatch) dispatch(tr);
   return true;
@@ -201,8 +205,10 @@ const listLevelStyle = Array.from(Array(MAX_INDENT + 1).keys()).reduce(
         }
       }
 
-      ul[data-level="${index}"]{
-        list-style-type: ${BULLET_TYPES[index % BULLET_TYPES.length]};
+      ul[data-level="${index}"] > li:before{
+        content: ${`counter( yo, ${
+          BULLET_TYPES[index % BULLET_TYPES.length]
+        })`};
       }
 
       ol[data-level="${index}"]{
@@ -250,6 +256,20 @@ export const listStyle = css`
   div.taskList {
     margin: 6px 0;
     padding: 0 0 0 24px;
+  }
+
+  ul {
+    list-style-type: none;
+    li:before {
+      position: absolute;
+      right: 100%;
+      text-align: right;
+      user-select: none;
+      padding-right: 9px;
+    }
+    li {
+      position: relative;
+    }
   }
 
   ol {

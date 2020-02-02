@@ -3,8 +3,6 @@ import { InputRule } from "prosemirror-inputrules";
 import { MarkType } from "prosemirror-model";
 import { css } from "styled-components";
 
-import { colors } from "components/styles/colors";
-
 import { schema } from "../schema";
 import { IBlock } from "./utils";
 
@@ -19,7 +17,7 @@ import { IBlock } from "./utils";
  *                      strike
  *                      code
  *
- * marks in another file:
+ * marks in another file (except for styles):
  *                      link
  *                      color
  *                      highlight
@@ -89,7 +87,7 @@ const keymaps = {
 
 export const markStyles = css`
   a {
-    color: ${colors.peterriver};
+    color: ${p => p.theme.text.accent};
   }
 `;
 
