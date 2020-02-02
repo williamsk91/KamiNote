@@ -16,7 +16,7 @@ export const IconButton = styled.button<{ active?: boolean }>`
   outline: none;
 
   :hover {
-    background: ${colors.clouds};
+    background: ${p => p.theme.background.action};
     cursor: pointer;
   }
 

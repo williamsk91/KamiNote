@@ -333,7 +333,7 @@ const NewHrefInput = styled.input`
   outline: none;
 
   :hover {
-    background: ${colors.clouds};
+    background: ${p => p.theme.background.action};
     cursor: text;
   }
 `;

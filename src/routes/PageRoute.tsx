@@ -1,6 +1,5 @@
 import React, { FC, useState } from "react";
 import { useHistory, useParams } from "react-router";
-import { Layout } from "antd";
 import styled from "styled-components";
 
 import { ErrorScreen } from "components/data/ErrorScreen";
@@ -8,7 +7,7 @@ import { LoadingScreen } from "components/data/LoadingScreen";
 import { Editor } from "components/editor/Editor";
 import { debounce } from "components/editor/utils/debounce";
 import { useSaveProtection } from "components/hooks/useSaveProtection";
-import { Content, Header, Sider } from "components/Layout";
+import { Content, Header, Layout, Sider } from "components/Layout";
 import { Navbar } from "components/Navbar";
 import { PageTitleBlock } from "components/PageTitle";
 import { SaveStatus } from "components/SaveState";
@@ -243,6 +242,7 @@ const Page: FC<IProp> = props => {
           pages={userPages}
           onAddPage={onAddPage}
           onDeletePage={onDeletePage}
+          closeSidebar={() => setCollapsed(true)}
         />
       </PageSider>
       <PageMain collapsed={collapsed}>
@@ -270,13 +270,20 @@ const PageSider = styled(Sider)`
 
   overflow: auto;
 
-  background: rgb(247, 246, 243);
+  @media screen and (max-width: 800px) {
+    position: absolute;
+    z-index: 2;
+  }
 `;
 
 const PageMain = styled(Layout)<{ collapsed: boolean }>`
   margin-left: ${p => `${p.collapsed ? 0 : 200}px`};
 
   height: 100vh;
+
+  @media screen and (max-width: 800px) {
+    margin-left: 0;
+  }
 `;
 
 const PageHeader = styled(Header)`

@@ -32,7 +32,7 @@
     "genGraphql": "graphql-codegen",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "storybook": "start-storybook -p 1000"
+    "storybook": "start-storybook -p 2000"
   },
   "eslintConfig": {
     "extends": "react-app"

@@ -13,5 +13,6 @@ export const sidebar = () => (
     ]}
     onAddPage={() => null}
     onDeletePage={() => null}
+    closeSidebar={() => null}
   />
 );

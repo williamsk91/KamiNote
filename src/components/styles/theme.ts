@@ -1,14 +1,13 @@
-import { Color } from "./colors";
+import { colors } from "./colors";
 
 export interface ITheme {
   name: Theme;
-  accent: Color;
+  accent: string;
   background: {
-    lighter: Color;
-    default: Color;
-    darker: Color;
+    primary: string;
+    secondary: string;
+    action: string;
   };
-  sidePadding: string;
 }
 
 export enum Theme {
@@ -17,16 +16,13 @@ export enum Theme {
 
 /** light theme is also the dafault theme */
 const lightTheme: ITheme = {
-  // styles
   name: Theme.light,
-  accent: "turqoise",
+  accent: colors.turqoise,
   background: {
-    lighter: "clouds",
-    default: "silver",
-    darker: "concrete"
-  },
-  // structure
-  sidePadding: "84px"
+    primary: colors.silver,
+    secondary: colors.beige,
+    action: colors.clouds
+  }
 };
 
 export const theme = lightTheme;

@@ -1,12 +1,14 @@
 import React, { FC } from "react";
 import { FiPlusSquare, FiTrash2 } from "react-icons/fi";
 import { useHistory } from "react-router-dom";
-import { Tree } from "antd";
+import { Icon, Tag, Tree, Typography } from "antd";
 import styled from "styled-components";
 
 import { pageUrl } from "routes/pagePath";
 
 import { IconButton } from "./IconButton";
+import { Header } from "./Layout";
+import { Spacer } from "./Spacer";
 import { colors } from "./styles/colors";
 
 interface IProp {
@@ -16,41 +18,88 @@ interface IProp {
   }[];
   onAddPage: () => void;
   onDeletePage: (pageId: string) => void;
+
+  closeSidebar: () => void;
 }
 
 export const Sidebar: FC<IProp> = props => {
-  const { pages, onAddPage, onDeletePage } = props;
+  const { pages, onAddPage, onDeletePage, closeSidebar } = props;
   const history = useHistory();
 
   return (
-    <Tree>
-      {pages.map(p => (
-        <Tree.TreeNode
-          key={p.id}
-          title={
-            <TreeNodeContainer>
-              <NodeText
-                onClick={() => {
-                  history.push(pageUrl(p.id));
-                }}
-              >
-                {p.title ? p.title : "Untitled"}
-              </NodeText>
-              <NodeIcons>
-                <IconButton onClick={onAddPage}>
-                  <FiPlusSquare />
-                </IconButton>
-                <IconButton onClick={() => onDeletePage(p.id)}>
-                  <FiTrash2 />
-                </IconButton>
-              </NodeIcons>
-            </TreeNodeContainer>
-          }
-        />
-      ))}
-    </Tree>
+    <Container>
+      <SidebarHeader>
+        <SidebarNavbar>
+          <CloseSidebar onClick={closeSidebar} />
+        </SidebarNavbar>
+      </SidebarHeader>
+      <SectionTitle>Pages</SectionTitle>
+      <Tree>
+        {pages.map(p => (
+          <Tree.TreeNode
+            selectable={false}
+            key={p.id}
+            title={
+              <TreeNodeContainer>
+                <NodeText
+                  onClick={() => {
+                    history.push(pageUrl(p.id));
+                  }}
+                >
+                  {p.title ? p.title : "Untitled"}
+                </NodeText>
+                <NodeIcons>
+                  <IconButton onClick={onAddPage}>
+                    <FiPlusSquare />
+                  </IconButton>
+                  <IconButton onClick={() => onDeletePage(p.id)}>
+                    <FiTrash2 />
+                  </IconButton>
+                </NodeIcons>
+              </TreeNodeContainer>
+            }
+          />
+        ))}
+      </Tree>
+    </Container>
   );
 };
+
+const Container = styled.div`
+  height: 100%;
+
+  background: ${p => p.theme.background.secondary};
+`;
+
+const SidebarHeader = styled(Header)`
+  padding: 0px;
+
+  background: ${p => p.theme.background.secondary};
+`;
+
+const SidebarNavbar = styled.div`
+  height: 100%;
+
+  padding: 6px;
+
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+`;
+
+const CloseSidebar = styled(Icon).attrs(() => ({
+  type: "menu-fold"
+}))`
+  font-size: 24px;
+`;
+
+const SectionTitle = styled(Typography.Text)`
+  text-transform: uppercase;
+  padding-left: 5px;
+  margin-left: 24px;
+
+  color: rgba(55, 53, 47, 0.4);
+`;
 
 const TreeNodeContainer = styled.div`
   position: relative;

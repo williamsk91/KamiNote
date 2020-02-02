@@ -4,7 +4,6 @@
  *  each color comes as a pair of lighter and darker version.
  *  src: https://www.materialui.co/flatuicolors
  */
-
 export const colors = {
   black: "#000",
   white: "#fff",
@@ -28,7 +27,9 @@ export const colors = {
   clouds: "#ecf0f1",
   silver: "#bdc3c7",
   concrete: "#95a5a6",
-  asbestos: "#7f8c8d"
+  asbestos: "#7f8c8d",
+
+  beige: "rgb(247, 246, 243)"
 };
 
 export type Color = keyof typeof colors;
