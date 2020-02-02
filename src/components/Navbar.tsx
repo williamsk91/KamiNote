@@ -11,12 +11,7 @@ export const Navbar: FC<IProp> = props => {
   const { collapsed, setCollapsed } = props;
   return (
     <Container>
-      {collapsed && (
-        <OpenSidebar
-          type="menu-unfold"
-          onClick={() => setCollapsed(!collapsed)}
-        />
-      )}
+      {collapsed && <OpenSidebar onClick={() => setCollapsed(!collapsed)} />}
     </Container>
   );
 };
@@ -31,7 +26,7 @@ const Container = styled.div`
 `;
 
 const OpenSidebar = styled(Icon).attrs(() => ({
-  type: "menu-unfold"
+  type: "double-right"
 }))`
   font-size: 24px;
 `;

@@ -91,7 +91,7 @@ const SidebarNavbar = styled.div`
 `;
 
 const CloseSidebar = styled(Icon).attrs(() => ({
-  type: "menu-fold"
+  type: "double-left"
 }))`
   font-size: 24px;
 `;
