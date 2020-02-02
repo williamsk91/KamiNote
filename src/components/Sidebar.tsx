@@ -1,7 +1,7 @@
 import React, { FC } from "react";
 import { FiPlusSquare, FiTrash2 } from "react-icons/fi";
 import { useHistory } from "react-router-dom";
-import { Icon, Tree, Typography } from "antd";
+import { Icon, Popconfirm, Tree, Typography } from "antd";
 import styled from "styled-components";
 
 import { pageUrl } from "routes/pagePath";
@@ -51,9 +51,15 @@ export const Sidebar: FC<IProp> = props => {
                   <IconButton onClick={onAddPage}>
                     <FiPlusSquare />
                   </IconButton>
-                  <IconButton onClick={() => onDeletePage(p.id)}>
-                    <FiTrash2 />
-                  </IconButton>
+                  <Popconfirm
+                    title="Delete page forever?"
+                    onConfirm={() => onDeletePage(p.id)}
+                    placement="right"
+                  >
+                    <IconButton>
+                      <FiTrash2 />
+                    </IconButton>
+                  </Popconfirm>
                 </NodeIcons>
               </TreeNodeContainer>
             }
