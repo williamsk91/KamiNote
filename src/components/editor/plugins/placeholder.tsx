@@ -43,6 +43,7 @@ export const placeholderPlugin = () =>
 const placeholderPluginNodeContent = (tag: string, text: string) => css`
   ${tag}.p-empty-focus::before {
     content: "${text}";
+    z-index: 0;
   }
 `;
 
