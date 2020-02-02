@@ -21,7 +21,8 @@ import { IBlock } from "./utils";
  *
  * marks in another file:
  *                      link
- *
+ *                      color
+ *                      highlight
  */
 
 // ------------------------- Input Rules -------------------------

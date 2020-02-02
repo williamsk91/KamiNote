@@ -8,6 +8,7 @@ import { EditorView } from "prosemirror-view";
 import styled from "styled-components";
 
 import { blockQuote, codeBlock, heading, hr } from "./blocks/base";
+import { color, highlight } from "./blocks/color";
 import { link } from "./blocks/link";
 import { list } from "./blocks/list";
 import { marks } from "./blocks/marks";
@@ -61,7 +62,11 @@ export const Editor: FC<IEditor> = props => {
   }, []);
 
   return (
-    <Container>
+    <Container
+      onClick={() => {
+        viewRef.current?.focus();
+      }}
+    >
       <EditorContainer id="editor" ref={ref} />
     </Container>
   );
@@ -82,7 +87,9 @@ const stateConfig = {
       hr,
       blockQuote,
       codeBlock,
-      link
+      link,
+      color,
+      highlight
     ]),
 
     // tooltipPlugin([linkTooltip, inlineToolbar]),

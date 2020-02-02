@@ -14,10 +14,14 @@ export const Navbar: FC<IProp> = props => {
   const { collapsed, setCollapsed, saveStatus } = props;
   return (
     <Container>
-      <Icon
-        type={collapsed ? "menu-unfold" : "menu-fold"}
-        onClick={() => setCollapsed(!collapsed)}
-      />
+      {collapsed ? (
+        <OpenSidebar
+          type="menu-unfold"
+          onClick={() => setCollapsed(!collapsed)}
+        />
+      ) : (
+        <div />
+      )}
       <SaveState saveStatus={saveStatus} />
     </Container>
   );
@@ -31,4 +35,10 @@ const Container = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
+`;
+
+const OpenSidebar = styled(Icon).attrs(() => ({
+  type: "menu-unfold"
+}))`
+  font-size: 24px;
 `;

@@ -43,6 +43,7 @@ export const placeholderPlugin = () =>
 const placeholderPluginNodeContent = (tag: string, text: string) => css`
   ${tag}.p-empty-focus::before {
     content: "${text}";
+    z-index: 0;
   }
 `;
 
@@ -50,7 +51,7 @@ export const placeholderPluginStyles = css`
   .p-empty-focus {
     ::before {
       position: absolute;
-      color: #aaa;
+      color: ${p => p.theme.text.disabled};
       cursor: text;
       /* place the text behind text cursor */
       z-index: -1;

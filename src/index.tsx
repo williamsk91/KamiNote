@@ -2,17 +2,22 @@ import React from "react";
 import ReactDOM from "react-dom";
 import { BrowserRouter as Router } from "react-router-dom";
 import { ApolloProvider } from "@apollo/react-hooks";
+import { ThemeProvider } from "styled-components";
+
+import { theme } from "components/styles/theme";
 
 import App from "./App";
 import { apolloClient } from "./graphql/client";
 import * as serviceWorker from "./serviceWorker";
 
 ReactDOM.render(
-  <ApolloProvider client={apolloClient}>
-    <Router>
-      <App />
-    </Router>
-  </ApolloProvider>,
+  <ThemeProvider theme={theme}>
+    <ApolloProvider client={apolloClient}>
+      <Router>
+        <App />
+      </Router>
+    </ApolloProvider>
+  </ThemeProvider>,
   document.getElementById("root")
 );
 

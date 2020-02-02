@@ -112,7 +112,7 @@ export const taskListStyle = css`
 
     &[data-checked="true"] {
       text-decoration: line-through;
-      color: #aaa;
+      color: ${p => p.theme.text.disabled};
     }
   }
 `;

@@ -1,3 +1,7 @@
+import { InputRule } from "prosemirror-inputrules";
+
+import { IBlock } from "./utils";
+
 // ------------------------- Pallete -------------------------
 
 export const colorPallete = {
@@ -25,3 +29,85 @@ export const highlightPallete = {
 export type HighlightPallete = keyof typeof highlightPallete;
 
 // -------------------- Commands --------------------
+
+// -------------------- Input Rule --------------------
+
+/**
+ * {c:color}
+ */
+const colorInputRule = new InputRule(
+  /{c:([^`]+)}$/,
+  (state, match, start, end) => {
+    const { tr } = state;
+    const color = match[1];
+
+    // check that color exists
+    if (!(color === "clear") && !(color in colorPallete)) return null;
+
+    tr.delete(start, end);
+
+    // color the whole node
+    const resolvedStart = state.doc.resolve(start);
+    const nodeStart = start - resolvedStart.parentOffset;
+    const nodeEnd =
+      nodeStart + resolvedStart.parent.textContent.length - (color.length + 1);
+
+    if (color === "clear") {
+      return tr.removeMark(nodeStart, nodeEnd, state.schema.marks.color);
+    }
+
+    return tr.addMark(
+      nodeStart,
+      nodeEnd,
+      state.schema.marks.color.create({
+        color: colorPallete[color as ColorPallete]
+      })
+    );
+  }
+);
+
+/**
+ * {h:highlight}
+ */
+const highlightInputRule = new InputRule(
+  /{h:([^`]+)}$/,
+  (state, match, start, end) => {
+    const { tr } = state;
+    const color = match[1];
+
+    // check that color exists
+    if (!(color === "clear") && !(color in highlightPallete)) return null;
+
+    tr.delete(start, end);
+
+    // highlight the whole node
+    const resolvedStart = state.doc.resolve(start);
+    const nodeStart = start - resolvedStart.parentOffset;
+    const nodeEnd =
+      nodeStart + resolvedStart.parent.textContent.length - (color.length + 1);
+
+    if (color === "clear") {
+      return tr.removeMark(nodeStart, nodeEnd, state.schema.marks.highlight);
+    }
+
+    return tr.addMark(
+      nodeStart,
+      nodeEnd,
+      state.schema.marks.highlight.create({
+        color: highlightPallete[color as HighlightPallete]
+      })
+    );
+  }
+);
+
+// ------------------------- Export -------------------------
+
+export const color: IBlock = {
+  name: "color",
+  inputRules: [colorInputRule]
+};
+
+export const highlight: IBlock = {
+  name: "highlight",
+  inputRules: [highlightInputRule]
+};
