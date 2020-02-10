@@ -12,6 +12,8 @@ export const Sider = styled(AntdLayout.Sider).attrs({
 
 export const Header = styled(AntdLayout.Header)`
   height: 45px;
+  padding: 0;
+
   background: white;
 `;
 

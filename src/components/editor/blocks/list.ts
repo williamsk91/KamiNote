@@ -45,7 +45,21 @@ const splitList = (listType: NodeType) => (
   let tr = state.tr.deleteSelection();
   if (!canSplit(tr.doc, $from.pos, 1)) return false;
 
-  tr.split($from.pos, 1).scrollIntoView();
+  let typesAfter = undefined;
+  if ($from.parent.type === state.schema.nodes.numberList) {
+    typesAfter = [
+      {
+        // if number list -> set order to undefined
+        type: state.schema.nodes.numberList,
+        attrs: {
+          order: undefined,
+          "data-level": $from.parent.attrs["data-level"]
+        }
+      }
+    ];
+  }
+
+  tr.split($from.pos, 1, typesAfter).scrollIntoView();
 
   if (dispatch) dispatch(tr);
   return true;
@@ -59,11 +73,26 @@ const adjustListLevel = (
   let dispatched = false;
 
   const tr = state.tr;
+
   state.doc.nodesBetween(from, to, (node, pos) => {
     if (listTypes.includes(node.type)) {
+      /**
+       * Special order attr for number list
+       */
+      const attrs = node.attrs;
+      if (node.type === state.schema.nodes.numberList) {
+        if (node.attrs["data-level"] < adjustedLevel(node)) {
+          // add order when indenting
+          attrs.order = 1;
+        } else {
+          // remove order when outdenting
+          attrs.order = undefined;
+        }
+      }
+
       dispatched = true;
       tr.setNodeMarkup(pos, undefined, {
-        ...node.attrs,
+        ...attrs,
         "data-level": adjustedLevel(node)
       });
     }
@@ -153,6 +182,7 @@ const keymaps = {
 };
 
 // ------------------------- Style -------------------------
+const MAX_INDENT = 8;
 
 const BULLET_TYPES = ["disc", "circle", "square"];
 const NUMBER_TYPES = ["decimal", "lower-alpha", "lower-roman"];
@@ -162,25 +192,45 @@ const NUMBER_TYPES = ["decimal", "lower-alpha", "lower-roman"];
  *    - indentation
  *    - list-style-type
  */
-const listLevelStyle = (indent: number) => css`
-  ul,
-  ol,
-  div.taskList {
-    &[data-level="${indent}"] {
-      margin-left: ${`${24 * indent}px`};
-    }
-  }
+const listLevelStyle = Array.from(Array(MAX_INDENT + 1).keys()).reduce(
+  (acc, index) => {
+    return css`
+      ${acc}
+      
+      ul,
+      ol,
+      div.taskList {
+        &[data-level="${index}"] {
+          margin-left: ${`${24 * index}px`};
+        }
+      }
 
-  ul[data-level="${indent}"]{
-    list-style-type: ${BULLET_TYPES[indent % BULLET_TYPES.length]}
-  }
+      ul[data-level="${index}"] > li:before{
+        content: ${`counter( yo, ${
+          BULLET_TYPES[index % BULLET_TYPES.length]
+        })`};
+      }
 
-  ol[data-level="${indent}"]{
-    list-style-type: ${NUMBER_TYPES[indent % NUMBER_TYPES.length]}
-  }
+      ol[data-level="${index}"]{
+        --counter-name: ${`counter-${index}`};
+      }
 
-  
-`;
+      /** Applies a counter's value to the list item's :before element */
+      ol[data-level="${index}"] > li:before {
+        content: ${`counter( var(--counter-name), ${
+          NUMBER_TYPES[index % NUMBER_TYPES.length]
+        } )". "`};
+      }
+
+      /** Increase a counter's value by 1 :after each list item */
+      ol[data-level="${index}"] > li:after {
+        content: "";
+        counter-increment: var(--counter-name);
+      }
+    `;
+  },
+  css``
+);
 
 // -------------------- Export --------------------
 
@@ -208,17 +258,38 @@ export const listStyle = css`
     padding: 0 0 0 24px;
   }
 
-  ${taskListStyle}
-  
-  /* indentation */
-  ${listLevelStyle(0)}
-  ${listLevelStyle(1)}
-  ${listLevelStyle(2)}
-  ${listLevelStyle(3)}
-  ${listLevelStyle(4)}
-  ${listLevelStyle(5)}
-  ${listLevelStyle(6)}
-  ${listLevelStyle(7)}
-  ${listLevelStyle(8)}
+  ul {
+    list-style-type: none;
+    li:before {
+      position: absolute;
+      right: 100%;
+      text-align: right;
+      user-select: none;
+      padding-right: 9px;
+    }
+    li {
+      position: relative;
+    }
+  }
 
+  ol {
+    list-style-type: none;
+    li:before {
+      position: absolute;
+      right: 100%;
+      text-align: right;
+      user-select: none;
+      padding-right: 9px;
+    }
+    li {
+      position: relative;
+    }
+  }
+
+  ${taskListStyle}
+
+  ${listLevelStyle}
+  ol[data-list-reset="true"] {
+    counter-reset: ${`var(--counter-name) var(--start-at, 1)`};
+  }
 `;

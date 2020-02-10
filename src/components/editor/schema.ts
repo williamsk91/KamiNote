@@ -74,29 +74,28 @@ export const schema = new Schema({
     numberList: {
       group: "block",
       content: "inline*",
-      attrs: { order: { default: 1 }, "data-level": { default: 0 } },
+      attrs: { order: { default: undefined }, "data-level": { default: 0 } },
       defining: true,
       parseDOM: [
         {
           tag: "ol",
           getAttrs: (node: any) => ({
             "data-level": getListDataLevel(node),
-            order: node.hasAttribute("start") ? +node.getAttribute("start") : 1
+            order: node.hasAttribute("start")
+              ? +node.getAttribute("start")
+              : undefined
           })
         }
       ],
       toDOM: node => {
-        const start = node.attrs.order !== 1 && {
-          start: node.attrs.order
+        const attrs = {
+          "data-level": node.attrs["data-level"],
+          ...(node.attrs.order && {
+            style: `--start-at: ${node.attrs.order}`,
+            "data-list-reset": "true"
+          })
         };
-        return [
-          "ol",
-          {
-            "data-level": node.attrs["data-level"],
-            ...start
-          },
-          ["li", 0]
-        ];
+        return ["ol", attrs, ["li", 0]];
       }
     },
     bulletList: {
