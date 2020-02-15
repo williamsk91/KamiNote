@@ -69,6 +69,7 @@ The editor is made using [Prosemirror](https://prosemirror.net/) and currently s
 _italic_ italic
 --strike-- strike
 `code` code
+[link](url) link
 
 {c:color} color
 {h:color} highlight

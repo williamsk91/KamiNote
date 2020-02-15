@@ -30,7 +30,7 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "genGraphql": "graphql-codegen",
+    "codegen": "graphql-codegen",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "storybook": "start-storybook -p 2000"
