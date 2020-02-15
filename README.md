@@ -1,44 +1,83 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+# KamiNote
 
-## Available Scripts
+KamiNote is the frontend codebase for Kaminote project.
 
-In the project directory, you can run:
+# Stack
 
-### `npm start`
+- Language - [Typescript](https://www.typescriptlang.org/)
+- Framework - React ([CRA](https://create-react-app.dev/))
+- GraphQL - [Apollo](https://www.apollographql.com/docs/react/api/react-apollo/)
+- Styling - [styled-components](https://styled-components.com/)
+- Editor - [Prosemirror](https://prosemirror.net/)
 
-Runs the app in the development mode.<br>
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+# Getting started
 
-The page will reload if you make edits.<br>
-You will also see any lint errors in the console.
+The following will set you up for development.
 
-### `npm test`
+## Installation
 
-Launches the test runner in the interactive watch mode.<br>
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+First, install dependencies
 
-### `npm run build`
+```
+yarn
+```
 
-Builds the app for production to the `build` folder.<br>
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## Start development
 
-The build is minified and the filenames include the hashes.<br>
-Your app is ready to be deployed!
+This will launch the website in [http://localhost:3000/](http://localhost:3000/)
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+```
+yarn start
+```
 
-### `npm run eject`
+## Component library
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+Component library, including documentation is set up using [Storybook](https://storybook.js.org/)
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+```
+yarn storybook
+```
 
-Instead, it will copy all the configuration files and the transitive dependencies (Webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+## GraphQL typings
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+GraphQL typing should not be done manually, instead be generated using [codegen](https://graphql-code-generator.com/)
 
-## Learn More
+```
+yarn codegen
+```
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+Note: Ink (backend codebase) has to also be up (see `codegen.yml`)
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+# Editor
+
+The editor is made using [Prosemirror](https://prosemirror.net/) and currently supports many custom nodes and marks accessible through [Markdown](https://www.markdownguide.org/basic-syntax/) syntax.
+
+````
+# Heading 1
+## Heading 2
+### Heading 3
+
+--- Divider
+``` Code Block
+> Blockquote
+
+[] Checklist
+- Bullet List
+1. Number List (or, any number + ".")
+
+*bold* bold
+_italic_ italic
+--strike-- strike
+`code` code
+
+{c:color} color
+{h:color} highlight
+note: color can be one of the following red, orange, yellow, green, blue, purple, pink
+
+````
+
+# Deployment
+
+Master branch is automatically deployed using Github action. It is deployed to [AWS S3](https://aws.amazon.com/s3/) bucket and distributed using [AWS Cloudfront](https://aws.amazon.com/cloudfront/) under [https://app.kaminote.io/](https://app.kaminote.io/).
+
+See `.github/workflows/cicd.yml` for more information.
