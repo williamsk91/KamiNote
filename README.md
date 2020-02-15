@@ -5,7 +5,7 @@ KamiNote is the frontend codebase for Kaminote project.
 # Stack
 
 - Language - [Typescript](https://www.typescriptlang.org/)
-- Framework - React ([CRA](https://create-react-app.dev/))
+- Framework - [React](https://reactjs.org/) ([CRA](https://create-react-app.dev/))
 - GraphQL - [Apollo](https://www.apollographql.com/docs/react/api/react-apollo/)
 - Styling - [styled-components](https://styled-components.com/)
 - Editor - [Prosemirror](https://prosemirror.net/)
@@ -76,6 +76,8 @@ _italic_ italic
 note: color can be one of the following red, orange, yellow, green, blue, purple, pink
 
 ````
+
+The editor is currently under heavy development. Many features such as advanced tables, dates, and collaborative editing will come one by one. See [Editor project board](https://github.com/williamsk91/KamiNote/projects/1) for more information.
 
 # Deployment
 
