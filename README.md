@@ -24,7 +24,7 @@ yarn
 
 ## Start development
 
-This will launch the website in [http://localhost:3000/](http://localhost:3000/)
+This will launch at [http://localhost:3000/](http://localhost:3000/)
 
 ```
 yarn start
