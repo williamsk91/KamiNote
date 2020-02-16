@@ -25,6 +25,12 @@ import {
 
 import { pageUrl } from "./pagePath";
 
+/**
+ * PageRoute is used to display a specific page to a user.
+ *
+ * If the user is authorised, he can also make changes to the page.
+ * There is also a sidebar listing all the current user's pages.
+ */
 export const PageRoute = () => {
   const { id } = useParams<{ id: string }>();
   const history = useHistory();

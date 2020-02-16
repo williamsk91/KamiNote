@@ -59,6 +59,7 @@ export const Editor: FC<IEditor> = props => {
         applyDevTools(viewRef.current);
       }
     }
+    // eslint-disable-next-line
   }, []);
 
   return (

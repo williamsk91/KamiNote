@@ -9,6 +9,9 @@ import { useGetUserPagesQuery } from "graphql/generatedGraphql";
 import { loginPath } from "./loginPath";
 import { pageUrl } from "./pagePath";
 
+/**
+ * IndexRoute is used to redirect user depending on their log in state.
+ */
 export const IndexRoute = () => {
   const history = useHistory();
 

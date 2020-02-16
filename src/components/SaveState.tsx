@@ -11,6 +11,9 @@ interface IProp {
   saveStatus: SaveStatus;
 }
 
+/**
+ * SaveState is the UI component to display `SaveStatus`.
+ */
 export const SaveState: FC<IProp> = props => {
   const { saveStatus } = props;
 

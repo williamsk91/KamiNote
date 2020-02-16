@@ -2,6 +2,9 @@ import React, { FC } from "react";
 import { Button, Card } from "antd";
 import styled from "styled-components";
 
+/**
+ * Login route is used to authenticate a user
+ */
 export const LoginRoute = () => {
   return (
     <Login

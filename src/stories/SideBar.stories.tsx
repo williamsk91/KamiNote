@@ -2,7 +2,7 @@ import React from "react";
 
 import { Sidebar } from "components/Sidebar";
 
-export default { title: "Sidebar", component: Sidebar };
+export default { title: "Page|Sidebar", component: Sidebar };
 
 export const sidebar = () => (
   <Sidebar

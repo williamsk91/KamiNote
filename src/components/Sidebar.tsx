@@ -21,6 +21,10 @@ interface IProp {
   closeSidebar: () => void;
 }
 
+/**
+ * Sidebar is layout level component used to display secondary information.
+ * It is collapsible.
+ */
 export const Sidebar: FC<IProp> = props => {
   const { pages, onAddPage, onDeletePage, closeSidebar } = props;
   const history = useHistory();

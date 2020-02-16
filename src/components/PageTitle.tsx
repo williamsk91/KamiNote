@@ -6,6 +6,10 @@ interface IProp {
   onChange: (title: string) => void;
 }
 
+/**
+ * PageTitleBlock is a styled native `input` tag used to get a page title.
+ * It has a placeholder when it is empty.
+ */
 export const PageTitleBlock: FC<IProp> = props => {
   const { title, onChange } = props;
 
