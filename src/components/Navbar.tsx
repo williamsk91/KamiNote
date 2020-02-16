@@ -7,6 +7,9 @@ interface IProp {
   setCollapsed: (collapsed: boolean) => void;
 }
 
+/**
+ * Navbar displays sidebar collapsed state.
+ */
 export const Navbar: FC<IProp> = props => {
   const { collapsed, setCollapsed } = props;
   return (

@@ -15,7 +15,9 @@ import { insertLink } from "../blocks/link";
 import { Tooltip } from "../plugins/tooltip";
 
 /**
- * Displays a toolbar
+ * A text editor toolbar suitable for editing inline contents.
+ * Therefore, it mainly provide commands for editing marks such as
+ * bold, italic, and link.
  */
 export const inlineToolbar: Tooltip = view => {
   // empty

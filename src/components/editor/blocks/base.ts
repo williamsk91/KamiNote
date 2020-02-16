@@ -56,8 +56,6 @@ const blockQuoteRule = (nodeType: NodeType) =>
 const codeBlockRule = (nodeType: NodeType) =>
   textblockTypeInputRule(/^```$/, nodeType);
 
-// -------------------- Keymaps --------------------
-
 // -------------------- Export --------------------
 
 export const heading: IBlock = {

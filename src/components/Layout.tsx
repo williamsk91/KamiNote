@@ -1,6 +1,10 @@
 import { Layout as AntdLayout } from "antd";
 import styled from "styled-components";
 
+/**
+ * Common layout components to easily structure pages
+ */
+
 export const Layout = styled(AntdLayout)`
   background: white;
   height: 100%;

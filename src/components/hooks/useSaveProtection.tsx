@@ -2,6 +2,9 @@ import { useEffect } from "react";
 
 let UNSAFE_IS_SAVING: boolean;
 
+/**
+ * Prevent browser tab from closing by displaying browser's alert box.
+ */
 function preventUnload(event: BeforeUnloadEvent) {
   if (UNSAFE_IS_SAVING) {
     const confirmation = `

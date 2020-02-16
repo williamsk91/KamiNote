@@ -8,6 +8,9 @@ interface IProp {
   className?: string;
 }
 
+/**
+ * A simple controlled Checkbox
+ */
 export const Checkbox: FC<IProp> = props => {
   const { checked, onClick, className } = props;
 

@@ -4,6 +4,9 @@ const errorMessages = {
   notSignedIn: "user is not signed in"
 };
 
+/**
+ * Apollo client to make GraphQL queries to backend
+ */
 export const apolloClient = new ApolloClient({
   uri: process.env.REACT_APP_GRAPHQL_SERVER_URI,
   credentials: "include",

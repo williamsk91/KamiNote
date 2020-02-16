@@ -9,6 +9,9 @@ import {
 
 // ------------------------- Schema -------------------------
 
+/**
+ * Allowed Nodes Schema for `Editor`
+ */
 export const schema = new Schema({
   nodes: {
     doc: { content: "block+" },

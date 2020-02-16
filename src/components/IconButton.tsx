@@ -2,6 +2,9 @@ import styled from "styled-components";
 
 import { colors } from "components/styles/colors";
 
+/**
+ * Button with an icon
+ */
 export const IconButton = styled.button<{ active?: boolean }>`
   width: 24px;
   height: 24px;

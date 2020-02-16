@@ -23,6 +23,9 @@ export interface IEditor {
   onChange: (content: string) => void;
 }
 
+/**
+ * Main WYSIWYM (What You See Is What You Mean) text editor.
+ */
 export const Editor: FC<IEditor> = props => {
   const { initState, onChange } = props;
 
@@ -88,8 +91,6 @@ const stateConfig = {
       color,
       highlight
     ]),
-
-    // tooltipPlugin([linkTooltip, inlineToolbar]),
 
     placeholderPlugin()
   ]

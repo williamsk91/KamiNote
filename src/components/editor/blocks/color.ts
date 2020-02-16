@@ -28,8 +28,6 @@ export const highlightPallete = {
 
 export type HighlightPallete = keyof typeof highlightPallete;
 
-// -------------------- Commands --------------------
-
 // -------------------- Input Rule --------------------
 
 /**
