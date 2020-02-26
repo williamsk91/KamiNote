@@ -6,6 +6,7 @@ import { ErrorScreen } from "components/data/ErrorScreen";
 import { LoadingScreen } from "components/data/LoadingScreen";
 import { Editor } from "components/editor/Editor";
 import { debounce } from "components/editor/utils/debounce";
+import { Guide } from "components/Guide";
 import { useSaveProtection } from "components/hooks/useSaveProtection";
 import { Content, Header, Layout, Sider } from "components/Layout";
 import { Navbar } from "components/Navbar";
@@ -234,30 +235,33 @@ const Page: FC<IProp> = props => {
   const [collapsed, setCollapsed] = useState(false);
 
   return (
-    <Layout>
-      <PageSider
-        collapsible
-        trigger={null}
-        collapsedWidth={0}
-        collapsed={collapsed}
-      >
-        <Sidebar
-          pages={userPages}
-          onAddPage={onAddPage}
-          onDeletePage={onDeletePage}
-          closeSidebar={() => setCollapsed(true)}
-        />
-      </PageSider>
-      <PageMain collapsed={collapsed}>
-        <PageHeader>
-          <Navbar collapsed={collapsed} setCollapsed={setCollapsed} />
-        </PageHeader>
-        <PageContent>
-          <PageTitleBlock title={title} onChange={onTitleChange} />
-          <Editor key={id} initState={content} onChange={onChange} />
-        </PageContent>
-      </PageMain>
-    </Layout>
+    <>
+      <Layout>
+        <PageSider
+          collapsible
+          trigger={null}
+          collapsedWidth={0}
+          collapsed={collapsed}
+        >
+          <Sidebar
+            pages={userPages}
+            onAddPage={onAddPage}
+            onDeletePage={onDeletePage}
+            closeSidebar={() => setCollapsed(true)}
+          />
+        </PageSider>
+        <PageMain collapsed={collapsed}>
+          <PageHeader>
+            <Navbar collapsed={collapsed} setCollapsed={setCollapsed} />
+          </PageHeader>
+          <PageContent>
+            <PageTitleBlock title={title} onChange={onTitleChange} />
+            <Editor key={id} initState={content} onChange={onChange} />
+          </PageContent>
+        </PageMain>
+      </Layout>
+      <Guide />
+    </>
   );
 };
 
