@@ -2,6 +2,10 @@
 
 KamiNote is the frontend codebase for Kaminote project.
 
+Server code: github.com/williamsk91/Ink
+
+
+
 # Stack
 
 - Language - [Typescript](https://www.typescriptlang.org/)
