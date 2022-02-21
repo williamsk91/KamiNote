@@ -2,7 +2,9 @@
 
 KamiNote is the frontend codebase for Kaminote project.
 
-Server code: github.com/williamsk91/Ink
+Server code: [Ink](https://github.com/williamsk91/Ink)
+
+![edit page](https://user-images.githubusercontent.com/25893551/155017506-5b8ba3dd-7171-4749-89c9-15b17b701b76.png)
 
 
 
